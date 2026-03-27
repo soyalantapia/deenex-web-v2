@@ -402,7 +402,7 @@
 
             <!-- Contenedor general que scrollea -->
             <div
-              class="flex-1 min-h-0 flex flex-col lg:flex-row w-full overflow-y-auto lg:overflow-hidden scrollbar-hide"
+              class="flex-1 min-h-0 flex flex-col lg:flex-row w-full overflow-y-auto lg:overflow-hidden"
             >
               <!-- ── Columna Izquierda: Configuración ── -->
               <div
@@ -423,10 +423,13 @@
                     <div class="bg-slate-50 rounded-3xl p-6 border border-slate-100">
                       <div class="flex items-center justify-between mb-4">
                         <div class="flex items-center gap-2">
-                          <span
-                            class="text-4xl font-black text-primary tabular-nums tracking-tighter"
-                            >{{ locales }}</span
-                          >
+                          <input
+                            type="number"
+                            v-model.number="locales"
+                            class="text-4xl font-black text-primary bg-transparent border-none outline-none w-24 tabular-nums tracking-tighter hover:bg-slate-100/50 focus:bg-white rounded-lg px-2 transition-colors"
+                            min="1"
+                            max="500"
+                          />
                           <span class="text-sm font-semibold text-slate-500"
                             >local{{ locales > 1 ? 'es' : '' }}</span
                           >
@@ -723,7 +726,7 @@
                     </div>
 
                     <!-- Totales -->
-                    <div class="bg-slate-900 p-5 text-white">
+                    <div class="bg-primary p-5 text-white">
                       <div class="flex items-end justify-between mb-1">
                         <div>
                           <p

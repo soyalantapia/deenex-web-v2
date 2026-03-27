@@ -94,7 +94,7 @@ const leftFeatures = [
   { 
     label: 'Red Unificada', 
     title: 'CLEARING UNIFICADO', 
-    desc: 'Toda la información y perfiles de tus clientes bajo control total de la marca.' 
+    desc: 'Sistema de liquidación de saldos entre locales por beneficios dados en un Punto de Venta y usados en otro.' 
   }
 ]
 
