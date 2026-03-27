@@ -89,7 +89,7 @@ const leftFeatures = [
   { 
     label: 'Soberanía', 
     title: 'CRM y DATOS', 
-    desc: 'Fomentá la lealtad con beneficios exclusivos y niveles VIP 100% automáticos.' 
+    desc: 'Accedé a perfiles únicos de cada cliente: valor de vida, historial de pedidos, actividad y categorías segmentadas de forma automática.' 
   },
   { 
     label: 'Red Unificada', 

@@ -299,9 +299,16 @@
             <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">
               2. USD 45 INICIAL
             </p>
-            <div class="flex items-baseline gap-2 mb-1">
-              <p class="text-xl font-bold text-slate-900">USD 45</p>
-              <span class="text-slate-400 text-sm font-normal">/ mes</span>
+            <div class="flex items-center flex-wrap gap-2 mb-3">
+              <div class="flex items-baseline gap-1">
+                <p class="text-xl font-bold text-slate-900">USD 45</p>
+                <span class="text-slate-400 text-sm font-normal">/ mes</span>
+              </div>
+              <span
+                class="bg-indigo-50 border border-indigo-100 text-indigo-600 text-[10px] font-bold px-2 py-0.5 rounded-full"
+              >
+                INCLUYE 1000 CREDITOS
+              </span>
             </div>
             <!-- Descuento badge -->
             <div
@@ -327,9 +334,16 @@
             <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">
               3. USD 200 AVANZADO
             </p>
-            <div class="flex items-baseline gap-2 mb-1">
-              <p class="text-xl font-bold text-slate-900">USD 200</p>
-              <span class="text-slate-400 text-sm font-normal">/ mes</span>
+            <div class="flex items-center flex-wrap gap-2 mb-3">
+              <div class="flex items-baseline gap-1">
+                <p class="text-xl font-bold text-slate-900">USD 200</p>
+                <span class="text-slate-400 text-sm font-normal">/ mes</span>
+              </div>
+              <span
+                class="bg-emerald-50 border border-emerald-100 text-emerald-600 text-[10px] font-bold px-2 py-0.5 rounded-full"
+              >
+                INCLUYE 5000 CREDITOS
+              </span>
             </div>
             <!-- Descuento badge -->
             <div
@@ -347,6 +361,17 @@
               Ideal para marcas con más volumen, campañas frecuentes, reactivación y recurrencia.
             </p>
           </div>
+        </div>
+        <!-- Botón Marketing WhatsApp -->
+        <div class="px-7 py-8 bg-white border-t border-slate-100 flex justify-center">
+          <a
+            :href="`https://wa.me/${whatsappNumber}?text=${marketingWhatsappMessage}`"
+            target="_blank"
+            class="group inline-flex items-center gap-2 bg-primary hover:bg-[#3c1fc9] text-white px-6 py-2.5 rounded-xl font-bold text-sm transition-all shadow-md shadow-primary/25 hover:shadow-primary/40 hover:-translate-y-0.5 relative overflow-hidden uppercase"
+          >
+            <MessageCircle class="w-4 h-4 flex-shrink-0" />
+            <span>ACTIVAR MARKETING AHORA</span>
+          </a>
         </div>
       </div>
     </div>
@@ -895,6 +920,11 @@ const totalFinal = computed(() => subtotalMensual.value - ahorroEscala.value)
 
 const calendarUrl = import.meta.env.VITE_CALENDAR_URL
 const whatsappNumber = import.meta.env.VITE_WHATSAPP_NUMBER
+
+const marketingWhatsappMessage = computed(() => {
+  const text = `Hola! Me gustaría activar el módulo de "Marketing Suite" en mi plan de Deenex. ¿Podrían asesorarme?`
+  return encodeURIComponent(text)
+})
 
 const whatsappMessage = computed(() => {
   let text = `Hola! Estuve usando el cotizador de Deenex y me gustaría hablar con ventas.\n\n`
