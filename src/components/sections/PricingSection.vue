@@ -765,14 +765,14 @@
                         </div>
                         <div class="text-right">
                           <div class="flex items-baseline justify-end gap-1">
-                            <span class="text-white/60 text-sm font-bold">USD</span>
+                            <span class="text-white760 text-sm font-bold">USD</span>
                             <p class="text-4xl font-black text-white tracking-tighter leading-none">
                               {{
                                 locales > 0 ? Math.round(totalFinal / locales).toLocaleString() : 0
                               }}
                             </p>
                           </div>
-                          <p class="text-white/50 text-[10px] font-semibold mt-1">
+                          <p class="text-white/80 text-[10px] font-semibold mt-1">
                             / mes · por local
                           </p>
                         </div>
@@ -781,12 +781,12 @@
                       <div
                         class="flex justify-between items-center text-[11px] pt-3 border-t border-white/10 mt-3"
                       >
-                        <span class="text-white/50 uppercase tracking-widest font-semibold"
-                          >Inversión mensual total</span
+                        <span class="text-white/90 uppercase tracking-widest font-semibold"
+                          >Inversión <br>mensual total</span
                         >
-                        <span class="text-white/60 text-sm font-bold"
+                        <span class="text-white/90 text-sm font-bold flex items-center gap-1 flex-col"
                           >USD {{ Math.round(totalFinal).toLocaleString() }}
-                          <span class="text-[9px] opacity-50">Total</span></span
+                          <span class="text-[9px] text-white/80 ml-auto">Total</span></span
                         >
                       </div>
                     </div>
