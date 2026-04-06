@@ -25,5 +25,7 @@ const imgArray = [
   new URL('../../assets/images/clients/palta.webp',     import.meta.url).href,
   new URL('../../assets/images/clients/emplatame.webp',     import.meta.url).href,
   new URL('../../assets/images/clients/glorias.webp',     import.meta.url).href,
+  new URL('../../assets/images/clients/hatsu.webp',     import.meta.url).href,
+  new URL('../../assets/images/clients/konex.webp',     import.meta.url).href,
 ]
 </script>
