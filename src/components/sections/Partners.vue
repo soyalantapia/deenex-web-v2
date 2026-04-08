@@ -24,10 +24,10 @@
         <!-- Logos (Grid más limpio y espaciado) -->
         <div class="lg:flex-1 w-full">
           <div class="grid grid-cols-3 sm:grid-cols-3 gap-6 sm:gap-10">
-            <div v-for="img in partners" :key="img"
+            <div v-for="partner in partners" :key="partner.src"
               class="group flex items-center justify-center p-2 transition-all duration-300">
-              <img :src="img"
-                class="h-10 sm:h-12 w-auto object-contain grayscale opacity-60 group-hover:grayscale-0 group-hover:opacity-100 group-hover:scale-110 transition-all duration-500" />
+              <img :src="partner.src"
+                :class="[partner.class, 'w-auto object-contain grayscale opacity-60 group-hover:grayscale-0 group-hover:opacity-100 group-hover:scale-110 transition-all duration-500']" />
             </div>
           </div>
         </div>
@@ -42,12 +42,11 @@
 
 <script setup>
 const partners = [
-  new URL('../../assets/images/clients/pimenton.png', import.meta.url).href,
-  new URL('../../assets/images/clients/sportclub.png', import.meta.url).href,
-  new URL('../../assets/images/clients/mp.png', import.meta.url).href,
-  new URL('../../assets/images/clients/Odoo.webp', import.meta.url).href,
-  new URL('../../assets/images/clients/ayres.webp', import.meta.url).href,
-  new URL('../../assets/images/clients/Maxirest.webp', import.meta.url).href,
-
+  { src: new URL('../../assets/images/clients/pimenton.png', import.meta.url).href, class: 'h-10 sm:h-12' },
+  { src: new URL('../../assets/images/clients/sportclub.png', import.meta.url).href, class: 'h-16 sm:h-[6rem]' },
+  { src: new URL('../../assets/images/clients/mp.png', import.meta.url).href, class: 'h-14 sm:h-[6rem]' },
+  { src: new URL('../../assets/images/clients/Odoo.webp', import.meta.url).href, class: 'h-10 sm:h-12' },
+  { src: new URL('../../assets/images/clients/ayres.webp', import.meta.url).href, class: 'h-10 sm:h-12' },
+  { src: new URL('../../assets/images/clients/Maxirest.webp', import.meta.url).href, class: 'h-10 sm:h-12' },
 ]
 </script>

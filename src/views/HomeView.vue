@@ -7,6 +7,7 @@
     <LogisticsSection class="v-reveal" />
     <LoyaltySection class="v-reveal" />
     <MarketingSection class="v-reveal" />
+    <SuccessCaseSection class="v-reveal" />
     <PricingSection class="v-reveal" />
     <CalendarSection class="v-reveal" />
     <Footer />
@@ -24,6 +25,7 @@ import MarketingSection from '@/components/sections/MarketingSection.vue'
 import LoyaltySection from '@/components/sections/LoyaltySection.vue'
 import PricingSection from '@/components/sections/PricingSection.vue'
 import CalendarSection from '@/components/sections/CalendarSection.vue'
+import SuccessCaseSection from '@/components/sections/SuccessCaseSection.vue'
 import { onMounted } from 'vue'
 
 onMounted(() => {
