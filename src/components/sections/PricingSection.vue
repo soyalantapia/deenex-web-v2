@@ -167,94 +167,82 @@
         </div>
       </div>
 
-      <!-- Módulos opcionales + Descuentos -->
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-        <!-- Fidelización destacada -->
-        <div class="border border-slate-200 rounded-2xl p-6 flex flex-col relative overflow-hidden">
-          <!-- Fondo decorativo sutil -->
+      <!-- Fidelización destacada (Full Width) -->
+      <div
+        class="border border-slate-200 rounded-3xl p-8 md:p-10 flex flex-col lg:flex-row lg:items-center gap-8 relative overflow-hidden mb-6 bg-slate-50/30"
+      >
+        <!-- Fondo decorativo sutil -->
+        <div
+          class="absolute inset-0 bg-gradient-to-br from-primary/[0.04] to-transparent pointer-events-none"
+        ></div>
+
+        <div class="flex-1 relative">
+          <!-- Icono -->
           <div
-            class="absolute inset-0 bg-gradient-to-br from-primary/[0.03] to-transparent pointer-events-none"
-          ></div>
-          <!-- Icono arriba -->
-          <div
-            class="w-9 h-9 rounded-lg bg-primary flex items-center justify-center mb-4 relative shadow-lg shadow-primary/10"
+            class="w-12 h-12 rounded-2xl bg-primary flex items-center justify-center mb-6 shadow-xl shadow-primary/20"
           >
-            <Sparkles class="w-4 h-4 text-white" />
+            <Sparkles class="w-6 h-6 text-white" />
           </div>
-          <div class="relative">
-            <h4 class="font-bold text-slate-900 mb-0.5">Fidelización</h4>
-            <p class="text-slate-400 text-sm mb-4">
-              Potenciá la recurrencia de tus clientes habituales.
-            </p>
-            <div class="space-y-4">
-              <!-- Loyalty Engine -->
+
+          <h4 class="text-2xl font-black text-slate-900 mb-2">Fidelización Dinámica</h4>
+          <p class="text-slate-500 text-base mb-6 max-w-xl">
+            Potenciá la recurrencia de tus clientes habituales con el motor de lealtad más potente.
+            Diseñado para marcas que buscan crear una comunidad real y aumentar el ticket promedio.
+          </p>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-4">
+            <div class="flex items-center gap-3 text-sm text-slate-600 font-bold">
               <div
-                class="flex flex-col sm:flex-row sm:items-center justify-between p-4 gap-3 rounded-2xl bg-primary/5 border border-primary/10"
+                class="w-5 h-5 rounded-full bg-primary/10 flex items-center justify-center shrink-0"
               >
-                <div class="flex items-center gap-3">
-                  <div
-                    class="w-8 h-8 rounded-lg bg-white flex items-center justify-center shadow-sm"
-                  >
-                    <Check class="w-3.5 h-3.5 text-primary" />
-                  </div>
-                  <div>
-                    <p class="text-slate-900 font-bold text-sm leading-none mb-1">
-                      Módulo Fidelización
-                    </p>
-                    <span
-                      class="text-[9px] font-black uppercase tracking-wider bg-primary text-white px-2 py-0.5 rounded-full shrink-0"
-                      >ACCESO TOTAL</span
-                    >
-                  </div>
-                </div>
-                <div class="flex items-baseline gap-1 text-primary">
-                  <span class="text-xs font-bold">+ USD</span>
-                  <span class="text-xl font-black">15</span>
-                  <span class="text-[10px] font-bold opacity-60">/ local</span>
-                </div>
+                <Check class="w-3 h-3 text-primary" />
               </div>
-              <p class="text-[11px] text-slate-400 leading-relaxed px-1 font-medium italic">
-                Puntos, cupones, categorías de beneficio y sistema tipo Starbucks para marcas que
-                buscan recurrencia.
-              </p>
+              Sistema de Puntos (Tipo Starbucks)
+            </div>
+            <div class="flex items-center gap-3 text-sm text-slate-600 font-bold">
+              <div
+                class="w-5 h-5 rounded-full bg-primary/10 flex items-center justify-center shrink-0"
+              >
+                <Check class="w-3 h-3 text-primary" />
+              </div>
+              Categorías VIP (Bronce, Plata, Oro)
+            </div>
+            <div class="flex items-center gap-3 text-sm text-slate-600 font-bold">
+              <div
+                class="w-5 h-5 rounded-full bg-primary/10 flex items-center justify-center shrink-0"
+              >
+                <Check class="w-3 h-3 text-primary" />
+              </div>
+              Cupones de Descuento Especiales
+            </div>
+            <div class="flex items-center gap-3 text-sm text-slate-600 font-bold">
+              <div
+                class="w-5 h-5 rounded-full bg-primary/10 flex items-center justify-center shrink-0"
+              >
+                <Check class="w-3 h-3 text-primary" />
+              </div>
+              Wallet Personalizada para Clientes
             </div>
           </div>
         </div>
 
-        <!-- Descuentos por volumen -->
-        <div class="border border-slate-200 rounded-2xl p-6 flex flex-col">
-          <!-- Icono arriba -->
-          <div class="w-9 h-9 rounded-lg bg-primary flex items-center justify-center mb-4">
-            <TrendingDown class="w-4 h-4 text-white" />
-          </div>
-          <div>
-            <h4 class="font-semibold text-slate-900 mb-0.5">Descuentos por volumen</h4>
-            <p class="text-slate-400 text-sm mb-4">
-              Se aplican automáticamente sobre el total mensual.
-            </p>
-            <div class="space-y-2">
-              <div class="flex items-center gap-2 text-sm">
-                <span
-                  class="bg-emerald-100 text-emerald-700 text-[11px] font-semibold px-2 py-0.5 rounded w-10 text-center"
-                  >-10%</span
-                >
-                <span class="text-slate-600">A partir de 25 locales (Growth)</span>
-              </div>
-              <div class="flex items-center gap-2 text-sm">
-                <span
-                  class="bg-emerald-100 text-emerald-700 text-[11px] font-semibold px-2 py-0.5 rounded w-10 text-center"
-                  >-20%</span
-                >
-                <span class="text-slate-600">A partir de 70 locales (Scale)</span>
-              </div>
-              <div class="flex items-center gap-2 text-sm">
-                <span
-                  class="bg-emerald-600 text-white text-[11px] font-semibold px-2 py-0.5 rounded w-10 text-center"
-                  >-30%</span
-                >
-                <span class="text-slate-600">A partir de 150 locales (Enterprise)</span>
-              </div>
+        <!-- Módulo Fidelización Price Box -->
+        <div class="w-full lg:w-[320px] shrink-0 relative">
+          <div
+            class="p-8 rounded-[2.5rem] bg-white border border-slate-100 shadow-xl shadow-slate-200/40 flex flex-col items-center text-center"
+          >
+            <span
+              class="text-[10px] font-black uppercase tracking-[0.15em] bg-primary text-white px-3 py-1 rounded-full mb-5"
+              >ACCESO TOTAL</span
+            >
+            <div class="flex items-baseline gap-1 text-primary mb-2">
+              <span class="text-sm font-black">USD</span>
+              <span class="text-5xl font-black tracking-tighter">15</span>
+              <span class="text-xs font-bold opacity-60">/ local · mes</span>
             </div>
+            <p class="text-[11px] text-slate-400 font-medium italic mt-2">
+              Se integra automáticamente con todos tus canales de venta.
+            </p>
           </div>
         </div>
       </div>
@@ -431,7 +419,7 @@
             >
               <!-- ── Columna Izquierda: Configuración ── -->
               <div
-                class="flex-1 p-8 sm:p-8 lg:p-10 lg:pr-8 border-b lg:border-b-0 lg:border-r border-slate-100 bg-white flex flex-col lg:min-h-0 lg:overflow-y-auto"
+                class="flex-1 p-6 sm:p-8 lg:p-10 lg:pr-8 border-b lg:border-b-0 lg:border-r border-slate-100 bg-white flex flex-col lg:min-h-0 lg:overflow-y-auto"
               >
                 <div class="space-y-8 sm:space-y-10">
                   <!-- Locales -->
@@ -446,42 +434,48 @@
                     </div>
 
                     <div class="bg-slate-50 rounded-3xl p-6 border border-slate-100">
-                      <div class="flex items-center justify-between mb-4">
-                        <div class="flex items-center gap-2">
-                          <input
-                            type="number"
-                            v-model.number="locales"
-                            class="text-4xl font-black text-primary bg-transparent border-none outline-none w-24 tabular-nums tracking-tighter hover:bg-slate-100/50 focus:bg-white rounded-lg px-2 transition-colors"
-                            min="1"
-                            max="500"
-                          />
-                          <span class="text-sm font-semibold text-slate-500"
-                            >local{{ locales > 1 ? 'es' : '' }}</span
-                          >
+                      <div class="flex items-center justify-between mb-6">
+                        <div class="flex flex-col">
+                          <div class="flex items-baseline gap-2">
+                            <input
+                              type="number"
+                              v-model.number="locales"
+                              class="text-5xl font-black text-primary bg-transparent border-none outline-none w-28 tabular-nums tracking-tighter hover:bg-slate-100/50 focus:bg-white rounded-lg px-2 transition-colors"
+                              min="1"
+                              max="500"
+                            />
+                            <span class="text-xs font-bold text-slate-400 uppercase tracking-wider"
+                              >locales operativos</span
+                            >
+                          </div>
                         </div>
 
-                        <!-- Badge descuento in-line -->
+                        <!-- Badge descuento in-line (Image 2 style) -->
                         <Transition name="fade" mode="out-in">
                           <div
                             v-if="descuentoInfo.pct > 0"
-                            class="inline-flex items-center gap-1.5 bg-emerald-100 text-emerald-700 text-xs font-bold px-2.5 py-1 rounded-lg"
+                            class="inline-flex items-center gap-1.5 bg-emerald-500 text-white text-[11px] font-black px-3 py-1.5 rounded-xl shadow-lg shadow-emerald-500/20"
                           >
                             <TrendingDown class="w-3.5 h-3.5" />
-                            -{{ descuentoInfo.pct * 100 }}% OFF
+                            <span v-if="descuentoInfo.contactSales">DESCUENTO ENTERPRISE</span>
+                            <span v-else>-{{ descuentoInfo.pct * 100 }}% {{ descuentoInfo.nivel }}</span>
                           </div>
-                          <div v-else class="text-xs text-slate-400 font-medium">
-                            1 a 24 locales
+                          <div
+                            v-else
+                            class="text-[10px] font-black text-slate-400 uppercase tracking-widest bg-slate-200/50 px-3 py-1.5 rounded-xl block"
+                          >
+                            Sin descuento aún
                           </div>
                         </Transition>
                       </div>
 
-                      <div class="relative py-4 mb-2">
+                      <div class="relative pt-2 pb-10">
                         <div
-                          class="absolute left-0 top-1/2 -translate-y-1/2 h-2 bg-slate-200 rounded-full w-full"
+                          class="absolute left-0 top-1/2 -translate-y-[20px] h-2 bg-slate-200 rounded-full w-full"
                         ></div>
                         <div
-                          class="absolute left-0 top-1/2 -translate-y-1/2 h-2 bg-primary rounded-full transition-all duration-150"
-                          :style="{ width: `${Math.min((locales / 200) * 100, 100)}%` }"
+                          class="absolute left-0 top-1/2 -translate-y-[20px] h-2 bg-primary rounded-full transition-all duration-150"
+                          :style="{ width: `${Math.min(((locales - 1) / 199) * 100, 100)}%` }"
                         ></div>
                         <input
                           type="range"
@@ -490,6 +484,33 @@
                           v-model.number="locales"
                           class="w-full h-2 appearance-none bg-transparent cursor-pointer relative z-10 custom-range"
                         />
+                        <!-- Slider Labels (Image 1 requested labels) - Precise Positioning -->
+                        <div
+                          class="absolute inset-x-0 bottom-0 text-[10px] font-black text-slate-400 uppercase tracking-tight h-4"
+                        >
+                          <span class="absolute left-0 -translate-x-1/2">1</span>
+                          <span
+                            class="absolute -translate-x-1/2 whitespace-nowrap"
+                            :style="{ left: `${(24 / 199) * 100}%` }"
+                            >25 (-10%)</span
+                          >
+                          <span
+                            class="absolute -translate-x-1/2 whitespace-nowrap"
+                            :style="{ left: `${(69 / 199) * 100}%` }"
+                            >70 (-20%)</span
+                          >
+                          <span
+                            class="absolute -translate-x-1/2 whitespace-nowrap hidden sm:block"
+                            :style="{ left: `${(99 / 199) * 100}%` }"
+                            >100 (-25%)</span
+                          >
+                          <span
+                            class="absolute -translate-x-1/2 whitespace-nowrap"
+                            :style="{ left: `${(149 / 199) * 100}%` }"
+                            >150 (-30%)</span
+                          >
+                          <span class="absolute right-0 translate-x-1/2 text-right">200+</span>
+                        </div>
                       </div>
                     </div>
                   </section>
@@ -652,7 +673,7 @@
                     </div>
                   </section>
 
-                  <!-- Módulos Extra -->
+                  <!-- Módulos Adicionales (Image 2 requested structure) -->
                   <section>
                     <div class="mb-4">
                       <h3 class="text-sm font-bold text-slate-900 uppercase tracking-widest">
@@ -661,38 +682,32 @@
                     </div>
 
                     <label
-                      class="relative flex items-center p-4 border-2 rounded-3xl cursor-pointer transition-all hover:bg-slate-50"
+                      class="relative flex items-center p-6 border-2 rounded-3xl cursor-pointer transition-all hover:bg-slate-50"
                       :class="
                         addFidelizacion ? 'border-primary bg-primary/[0.02]' : 'border-slate-200'
                       "
                     >
                       <input type="checkbox" v-model="addFidelizacion" class="sr-only" />
-                      <div
-                        class="w-10 h-10 rounded-xl flex items-center justify-center shrink-0 mr-4 transition-colors"
-                        :class="
-                          addFidelizacion ? 'bg-primary text-white' : 'bg-slate-100 text-slate-400'
-                        "
-                      >
-                        <Sparkles class="w-5 h-5" />
-                      </div>
                       <div class="flex-1">
-                        <div class="flex items-center gap-2 mb-0.5">
-                          <span class="font-bold text-slate-900 text-sm">Fidelización</span>
+                        <div class="flex items-center gap-2 mb-1">
+                          <span class="font-bold text-slate-900 text-base">Fidelización</span>
                         </div>
-                        <p class="text-xs text-slate-500 leading-tight hidden sm:block">
-                          Puntos, cupones y niveles VIP para tus clientes.
+                        <p class="text-xs text-slate-500 leading-tight pr-8">
+                          Puntos, cupones, niveles VIP. Sistema tipo Starbucks.
                         </p>
+                        <span class="inline-block mt-2 text-xs font-bold text-primary"
+                          >+ USD 15 / local</span
+                        >
                       </div>
-                      <div class="flex flex-col items-end ml-4 shrink-0">
-                        <span class="text-xs font-bold text-primary mb-1">+ USD 15</span>
-                        <!-- Toggle switch visual -->
+                      <div class="shrink-0">
+                        <!-- Toggle switch visual cleaner -->
                         <div
-                          class="w-9 h-5 rounded-full p-0.5 transition-colors"
+                          class="w-11 h-6 rounded-full p-1 transition-colors"
                           :class="addFidelizacion ? 'bg-primary' : 'bg-slate-300'"
                         >
                           <div
                             class="w-4 h-4 bg-white rounded-full shadow-sm transition-transform"
-                            :class="addFidelizacion ? 'translate-x-4' : 'translate-x-0'"
+                            :class="addFidelizacion ? 'translate-x-5' : 'translate-x-0'"
                           ></div>
                         </div>
                       </div>
@@ -752,42 +767,51 @@
 
                     <!-- Totales -->
                     <div class="bg-primary p-5 text-white">
-                      <div class="flex items-end justify-between mb-1">
-                        <div>
-                          <p
-                            class="text-white/70 text-[10px] font-bold uppercase tracking-widest mb-1"
-                          >
-                            Costo por local
-                          </p>
-                          <p class="text-white/90 text-[10px] font-semibold">
-                            {{ locales }} local{{ locales > 1 ? 'es' : '' }} operativos
-                          </p>
-                        </div>
-                        <div class="text-right">
-                          <div class="flex items-baseline justify-end gap-1">
-                            <span class="text-white760 text-sm font-bold">USD</span>
-                            <p class="text-4xl font-black text-white tracking-tighter leading-none">
-                              {{
-                                locales > 0 ? Math.round(totalFinal / locales).toLocaleString() : 0
-                              }}
-                            </p>
-                          </div>
-                          <p class="text-white/80 text-[10px] font-semibold mt-1">
-                            / mes · por local
-                          </p>
-                        </div>
+                      <!-- Caso especial +200 locales -->
+                      <div v-if="descuentoInfo.contactSales" class="py-2 text-center">
+                        <p class="text-[10px] font-bold uppercase tracking-[0.2em] text-white/70 mb-2">Plan Enterprise</p>
+                        <p class="text-xl font-black text-white leading-tight mb-1">PRECIO A MEDIDA</p>
+                        <p class="text-[11px] text-white/80 font-medium">Contactanos con nuestro equipo comercial</p>
                       </div>
 
-                      <div
-                        class="flex justify-between items-center text-[11px] pt-3 border-t border-white/10 mt-3"
-                      >
-                        <span class="text-white/90 uppercase tracking-widest font-semibold"
-                          >Inversión <br>mensual total</span
+                      <div v-else>
+                        <div class="flex items-end justify-between mb-1">
+                          <div>
+                            <p
+                              class="text-white/70 text-[10px] font-bold uppercase tracking-widest mb-1"
+                            >
+                              Costo por local
+                            </p>
+                            <p class="text-white/90 text-[10px] font-semibold">
+                              {{ locales }} local{{ locales > 1 ? 'es' : '' }} operativos
+                            </p>
+                          </div>
+                          <div class="text-right">
+                            <div class="flex items-baseline justify-end gap-1">
+                              <span class="text-white760 text-sm font-bold">USD</span>
+                              <p class="text-4xl font-black text-white tracking-tighter leading-none">
+                                {{
+                                  locales > 0 ? Math.round(totalFinal / locales).toLocaleString() : 0
+                                }}
+                              </p>
+                            </div>
+                            <p class="text-white/80 text-[10px] font-semibold mt-1">
+                              / mes · por local
+                            </p>
+                          </div>
+                        </div>
+
+                        <div
+                          class="flex justify-between items-center text-[11px] pt-3 border-t border-white/10 mt-3"
                         >
-                        <span class="text-white/90 text-sm font-bold flex items-center gap-1 flex-col"
-                          >USD {{ Math.round(totalFinal).toLocaleString() }}
-                          <span class="text-[9px] text-white/80 ml-auto">Total</span></span
-                        >
+                          <span class="text-white/90 uppercase tracking-widest font-semibold"
+                            >Inversión <br>mensual total</span
+                          >
+                          <span class="text-white/90 text-sm font-bold flex items-center gap-1 flex-col"
+                            >USD {{ Math.round(totalFinal).toLocaleString() }}
+                            <span class="text-[9px] text-white/80 ml-auto">Total</span></span
+                          >
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -909,7 +933,9 @@ const precioPorLocal = computed(() => precioBaseVenta.value + (addFidelizacion.v
 const subtotalMensual = computed(() => precioPorLocal.value * locales.value)
 
 const descuentoInfo = computed(() => {
-  if (locales.value > 150) return { pct: 0.3, nivel: 'Empresa' }
+  if (locales.value >= 200) return { pct: 0.35, nivel: 'Custom', contactSales: true }
+  if (locales.value >= 150) return { pct: 0.3, nivel: 'Corporativo' }
+  if (locales.value >= 100) return { pct: 0.25, nivel: 'Premium' }
   if (locales.value >= 70) return { pct: 0.2, nivel: 'Escala' }
   if (locales.value >= 25) return { pct: 0.1, nivel: 'Crecimiento' }
   return { pct: 0, nivel: 'Inicial' }
@@ -941,7 +967,13 @@ const whatsappMessage = computed(() => {
 
   text += `- Canales: ${canalesArr.length > 0 ? canalesArr.join(' y ') : 'Ninguno'}\n`
   text += `- Fidelización: ${addFidelizacion.value ? 'Sí' : 'No'}\n\n`
-  text += `- Total mensual: USD ${Math.round(totalFinal.value)}\n\n`
+  
+  if (descuentoInfo.value.contactSales) {
+    text += `- Total mensual: A convenir (Plan Enterprise)\n\n`
+  } else {
+    text += `- Total mensual: USD ${Math.round(totalFinal.value)}\n\n`
+  }
+  
   text += `A la espera de su contacto. Gracias!`
   return encodeURIComponent(text)
 })

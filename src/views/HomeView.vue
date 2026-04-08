@@ -3,6 +3,7 @@
     <Navbar />
     <HeroSection />
     <Clients />
+    <Partners class="v-reveal" />
     <InfraSection class="v-reveal" />
     <LogisticsSection class="v-reveal" />
     <LoyaltySection class="v-reveal" />
@@ -18,6 +19,7 @@ import Navbar from '@/components/layout/Navbar.vue'
 import Footer from '@/components/layout/Footer.vue'
 import HeroSection from '@/components/sections/HeroSection.vue'
 import Clients from '@/components/sections/Clients.vue'
+import Partners from '@/components/sections/Partners.vue'
 import InfraSection from '@/components/sections/InfraSection.vue'
 import LogisticsSection from '@/components/sections/LogisticsSection.vue'
 import MarketingSection from '@/components/sections/MarketingSection.vue'
