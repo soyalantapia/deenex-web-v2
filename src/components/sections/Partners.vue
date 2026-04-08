@@ -1,78 +1,53 @@
 <template>
-  <section id="partners" class="py-12 bg-white overflow-hidden">
-    <div class="max-w-6xl mx-auto px-6">
-      <!-- Layout Desktop (Sideways Grid) -->
-      <div class="hidden lg:flex lg:flex-row lg:items-center lg:gap-20">
-        <!-- Texto lateral -->
-        <div class="lg:w-[350px] shrink-0 text-left">
-          <h3 class="text-xs font-black text-primary uppercase tracking-[0.25em] mb-4">
+  <div class="relative">
+    <!-- Contenedor con fondo sutil y gradiente -->
+    <div
+      class="bg-gradient-to-br from-slate-50/80 to-white border border-slate-100/80 backdrop-blur-sm rounded-[2.5rem] p-8 sm:p-12 overflow-hidden shadow-sm">
+      <div class="flex flex-col lg:flex-row items-center gap-10 lg:gap-16">
+
+        <!-- Texto explicativo -->
+        <div class="lg:w-1/3 text-center lg:text-left">
+          <div
+            class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 text-primary text-[10px] font-bold uppercase tracking-wider mb-4">
+            <span class="w-1.5 h-1.5 rounded-full bg-primary animate-pulse"></span>
             Ecosistema & Alianzas
-          </h3>
-          <p class="text-[1.1rem] text-slate-500 font-medium leading-relaxed">
-            Nos aliamos con empresas que aportan
-            <span class="text-slate-900 font-bold">valor diferencial</span> a nuestros clientes.
+          </div>
+          <p class="text-[1.05rem] text-slate-600 font-medium leading-relaxed">
+            Potenciamos tu negocio a través de alianzas con empresas que aportan
+            <span class="text-slate-900 font-bold">valor diferencial</span> y soluciones integrales.
           </p>
         </div>
 
-        <!-- Grilla con líneas difuminadas -->
-        <div class="flex-1 relative pl-10">
-          <div class="absolute inset-0 pointer-events-none opacity-60">
-            <div
-              class="absolute left-1/3 top-4 bottom-4 w-px bg-gradient-to-b from-transparent via-slate-200 to-transparent"
-            ></div>
-            <div
-              class="absolute left-2/3 top-4 bottom-4 w-px bg-gradient-to-b from-transparent via-slate-200 to-transparent"
-            ></div>
-            <div
-              class="absolute top-1/2 left-4 right-4 h-px bg-gradient-to-r from-transparent via-slate-200 to-transparent"
-            ></div>
-          </div>
+        <!-- Separador (Solo Desktop) -->
+        <div class="hidden lg:block w-px h-24 bg-gradient-to-b from-transparent via-slate-200 to-transparent"></div>
 
-          <div class="grid grid-cols-3 relative z-10">
-            <div
-              v-for="img in partners"
-              :key="img"
-              class="p-8 h-36 flex items-center justify-center transition-all"
-            >
-              <img :src="img" class="h-[60px] w-auto object-contain" />
+        <!-- Logos (Grid más limpio y espaciado) -->
+        <div class="lg:flex-1 w-full">
+          <div class="grid grid-cols-3 sm:grid-cols-3 gap-6 sm:gap-10">
+            <div v-for="img in partners" :key="img"
+              class="group flex items-center justify-center p-2 transition-all duration-300">
+              <img :src="img"
+                class="h-10 sm:h-12 w-auto object-contain grayscale opacity-60 group-hover:grayscale-0 group-hover:opacity-100 group-hover:scale-110 transition-all duration-500" />
             </div>
           </div>
-        </div>
-      </div>
-
-      <!-- Layout Mobile (Marquee like Clients) -->
-      <div class="lg:hidden flex flex-col items-center">
-        <div class="text-center mb-10 px-4">
-          <h3 class="text-[10px] font-black text-primary uppercase tracking-[0.2em] mb-3">
-            Ecosistema & Alianzas
-          </h3>
-          <p class="text-sm text-slate-500 font-medium leading-relaxed">
-            Nos aliamos con empresas que aportan
-            <span class="text-slate-900 font-bold">valor diferencial</span> a nuestros clientes.
-          </p>
-        </div>
-
-        <div class="w-full">
-          <Vue3Marquee :duration="20" gradient="true" :gradientColor="[255, 255, 255]" clone="true">
-            <div v-for="img in partners" :key="img" class="mx-8 flex items-center justify-center">
-              <img :src="img" :alt="img" class="h-9 w-auto object-contain" />
-            </div>
-          </Vue3Marquee>
         </div>
       </div>
     </div>
-  </section>
+
+    <!-- Decoración sutil -->
+    <div class="absolute -top-6 -right-6 w-24 h-24 bg-primary/5 rounded-full blur-2xl pointer-events-none"></div>
+    <div class="absolute -bottom-6 -left-6 w-24 h-24 bg-primary/5 rounded-full blur-2xl pointer-events-none"></div>
+  </div>
 </template>
 
 <script setup>
-import { Vue3Marquee } from 'vue3-marquee'
-
 const partners = [
-  new URL('../../assets/images/clients/pimenton.webp', import.meta.url).href,
-  new URL('../../assets/images/clients/aamf.jpg', import.meta.url).href,
-  new URL('../../assets/images/clients/puni.webp', import.meta.url).href,
+  new URL('../../assets/images/clients/pimenton.png', import.meta.url).href,
+  new URL('../../assets/images/clients/sportclub.png', import.meta.url).href,
+  new URL('../../assets/images/clients/mp.png', import.meta.url).href,
   new URL('../../assets/images/clients/Odoo.webp', import.meta.url).href,
   new URL('../../assets/images/clients/ayres.webp', import.meta.url).href,
   new URL('../../assets/images/clients/Maxirest.webp', import.meta.url).href,
+
 ]
 </script>
