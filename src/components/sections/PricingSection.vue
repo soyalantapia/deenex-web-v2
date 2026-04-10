@@ -428,6 +428,8 @@
                         :class="selectedVenta.presencial && !selectedVenta.delivery
                           ? 'border-primary bg-primary/[0.02]'
                           : 'border-slate-200'
+                            ? 'border-primary bg-primary/[0.02]'
+                            : 'border-slate-200'
                           " @click.prevent="setCanal('presencial')">
                         <input type="radio" :checked="selectedVenta.presencial && !selectedVenta.delivery"
                           class="sr-only" />
@@ -618,28 +620,43 @@
                     <div class="bg-primary p-5 text-white">
                       <!-- Caso especial +200 locales -->
                       <div v-if="descuentoInfo.contactSales" class="py-2 text-center">
-                        <p class="text-[10px] font-bold uppercase tracking-[0.2em] text-white/70 mb-2">Plan Enterprise</p>
+                        <p class="text-[10px] font-bold uppercase tracking-[0.2em] text-white/70 mb-2">Plan Enterprise
+                        </p>
                         <p class="text-xl font-black text-white leading-tight mb-1">PRECIO A MEDIDA</p>
                         <p class="text-[11px] text-white/80 font-medium">Contactanos con nuestro equipo comercial</p>
                       </div>
 
-                      <div v-else class="flex items-end justify-between">
-                        <div>
-                          <p class="text-white/70 text-[10px] font-bold uppercase tracking-widest mb-1">
-                            Costo por local
-                          </p>
-                          <p class="text-white/60 text-[10px] font-semibold">
-                            {{ locales }} local{{ locales > 1 ? 'es' : '' }} operativos
-                          </p>
-                        </div>
-                        <div class="text-right">
-                          <div class="flex items-baseline justify-end gap-1">
-                            <span class="text-white/80 text-sm font-bold">USD</span>
-                            <p class="text-4xl font-black text-white tracking-tighter leading-none">
-                              {{ locales > 0 ? Math.round(totalFinal / locales).toLocaleString() : 0 }}
+                      <div v-else>
+                        <div class="flex items-end justify-between mb-1">
+                          <div>
+                            <p class="text-white/70 text-[10px] font-bold uppercase tracking-widest mb-1">
+                              Costo por local
+                            </p>
+                            <p class="text-white/90 text-[10px] font-semibold">
+                              {{ locales }} local{{ locales > 1 ? 'es' : '' }} operativos
                             </p>
                           </div>
-                          <p class="text-white/70 text-[10px] font-semibold mt-1">/ mes · por local</p>
+                          <div class="text-right">
+                            <div class="flex items-baseline justify-end gap-1">
+                              <span class="text-white760 text-sm font-bold">USD</span>
+                              <p class="text-4xl font-black text-white tracking-tighter leading-none">
+                                {{
+                                  locales > 0 ? Math.round(totalFinal / locales).toLocaleString() : 0
+                                }}
+                              </p>
+                            </div>
+                            <p class="text-white/80 text-[10px] font-semibold mt-1">
+                              / mes · por local
+                            </p>
+                          </div>
+                        </div>
+
+                        <div class="flex justify-between items-center text-[11px] pt-3 border-t border-white/10 mt-3">
+                          <span class="text-white/90 uppercase tracking-widest font-semibold">Inversión <br>mensual
+                            total</span>
+                          <span class="text-white/90 text-sm font-bold flex items-center gap-1 flex-col">USD {{
+                            Math.round(totalFinal).toLocaleString() }}
+                            <span class="text-[9px] text-white/80 ml-auto">Total</span></span>
                         </div>
                       </div>
                     </div>
