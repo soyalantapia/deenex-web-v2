@@ -426,22 +426,22 @@
                       <label
                         class="relative flex p-4 border-2 rounded-3xl cursor-pointer transition-all hover:bg-slate-50"
                         :class="selectedVenta.presencial && !selectedVenta.delivery
-                            ? 'border-primary bg-primary/[0.02]'
-                            : 'border-slate-200'
+                          ? 'border-primary bg-primary/[0.02]'
+                          : 'border-slate-200'
                           " @click.prevent="setCanal('presencial')">
                         <input type="radio" :checked="selectedVenta.presencial && !selectedVenta.delivery"
                           class="sr-only" />
                         <div class="flex flex-col gap-1 w-full">
                           <div class="flex items-center justify-between mb-1">
                             <Store class="w-5 h-5" :class="selectedVenta.presencial && !selectedVenta.delivery
-                                ? 'text-primary'
-                                : 'text-slate-400'
+                              ? 'text-primary'
+                              : 'text-slate-400'
                               " />
                             <div
                               class="w-4 h-4 sm:w-5 sm:h-5 rounded-full border-2 flex items-center justify-center transition-colors"
                               :class="selectedVenta.presencial && !selectedVenta.delivery
-                                  ? 'bg-primary border-primary'
-                                  : 'border-slate-300'
+                                ? 'bg-primary border-primary'
+                                : 'border-slate-300'
                                 ">
                               <Check v-if="selectedVenta.presencial && !selectedVenta.delivery"
                                 class="w-3 h-3 text-white" />
@@ -456,22 +456,22 @@
                       <label
                         class="relative flex p-4 border-2 rounded-3xl cursor-pointer transition-all hover:bg-slate-50"
                         :class="selectedVenta.delivery && !selectedVenta.presencial
-                            ? 'border-primary bg-primary/[0.02]'
-                            : 'border-slate-200'
+                          ? 'border-primary bg-primary/[0.02]'
+                          : 'border-slate-200'
                           " @click.prevent="setCanal('delivery')">
                         <input type="radio" :checked="selectedVenta.delivery && !selectedVenta.presencial"
                           class="sr-only" />
                         <div class="flex flex-col gap-1 w-full">
                           <div class="flex items-center justify-between mb-1">
                             <Bike class="w-5 h-5" :class="selectedVenta.delivery && !selectedVenta.presencial
-                                ? 'text-primary'
-                                : 'text-slate-400'
+                              ? 'text-primary'
+                              : 'text-slate-400'
                               " />
                             <div
                               class="w-4 h-4 sm:w-5 sm:h-5 rounded-full border-2 flex items-center justify-center transition-colors"
                               :class="selectedVenta.delivery && !selectedVenta.presencial
-                                  ? 'bg-primary border-primary'
-                                  : 'border-slate-300'
+                                ? 'bg-primary border-primary'
+                                : 'border-slate-300'
                                 ">
                               <Check v-if="selectedVenta.delivery && !selectedVenta.presencial"
                                 class="w-3 h-3 text-white" />
@@ -486,22 +486,22 @@
                       <label
                         class="relative flex p-4 border-2 rounded-3xl cursor-pointer transition-all hover:bg-slate-50 sm:col-span-2"
                         :class="selectedVenta.presencial && selectedVenta.delivery
-                            ? 'border-primary bg-primary/[0.02]'
-                            : 'border-slate-200'
+                          ? 'border-primary bg-primary/[0.02]'
+                          : 'border-slate-200'
                           " @click.prevent="setCanal('pack')">
                         <input type="radio" :checked="selectedVenta.presencial && selectedVenta.delivery"
                           class="sr-only" />
                         <div class="flex flex-col gap-1 w-full">
                           <div class="flex items-center justify-between mb-1">
                             <Layers class="w-5 h-5" :class="selectedVenta.presencial && selectedVenta.delivery
-                                ? 'text-primary'
-                                : 'text-slate-400'
+                              ? 'text-primary'
+                              : 'text-slate-400'
                               " />
                             <div
                               class="w-4 h-4 sm:w-5 sm:h-5 rounded-full border-2 flex items-center justify-center transition-colors"
                               :class="selectedVenta.presencial && selectedVenta.delivery
-                                  ? 'bg-primary border-primary'
-                                  : 'border-slate-300'
+                                ? 'bg-primary border-primary'
+                                : 'border-slate-300'
                                 ">
                               <Check v-if="selectedVenta.presencial && selectedVenta.delivery"
                                 class="w-3 h-3 text-white" />
@@ -613,8 +613,8 @@
                       <div v-else>
                         <div class="flex items-end justify-between mb-1">
                           <div>
-                            <p class="text-white/70 text-[10px] font-bold uppercase tracking-widest mb-1">
-                              Costo por local
+                            <p class="text-white/70 text-[15px] font-bold uppercase tracking-widest mb-1">
+                              Costo por <br> local
                             </p>
                             <p class="text-white/90 text-[10px] font-semibold">
                               {{ locales }} local{{ locales > 1 ? 'es' : '' }} operativos
@@ -635,13 +635,6 @@
                           </div>
                         </div>
 
-                        <div class="flex justify-between items-center text-[11px] pt-3 border-t border-white/10 mt-3">
-                          <span class="text-white/90 uppercase tracking-widest font-semibold">Inversión <br>mensual
-                            total</span>
-                          <span class="text-white/90 text-sm font-bold flex items-center gap-1 flex-col">USD {{
-                            Math.round(totalFinal).toLocaleString() }}
-                            <span class="text-[9px] text-white/80 ml-auto">Total</span></span>
-                        </div>
                       </div>
                     </div>
                   </div>
