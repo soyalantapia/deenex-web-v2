@@ -426,22 +426,22 @@
                       <label
                         class="relative flex p-4 border-2 rounded-3xl cursor-pointer transition-all hover:bg-slate-50"
                         :class="selectedVenta.presencial && !selectedVenta.delivery
-                            ? 'border-primary bg-primary/[0.02]'
-                            : 'border-slate-200'
+                          ? 'border-primary bg-primary/[0.02]'
+                          : 'border-slate-200'
                           " @click.prevent="setCanal('presencial')">
                         <input type="radio" :checked="selectedVenta.presencial && !selectedVenta.delivery"
                           class="sr-only" />
                         <div class="flex flex-col gap-1 w-full">
                           <div class="flex items-center justify-between mb-1">
                             <Store class="w-5 h-5" :class="selectedVenta.presencial && !selectedVenta.delivery
-                                ? 'text-primary'
-                                : 'text-slate-400'
+                              ? 'text-primary'
+                              : 'text-slate-400'
                               " />
                             <div
                               class="w-4 h-4 sm:w-5 sm:h-5 rounded-full border-2 flex items-center justify-center transition-colors"
                               :class="selectedVenta.presencial && !selectedVenta.delivery
-                                  ? 'bg-primary border-primary'
-                                  : 'border-slate-300'
+                                ? 'bg-primary border-primary'
+                                : 'border-slate-300'
                                 ">
                               <Check v-if="selectedVenta.presencial && !selectedVenta.delivery"
                                 class="w-3 h-3 text-white" />
@@ -456,22 +456,22 @@
                       <label
                         class="relative flex p-4 border-2 rounded-3xl cursor-pointer transition-all hover:bg-slate-50"
                         :class="selectedVenta.delivery && !selectedVenta.presencial
-                            ? 'border-primary bg-primary/[0.02]'
-                            : 'border-slate-200'
+                          ? 'border-primary bg-primary/[0.02]'
+                          : 'border-slate-200'
                           " @click.prevent="setCanal('delivery')">
                         <input type="radio" :checked="selectedVenta.delivery && !selectedVenta.presencial"
                           class="sr-only" />
                         <div class="flex flex-col gap-1 w-full">
                           <div class="flex items-center justify-between mb-1">
                             <Bike class="w-5 h-5" :class="selectedVenta.delivery && !selectedVenta.presencial
-                                ? 'text-primary'
-                                : 'text-slate-400'
+                              ? 'text-primary'
+                              : 'text-slate-400'
                               " />
                             <div
                               class="w-4 h-4 sm:w-5 sm:h-5 rounded-full border-2 flex items-center justify-center transition-colors"
                               :class="selectedVenta.delivery && !selectedVenta.presencial
-                                  ? 'bg-primary border-primary'
-                                  : 'border-slate-300'
+                                ? 'bg-primary border-primary'
+                                : 'border-slate-300'
                                 ">
                               <Check v-if="selectedVenta.delivery && !selectedVenta.presencial"
                                 class="w-3 h-3 text-white" />
@@ -486,22 +486,22 @@
                       <label
                         class="relative flex p-4 border-2 rounded-3xl cursor-pointer transition-all hover:bg-slate-50 sm:col-span-2"
                         :class="selectedVenta.presencial && selectedVenta.delivery
-                            ? 'border-primary bg-primary/[0.02]'
-                            : 'border-slate-200'
+                          ? 'border-primary bg-primary/[0.02]'
+                          : 'border-slate-200'
                           " @click.prevent="setCanal('pack')">
                         <input type="radio" :checked="selectedVenta.presencial && selectedVenta.delivery"
                           class="sr-only" />
                         <div class="flex flex-col gap-1 w-full">
                           <div class="flex items-center justify-between mb-1">
                             <Layers class="w-5 h-5" :class="selectedVenta.presencial && selectedVenta.delivery
-                                ? 'text-primary'
-                                : 'text-slate-400'
+                              ? 'text-primary'
+                              : 'text-slate-400'
                               " />
                             <div
                               class="w-4 h-4 sm:w-5 sm:h-5 rounded-full border-2 flex items-center justify-center transition-colors"
                               :class="selectedVenta.presencial && selectedVenta.delivery
-                                  ? 'bg-primary border-primary'
-                                  : 'border-slate-300'
+                                ? 'bg-primary border-primary'
+                                : 'border-slate-300'
                                 ">
                               <Check v-if="selectedVenta.presencial && selectedVenta.delivery"
                                 class="w-3 h-3 text-white" />
@@ -566,81 +566,80 @@
                 <div class="p-8 sm:p-8 lg:p-10 flex-1 lg:pt-8">
                   <!-- Ticket Resumen -->
                   <div class="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden mb-8">
-                    <!-- Items -->
-                    <div class="p-5 space-y-4">
+                    <!-- Items: todo en valores por local -->
+                    <div class="p-5 space-y-3.5">
+                      <!-- Canales de venta -->
                       <div class="flex justify-between items-start">
                         <div>
                           <p class="text-sm font-semibold text-slate-900">Canales de venta</p>
                           <p class="text-xs text-slate-500 mt-0.5">
-                            {{ locales }} local{{ locales > 1 ? 'es' : '' }}
+                            {{ locales }} local{{ locales > 1 ? 'es' : '' }} × USD {{ precioBaseVenta }}
                           </p>
                         </div>
-                        <span class="text-sm font-bold text-slate-900">USD {{ (precioBaseVenta *
-                          locales).toLocaleString() }}</span>
+                        <div class="text-right">
+                          <span class="text-sm font-bold text-slate-900">USD {{ precioBaseVenta }}</span>
+                          <p class="text-[10px] text-slate-400 mt-0.5">/ local</p>
+                        </div>
                       </div>
 
+                      <!-- Módulo Fidelización -->
                       <div v-if="addFidelizacion" class="flex justify-between items-start">
                         <div>
                           <p class="text-sm font-semibold text-slate-900">Módulo Fidelización</p>
+                          <p class="text-xs text-slate-500 mt-0.5">
+                            {{ locales }} local{{ locales > 1 ? 'es' : '' }} × USD 15
+                          </p>
                         </div>
-                        <span class="text-sm font-bold text-slate-900">+ USD {{ (15 * locales).toLocaleString()
-                          }}</span>
+                        <div class="text-right">
+                          <span class="text-sm font-bold text-slate-900">+ USD 15</span>
+                          <p class="text-[10px] text-slate-400 mt-0.5">/ local</p>
+                        </div>
                       </div>
 
+                      <!-- Descuento volumen -->
                       <div v-if="descuentoInfo.pct > 0"
-                        class="flex justify-between items-start pt-2 border-t border-slate-100">
+                        class="flex justify-between items-start pt-3 border-t border-slate-100">
                         <div>
                           <p class="text-sm font-bold text-emerald-600">Descuento volumen</p>
                           <p class="text-xs text-emerald-600/70 mt-0.5">
-                            Nivel {{ descuentoInfo.nivel }} (-{{ descuentoInfo.pct * 100 }}%)
+                            Nivel {{ descuentoInfo.nivel }} (−{{ descuentoInfo.pct * 100 }}%)
                           </p>
                         </div>
-                        <span class="text-sm font-black text-emerald-600">− USD {{
-                          Math.round(ahorroEscala).toLocaleString() }}</span>
+                        <div class="text-right">
+                          <span class="text-sm font-black text-emerald-600">
+                            − USD {{ locales > 0 ? Math.round(ahorroEscala / locales) : 0 }}
+                          </span>
+                          <p class="text-[10px] text-emerald-500/70 mt-0.5">/ local</p>
+                        </div>
                       </div>
                     </div>
 
-                    <!-- Totales -->
+                    <!-- Footer azul: costo final por local -->
                     <div class="bg-primary p-5 text-white">
                       <!-- Caso especial +200 locales -->
                       <div v-if="descuentoInfo.contactSales" class="py-2 text-center">
-                        <p class="text-[10px] font-bold uppercase tracking-[0.2em] text-white/70 mb-2">Plan Enterprise
-                        </p>
+                        <p class="text-[10px] font-bold uppercase tracking-[0.2em] text-white/70 mb-2">Plan Enterprise</p>
                         <p class="text-xl font-black text-white leading-tight mb-1">PRECIO A MEDIDA</p>
                         <p class="text-[11px] text-white/80 font-medium">Contactanos con nuestro equipo comercial</p>
                       </div>
 
-                      <div v-else>
-                        <div class="flex items-end justify-between mb-1">
-                          <div>
-                            <p class="text-white/70 text-[10px] font-bold uppercase tracking-widest mb-1">
-                              Costo por local
-                            </p>
-                            <p class="text-white/90 text-[10px] font-semibold">
-                              {{ locales }} local{{ locales > 1 ? 'es' : '' }} operativos
-                            </p>
-                          </div>
-                          <div class="text-right">
-                            <div class="flex items-baseline justify-end gap-1">
-                              <span class="text-white760 text-sm font-bold">USD</span>
-                              <p class="text-4xl font-black text-white tracking-tighter leading-none">
-                                {{
-                                  locales > 0 ? Math.round(totalFinal / locales).toLocaleString() : 0
-                                }}
-                              </p>
-                            </div>
-                            <p class="text-white/80 text-[10px] font-semibold mt-1">
-                              / mes · por local
-                            </p>
-                          </div>
+                      <div v-else class="flex items-end justify-between">
+                        <div>
+                          <p class="text-white/70 text-[10px] font-bold uppercase tracking-widest mb-1">
+                            Costo por local
+                          </p>
+                          <p class="text-white/60 text-[10px] font-semibold">
+                            {{ locales }} local{{ locales > 1 ? 'es' : '' }} operativos
+                          </p>
                         </div>
-
-                        <div class="flex justify-between items-center text-[11px] pt-3 border-t border-white/10 mt-3">
-                          <span class="text-white/90 uppercase tracking-widest font-semibold">Inversión <br>mensual
-                            total</span>
-                          <span class="text-white/90 text-sm font-bold flex items-center gap-1 flex-col">USD {{
-                            Math.round(totalFinal).toLocaleString() }}
-                            <span class="text-[9px] text-white/80 ml-auto">Total</span></span>
+                        <div class="text-right">
+                          <div class="flex items-baseline justify-end gap-1">
+                            <span class="text-white/80 text-sm font-bold">USD</span>
+                            <p class="text-4xl font-black text-white tracking-tighter leading-none">
+                              {{ locales > 0 ? Math.round(totalFinal / locales).toLocaleString() : 0 }}
+                            </p>
+                          </div>
+                          <p class="text-white/70 text-[10px] font-semibold mt-1">/ mes · por local</p>
                         </div>
                       </div>
                     </div>

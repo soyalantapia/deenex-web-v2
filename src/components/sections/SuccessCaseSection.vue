@@ -22,15 +22,17 @@
         <!-- Features col -->
         <div class="flex flex-col gap-3 order-1 pt-4 lg:pt-0">
 
-          <!-- Cita estilo card con barra primary -->
-          <blockquote class="relative border border-slate-200 rounded-2xl p-5 pl-6 bg-white shadow-sm">
+          <!-- Testimonios — 3 citas con barra primary -->
+          <blockquote
+            v-for="t in testimonials"
+            :key="t.author"
+            class="relative border border-slate-200 rounded-2xl p-5 pl-6 bg-white shadow-sm hover:border-primary/20 transition-colors"
+          >
             <div class="absolute left-0 top-4 bottom-4 w-[3px] rounded-full bg-primary" />
-            <p class="text-sm text-slate-500 leading-relaxed italic">
-              "Deenex superó nuestras expectativas. Estamos recuperando clientes que compraban por apps de terceros y
-              volviendo a fidelizarlos en nuestro propio ámbito."
-            </p>
-            <footer class="mt-2 text-[11px] text-slate-400 tracking-wide uppercase font-semibold">
-              — Marcos Aldazábal, Socio y Fundador
+            <p class="text-sm text-slate-500 leading-relaxed italic">{{ t.quote }}</p>
+            <footer class="mt-2 flex items-center justify-between gap-2">
+              <span class="text-[11px] text-slate-400 tracking-wide uppercase font-semibold">— {{ t.author }}</span>
+              <span class="text-[10px] text-primary/60 font-bold uppercase tracking-wider">{{ t.brand }}</span>
             </footer>
           </blockquote>
 
@@ -107,6 +109,24 @@ import { MessageSquare, Heart, Repeat, Play, Volume2 } from 'lucide-vue-next'
 
 const videoRef = ref(null)
 const isPlaying = ref(false)
+
+const testimonials = [
+  {
+    quote: '"Deenex superó nuestras expectativas. Estamos recuperando clientes que compraban por apps de terceros y volviendo a fidelizarlos en nuestro propio ámbito."',
+    author: 'Marcos Aldazábal, Socio y Fundador',
+    brand: 'Coquitos',
+  },
+  {
+    quote: '"Con el canal propio dejamos de regalarle nuestra base de clientes a Rappi. Ahora sabemos quiénes son, qué piden y los reactivamos con campañas nuestras."',
+    author: 'Equipo Comercial',
+    brand: 'Hatsu',
+  },
+  {
+    quote: '"La implementación fue más rápida de lo que esperábamos y el equipo de soporte estuvo presente en cada paso. Lo recomendamos sin dudarlo."',
+    author: 'Operaciones',
+    brand: 'Monti',
+  },
+]
 
 const successFeatures = [
   {
