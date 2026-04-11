@@ -428,8 +428,6 @@
                         :class="selectedVenta.presencial && !selectedVenta.delivery
                           ? 'border-primary bg-primary/[0.02]'
                           : 'border-slate-200'
-                            ? 'border-primary bg-primary/[0.02]'
-                            : 'border-slate-200'
                           " @click.prevent="setCanal('presencial')">
                         <input type="radio" :checked="selectedVenta.presencial && !selectedVenta.delivery"
                           class="sr-only" />
@@ -571,21 +569,18 @@
                     <!-- Items: todo en valores por local -->
                     <div class="p-5 space-y-3.5">
                       <!-- Canales de venta -->
-                      <!-- Items: todo en valores por local -->
-                      <div class="p-5 space-y-3.5">
-                        <!-- Canales de venta -->
-                        <div class="flex justify-between items-start">
-                          <div>
-                            <p class="text-sm font-semibold text-slate-900">Canales de venta</p>
-                            <p class="text-xs text-slate-500 mt-0.5">
-                              {{ locales }} local{{ locales > 1 ? 'es' : '' }} × USD {{ precioBaseVenta }}
-                            </p>
-                          </div>
-                          <div class="text-right">
-                            <span class="text-sm font-bold text-slate-900">USD {{ precioBaseVenta }}</span>
-                            <p class="text-[10px] text-slate-400 mt-0.5">/ local</p>
-                          </div>
+                      <div class="flex justify-between items-start">
+                        <div>
+                          <p class="text-sm font-semibold text-slate-900">Canales de venta</p>
+                          <p class="text-xs text-slate-500 mt-0.5">
+                            {{ locales }} local{{ locales > 1 ? 'es' : '' }} × USD {{ precioBaseVenta }}
+                          </p>
                         </div>
+                        <div class="text-right">
+                          <span class="text-sm font-bold text-slate-900">USD {{ precioBaseVenta }}</span>
+                          <p class="text-[10px] text-slate-400 mt-0.5">/ local</p>
+                        </div>
+                      </div>
 
                         <!-- Módulo Fidelización -->
                         <div v-if="addFidelizacion" class="flex justify-between items-start">
@@ -683,6 +678,7 @@
               </div>
             </div>
           </div>
+        </div>
       </Transition>
     </Teleport>
   </section>
