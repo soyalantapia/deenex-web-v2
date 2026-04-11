@@ -23,11 +23,8 @@
         <div class="flex flex-col gap-3 order-1 pt-4 lg:pt-0">
 
           <!-- Testimonios — 3 citas con barra primary -->
-          <blockquote
-            v-for="t in testimonials"
-            :key="t.author"
-            class="relative border border-slate-200 rounded-2xl p-5 pl-6 bg-white shadow-sm hover:border-primary/20 transition-colors"
-          >
+          <blockquote v-for="t in testimonials" :key="t.author"
+            class="relative border border-slate-200 rounded-2xl p-5 pl-6 bg-white shadow-sm hover:border-primary/20 transition-colors">
             <div class="absolute left-0 top-4 bottom-4 w-[3px] rounded-full bg-primary" />
             <p class="text-sm text-slate-500 leading-relaxed italic">{{ t.quote }}</p>
             <footer class="mt-2 flex items-center justify-between gap-2">
@@ -114,17 +111,7 @@ const testimonials = [
   {
     quote: '"Deenex superó nuestras expectativas. Estamos recuperando clientes que compraban por apps de terceros y volviendo a fidelizarlos en nuestro propio ámbito."',
     author: 'Marcos Aldazábal, Socio y Fundador',
-    brand: 'Coquitos',
-  },
-  {
-    quote: '"Con el canal propio dejamos de regalarle nuestra base de clientes a Rappi. Ahora sabemos quiénes son, qué piden y los reactivamos con campañas nuestras."',
-    author: 'Equipo Comercial',
-    brand: 'Hatsu',
-  },
-  {
-    quote: '"La implementación fue más rápida de lo que esperábamos y el equipo de soporte estuvo presente en cada paso. Lo recomendamos sin dudarlo."',
-    author: 'Operaciones',
-    brand: 'Monti',
+    brand: 'Palta',
   },
 ]
 

@@ -143,7 +143,7 @@
         <!-- Dots mobile -->
         <div class="flex lg:hidden items-center justify-center gap-2 mt-4">
           <button v-for="(_, i) in 3" :key="i" @click="scrollToPlan(i)" class="transition-all duration-300 rounded-full"
-            :class="activePlan === i ? 'bg-primary w-6 h-2' : 'bg-slate-300 w-2 h-2'" />
+            :class="activePlan === i ? 'bg-primary w-6 h-2' : 'bg-slate-300 w-2 h-2'"></button>
         </div>
       </div>
 
