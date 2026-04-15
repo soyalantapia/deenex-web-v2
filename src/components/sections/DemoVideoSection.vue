@@ -22,12 +22,8 @@
           <div class="demo-ratio">
             <iframe
               :src="`https://player.vimeo.com/video/${VIMEO_ID}?badge=0&autopause=0&player_id=0&app_id=58479&title=0&byline=0&portrait=0&color=4f26db`"
-              frameborder="0"
-              allow="autoplay; fullscreen; picture-in-picture; clipboard-write; encrypted-media"
-              allowfullscreen
-              class="demo-iframe"
-              title="Deenex Platform Demo"
-            ></iframe>
+              frameborder="0" allow="autoplay; fullscreen; picture-in-picture; clipboard-write; encrypted-media"
+              allowfullscreen class="demo-iframe" title="Deenex Platform Demo"></iframe>
           </div>
         </div>
       </div>
@@ -46,7 +42,7 @@
 import { ref, onMounted, onUnmounted } from 'vue'
 
 // ← reemplazá con tu ID de Vimeo real
-const VIMEO_ID = '1183238338'
+const VIMEO_ID = '1183253994'
 
 const sectionRef = ref(null)
 const visible = ref(false)
