@@ -9,6 +9,7 @@
     <LoyaltySection class="v-reveal" />
     <MarketingSection class="v-reveal" />
     <SuccessCaseSection class="v-reveal" />
+    <DemoVideoSection class="v-reveal" />
     <PricingSection class="v-reveal" />
     <FAQSection class="v-reveal" />
     <CalendarSection class="v-reveal" />
@@ -21,6 +22,7 @@ import Navbar from '@/components/layout/Navbar.vue'
 import Footer from '@/components/layout/Footer.vue'
 import HeroSection from '@/components/sections/HeroSection.vue'
 import StatsSection from '@/components/sections/StatsSection.vue'
+import DemoVideoSection from '@/components/sections/DemoVideoSection.vue'
 import Clients from '@/components/sections/Clients.vue'
 import InfraSection from '@/components/sections/InfraSection.vue'
 import LogisticsSection from '@/components/sections/LogisticsSection.vue'
