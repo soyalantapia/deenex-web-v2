@@ -93,7 +93,7 @@ const navLinks = [
   { label: 'Loyalty', href: '#fidelizacion' },
   { label: 'Marketing', href: '#marketing' },
   { label: 'Producto', href: '#demo' },
-  { label: 'Precios', href: '#precios' },
+  // { label: 'Precios', href: '#precios' },
 ]
 
 function onScroll() {

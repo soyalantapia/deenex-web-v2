@@ -10,7 +10,7 @@
     <MarketingSection class="v-reveal" />
     <SuccessCaseSection class="v-reveal" />
     <DemoVideoSection class="v-reveal" />
-    <PricingSection class="v-reveal" />
+    <!-- <PricingSection class="v-reveal" /> -->
     <FAQSection class="v-reveal" />
     <CalendarSection class="v-reveal" />
     <Footer />
