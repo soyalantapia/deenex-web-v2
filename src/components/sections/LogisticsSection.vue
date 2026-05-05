@@ -5,7 +5,7 @@
       <div class="text-left mb-10">
         <h2 class="text-[clamp(1.8rem,4vw,2.8rem)] font-extrabold tracking-tighter leading-[1.05] text-slate-900">
           Tu delivery, <br />
-          <span class="text-primary italic font-light">sin comisiones.</span>
+          <span class="text-primary italic font-light">sin intermediarios.</span>
         </h2>
       </div>
 
@@ -75,8 +75,8 @@ const logisticsFeatures = [
     icon: Truck,
   },
   {
-    title: 'Cero Comisiones',
-    desc: 'Sin comisiones ocultas por venta. Todo el margen queda en tu negocio.',
+    title: 'Sin Intermediarios',
+    desc: 'Sin intermediarios ni costos ocultos. Todo el margen queda en tu negocio.',
     icon: CircleDollarSign,
   },
   {

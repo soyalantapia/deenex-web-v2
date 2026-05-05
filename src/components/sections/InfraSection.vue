@@ -4,7 +4,7 @@
 
       <div class="flex flex-col lg:flex-row lg:items-end justify-between gap-8 mb-16">
         <h2 class="text-[clamp(1.8rem,4vw,2.8rem)] font-extrabold tracking-tighter leading-[1.05] text-slate-900">
-          Un solo sistema para vender <br/>
+          Un solo sistema para vender <br />
           <span class="text-primary italic font-light">en todos tus locales y canales.</span>
         </h2>
         <div class="hidden lg:block max-w-[320px] text-right relative lg:ml-auto">
@@ -16,36 +16,26 @@
       </div>
 
       <!-- Carrusel -->
-      <div
-        ref="carouselRef"
+      <div ref="carouselRef"
         class="flex md:grid md:grid-cols-2 lg:grid-cols-3 gap-4 overflow-x-auto md:overflow-hidden pb-6 md:pb-0 scrollbar-hide snap-x snap-mandatory -mx-6 px-6 md:mx-0 md:px-0"
-        @scroll="onScroll"
-        @touchstart="isPaused = true"
-        @touchend="resumeAuto"
-      >
-        <div
-          v-for="(item, index) in features"
-          :key="item.title"
-          class="relative min-w-[280px] sm:min-w-[300px] md:min-w-0 border border-slate-200 hover:border-slate-300 rounded-2xl p-7 snap-center transition-colors duration-200 flex flex-col"
-        >
+        @scroll="onScroll" @touchstart="isPaused = true" @touchend="resumeAuto">
+        <div v-for="(item, index) in features" :key="item.title"
+          class="relative min-w-[280px] sm:min-w-[300px] md:min-w-0 border border-slate-200 hover:border-slate-300 rounded-2xl p-7 snap-center transition-colors duration-200 flex flex-col">
           <div class="w-9 h-9 rounded-lg bg-primary flex items-center justify-center mb-5">
             <component :is="item.icon" class="w-4 h-4 text-white" />
           </div>
           <h3 class="text-base font-semibold text-slate-900 mb-2 leading-tight">{{ item.title }}</h3>
           <p class="text-sm text-slate-500 leading-relaxed">{{ item.desc }}</p>
-          <span class="absolute bottom-5 right-6 text-[2.5rem] font-bold text-slate-100 select-none leading-none">0{{ index + 1 }}</span>
+          <span class="absolute bottom-5 right-6 text-[2.5rem] font-bold text-slate-100 select-none leading-none">0{{
+            index + 1 }}</span>
         </div>
       </div>
 
       <!-- Dots — solo mobile, con auto-scroll -->
       <div class="flex justify-center gap-2 mt-4 md:hidden">
-        <button
-          v-for="(_, i) in features"
-          :key="i"
-          @click="scrollToCard(i)"
+        <button v-for="(_, i) in features" :key="i" @click="scrollToCard(i)"
           class="transition-all duration-300 rounded-full"
-          :class="activeIndex === i ? 'bg-primary w-6 h-2' : 'bg-slate-300 w-2 h-2'"
-        />
+          :class="activeIndex === i ? 'bg-primary w-6 h-2' : 'bg-slate-300 w-2 h-2'" />
       </div>
 
     </div>
@@ -59,7 +49,7 @@ import { Layers, ShoppingBag, Users } from 'lucide-vue-next'
 const features = [
   {
     title: 'App Web & Stores',
-    desc: 'Publicamos tu propia web y apps oficiales en App Store y Play Store bajo tu marca. Sin comisiones por venta, con total soberanía sobre tus clientes.',
+    desc: 'Publicamos tu propia web y apps oficiales en App Store y Play Store bajo tu marca. Con total soberanía sobre tus clientes.',
     icon: Layers,
   },
   {
@@ -106,6 +96,12 @@ onUnmounted(() => { clearInterval(autoTimer) })
 </script>
 
 <style scoped>
-.scrollbar-hide::-webkit-scrollbar { display: none; }
-.scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
 </style>

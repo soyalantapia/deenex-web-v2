@@ -5,7 +5,7 @@
         <div class="max-w-xl">
           <h2 class="text-[clamp(1.8rem,4vw,2.8rem)] font-extrabold tracking-tighter leading-[1.05] text-slate-900">
             Pagás por lo que usás.<br />
-            <span class="text-primary italic font-light">Sin comisiones por pedido.</span>
+            <span class="text-primary italic font-light">Sin intermediarios ni costos ocultos.</span>
           </h2>
         </div>
         <button @click="openModal"
