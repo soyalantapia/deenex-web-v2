@@ -2,12 +2,7 @@
   <section class="stats-section py-8 overflow-hidden" ref="sectionRef">
     <div class="max-w-6xl mx-auto px-6">
       <div class="stats-grid">
-        <div
-          v-for="(stat, i) in stats"
-          :key="i"
-          class="stat-card"
-          :class="{ 'stat-card--active': hasAnimated }"
-        >
+        <div v-for="(stat, i) in stats" :key="i" class="stat-card" :class="{ 'stat-card--active': hasAnimated }">
           <span class="stat-value text-primary">
             <span v-if="stat.prefix" class="stat-prefix">{{ stat.prefix }}</span>
             <span class="stat-number">{{ displayValues[i] }}</span>
@@ -30,9 +25,9 @@ const displayValues = reactive([0, 0, 0, 0])
 
 const stats = [
   { prefix: '+', value: 500, suffix: '', label: 'Sucursales activas', sub: 'En toda la red Deenex' },
-  { prefix: '',  value: 0,   suffix: '%', label: 'Comisiones por venta', sub: 'Todo el margen es tuyo' },
-  { prefix: '',  value: 2,   suffix: 'X', label: 'Más fidelización', sub: 'Vs. apps de terceros' },
-  { prefix: '+', value: 40,  suffix: '%', label: 'Clientes recuperados', sub: 'De Rappi y PedidosYa' },
+  { prefix: '+', value: 25, suffix: '%', label: 'Ticket promedio', sub: 'Mayor rentabilidad por pedido' },
+  { prefix: '', value: 2, suffix: 'X', label: 'Más fidelización', sub: 'Vs. apps de terceros' },
+  { prefix: '+', value: 40, suffix: '%', label: 'Clientes recuperados', sub: 'De Rappi y PedidosYa' },
 ]
 
 function animateCounter(index, target, duration = 1800) {
@@ -126,13 +121,11 @@ onUnmounted(() => {
   bottom: 0;
   right: 0;
   width: 1px;
-  background: linear-gradient(
-    to bottom,
-    transparent 0%,
-    #dde3ec 25%,
-    #dde3ec 75%,
-    transparent 100%
-  );
+  background: linear-gradient(to bottom,
+      transparent 0%,
+      #dde3ec 25%,
+      #dde3ec 75%,
+      transparent 100%);
 }
 
 .stat-card:last-child::after {
@@ -141,6 +134,7 @@ onUnmounted(() => {
 
 /* Mobile: separadores */
 @media (max-width: 1023px) {
+
   /* Separador horizontal entre filas */
   .stat-card::before {
     content: '';
@@ -149,13 +143,11 @@ onUnmounted(() => {
     left: 0;
     right: 0;
     height: 1px;
-    background: linear-gradient(
-      to right,
-      transparent 0%,
-      #dde3ec 20%,
-      #dde3ec 80%,
-      transparent 100%
-    );
+    background: linear-gradient(to right,
+        transparent 0%,
+        #dde3ec 20%,
+        #dde3ec 80%,
+        transparent 100%);
   }
 
   /* Solo los dos primeros (primera fila) necesitan borde inferior */
