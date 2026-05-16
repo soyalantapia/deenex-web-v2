@@ -53,6 +53,7 @@
       <div :class="{ 'animate-rise': ready, 'opacity-0': !ready }"
         class="mt-9 mb-5 sm:mb-0 flex items-center justify-center gap-3 sm:gap-4" style="animation-delay:0.4s">
         <a href="#agendar"
+          @click="trackEvent('click_comenzar_ahora')"
           class="btn-primary group inline-flex items-center gap-2 bg-primary text-white font-semibold rounded-xl px-4 py-2.5 sm:px-6 sm:py-3.5 text-[0.82rem] sm:text-[0.9rem] transition-all hover:bg-[#3c1fc9] shadow-lg shadow-primary/25 hover:shadow-primary/40 hover:-translate-y-0.5 relative overflow-hidden">
           <span class="btn-shimmer"></span>
           Comenzar Ahora
@@ -140,6 +141,7 @@
 
 <script setup>
 import { ref, onMounted } from 'vue'
+import { trackEvent } from '@/utils/analytics'
 const ready = ref(false)
 
 // Carga dinámica de imágenes de floats

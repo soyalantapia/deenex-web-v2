@@ -34,6 +34,28 @@
 </template>
 
 <script setup>
+import { onMounted, onUnmounted } from 'vue'
+import { trackEvent } from '@/utils/analytics'
+
 const calendarUrl = import.meta.env.VITE_CALENDAR_URL
+
+const handleCalendarMessage = (e) => {
+  // Common patterns for calendar providers (Calendly, Cal.com, etc.)
+  const isScheduled = e.data.event === 'calendly.event_scheduled' || 
+                      e.data.event === 'scheduled' ||
+                      (typeof e.data === 'string' && e.data.includes('event_scheduled'))
+
+  if (isScheduled) {
+    trackEvent('agenda_demo_completado')
+  }
+}
+
+onMounted(() => {
+  window.addEventListener('message', handleCalendarMessage)
+})
+
+onUnmounted(() => {
+  window.removeEventListener('message', handleCalendarMessage)
+})
 </script>
 

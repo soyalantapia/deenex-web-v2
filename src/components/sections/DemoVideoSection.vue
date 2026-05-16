@@ -30,7 +30,7 @@
 
       <!-- CTA — texto solamente, en sintonía con el patrón del resto del sitio -->
       <div class="mt-12 flex flex-col sm:flex-row items-start sm:items-center gap-5">
-        <a href="#agendar" class="demo-link-primary">Agendar una demo en vivo</a>
+        <a href="#agendar" @click="trackEvent('click_agendar_demo')" class="demo-link-primary">Agendar una demo en vivo</a>
         <a href="#infraestructura" class="demo-link-ghost">Ver toda la infraestructura</a>
       </div>
 
@@ -40,6 +40,7 @@
 
 <script setup>
 import { ref, onMounted, onUnmounted } from 'vue'
+import { trackEvent } from '@/utils/analytics'
 
 // ← reemplazá con tu ID de Vimeo real
 const VIMEO_ID = '1183253994'
@@ -59,6 +60,20 @@ onMounted(() => {
     { threshold: 0.12 }
   )
   if (sectionRef.value) observer.observe(sectionRef.value)
+
+  // Vimeo Tracking
+  const iframe = document.querySelector('.demo-iframe')
+  if (iframe && window.Vimeo) {
+    const player = new window.Vimeo.Player(iframe)
+    
+    player.on('play', () => {
+      trackEvent('video_play')
+    })
+
+    player.on('ended', () => {
+      trackEvent('video_completado')
+    })
+  }
 })
 
 onUnmounted(() => {

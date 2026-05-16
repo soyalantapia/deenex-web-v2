@@ -666,6 +666,7 @@
                     </a>
 
                     <a :href="calendarUrl" target="_blank" rel="noopener"
+                      @click="trackEvent('click_agendar_demo')"
                       class="w-full bg-white border-2 border-slate-200 hover:border-slate-300 text-slate-700 hover:text-slate-900 py-3.5 rounded-xl font-bold text-sm transition-colors flex items-center justify-center gap-2">
                       <CalendarDays class="w-4 h-4 text-slate-400" />
                       Agendar Demo
@@ -684,6 +685,7 @@
 
 <script setup>
 import { ref, computed, nextTick, onMounted, onUnmounted } from 'vue'
+import { trackEvent } from '@/utils/analytics'
 import {
   Check,
   Sparkles,

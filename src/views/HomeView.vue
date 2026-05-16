@@ -33,6 +33,9 @@ import CalendarSection from '@/components/sections/CalendarSection.vue'
 import SuccessCaseSection from '@/components/sections/SuccessCaseSection.vue'
 import FAQSection from '@/components/sections/FAQSection.vue'
 import { onMounted } from 'vue'
+import { useScrollTracking } from '@/composables/useScrollTracking'
+
+useScrollTracking()
 
 onMounted(() => {
   const observer = new IntersectionObserver((entries) => {

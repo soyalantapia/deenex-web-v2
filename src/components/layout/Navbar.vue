@@ -27,6 +27,7 @@
         <!-- Desktop CTA + Mobile hamburger -->
         <div class="flex items-center gap-3">
           <a href="#agendar"
+            @click="trackEvent('click_agendar_demo')"
             class="hidden md:inline-flex items-center gap-2 text-[0.82rem] font-bold px-4 py-2.5 rounded-xl transition-all duration-300 shrink-0"
             :class="scrolled
               ? 'bg-white text-primary hover:bg-slate-50'
@@ -65,7 +66,7 @@
           </a>
         </div>
         <div class="px-2.5 pb-2.5">
-          <a href="#agendar" @click="isMenuOpen = false"
+          <a href="#agendar" @click="isMenuOpen = false; trackEvent('click_agendar_demo')"
             class="flex items-center justify-center gap-2 text-sm font-bold py-3 rounded-xl bg-primary text-white hover:bg-[#3c1fc9] transition-colors shadow-md shadow-primary/20">
             Agendar Demo
             <svg width="10" height="10" viewBox="0 0 13 13" fill="none">
@@ -82,6 +83,7 @@
 
 <script setup>
 import { ref, onMounted, onUnmounted } from 'vue'
+import { trackEvent } from '@/utils/analytics'
 
 const isMenuOpen = ref(false)
 const scrolled = ref(false)
