@@ -67,7 +67,7 @@
     </div>
 
     <!-- CTAs -->
-    <div v-if="!isEnterprise" class="flex flex-col sm:flex-row gap-3">
+    <div v-if="!isEnterprise" class="flex flex-col sm:flex-row gap-3 mb-8">
       <a
         :href="dashboardUrl"
         @click="trackDashboardClick"
@@ -86,6 +86,62 @@
         <CalendarDays class="w-3.5 h-3.5" />
         Agendar Customer Success
       </a>
+    </div>
+
+    <!-- Refer-a-friend block ────────────────────────────────────────── -->
+    <div v-if="!isEnterprise" class="relative rounded-3xl border-2 border-dashed border-primary/30 bg-primary/[0.02] p-6 mb-4">
+      <div class="absolute -top-3 left-6 bg-white px-3 py-0.5 text-[10px] font-black text-primary uppercase tracking-widest rounded-full border border-primary/30">
+        Beneficio mutuo
+      </div>
+      <div class="flex items-start gap-4">
+        <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-amber-400 to-amber-500 flex items-center justify-center shrink-0 text-2xl">
+          🎁
+        </div>
+        <div class="flex-1 min-w-0">
+          <h3 class="text-base font-bold text-slate-900 leading-tight mb-1">
+            ¿Conocés otra marca que sufre con apps de terceros?
+          </h3>
+          <p class="text-xs text-slate-500 leading-relaxed mb-4">
+            Invitalos con tu link personal: cuando activan, vos sumás
+            <span class="font-bold text-emerald-600">1 mes gratis</span>
+            y ellos arrancan con
+            <span class="font-bold text-emerald-600">25% off</span>
+            sobre el primer mes.
+          </p>
+          <div class="flex items-center gap-2 bg-white border border-slate-200 rounded-lg px-3 py-2">
+            <code class="flex-1 text-xs font-mono text-slate-600 truncate">{{ referralLink }}</code>
+            <button
+              type="button"
+              @click="copyReferral"
+              class="text-[10px] font-black uppercase tracking-widest px-2.5 py-1 rounded-md transition-colors shrink-0"
+              :class="copied ? 'bg-emerald-500 text-white' : 'bg-primary text-white hover:bg-[#3c1fc9]'"
+            >
+              {{ copied ? '¡Copiado!' : 'Copiar' }}
+            </button>
+          </div>
+          <div class="flex items-center gap-2 mt-3">
+            <a
+              :href="whatsappShareUrl"
+              target="_blank"
+              rel="noopener"
+              @click="trackShare('whatsapp')"
+              class="inline-flex items-center gap-1.5 text-xs font-semibold text-emerald-600 hover:text-emerald-700 transition-colors"
+            >
+              <MessageCircle class="w-3 h-3" />
+              Compartir por WhatsApp
+            </a>
+            <span class="w-px h-3 bg-slate-200"></span>
+            <a
+              :href="emailShareUrl"
+              @click="trackShare('email')"
+              class="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-500 hover:text-slate-700 transition-colors"
+            >
+              <Mail class="w-3 h-3" />
+              Compartir por email
+            </a>
+          </div>
+        </div>
+      </div>
     </div>
 
     <!-- Enterprise CTA -->
@@ -118,7 +174,7 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { Check, CalendarDays, ArrowRight } from 'lucide-vue-next'
+import { Check, CalendarDays, ArrowRight, MessageCircle, Mail } from 'lucide-vue-next'
 import ConfettiCanvas from '@/components/onboarding/ConfettiCanvas.vue'
 import { useOnboarding } from '@/composables/useOnboarding'
 
@@ -167,6 +223,38 @@ const nextSteps = [
 
 function trackNextStepClick(key) {
   onboarding.track('next_step_click', { step: key })
+}
+
+// ── Referral ─────────────────────────────────────────────────────────────
+const referralCode = computed(() => {
+  // Código simple basado en el subdomain del lead. En producción esto vendría
+  // de la API con un ID único por cuenta.
+  const slug = onboarding.subdomainPreview.value
+  return slug && slug !== 'tu-marca' ? slug : 'amigo'
+})
+const referralLink = computed(() => `https://deenex.tech/r/${referralCode.value}`)
+const copied = ref(false)
+async function copyReferral() {
+  try {
+    await navigator.clipboard.writeText(referralLink.value)
+    copied.value = true
+    onboarding.track('referral_copied', { code: referralCode.value })
+    setTimeout(() => { copied.value = false }, 2000)
+  } catch {
+    // Clipboard fallido — UX queda igual, no rompemos nada.
+  }
+}
+const whatsappShareUrl = computed(() => {
+  const text = `Hola! Estoy probando Deenex y me parece muy útil para marcas gastronómicas. Te dejo mi link de referido, arrancás con 25% off el primer mes: ${referralLink.value}`
+  return `https://wa.me/?text=${encodeURIComponent(text)}`
+})
+const emailShareUrl = computed(() => {
+  const subject = 'Probá Deenex con 25% off el primer mes'
+  const body = `Estoy probando Deenex y me parece muy útil para marcas gastronómicas. Te dejo mi link de referido, arrancás con 25% off el primer mes: ${referralLink.value}`
+  return `mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`
+})
+function trackShare(channel) {
+  onboarding.track('referral_share', { channel, code: referralCode.value })
 }
 
 const playConfetti = ref(false)

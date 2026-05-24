@@ -14,6 +14,38 @@
       con su branding aplicado.
     </p>
 
+    <!-- Tour callout: aparece la primera vez que ven el sandbox -->
+    <Transition name="tour">
+      <div
+        v-if="showTour"
+        class="mb-5 rounded-2xl border-2 border-amber-200 bg-amber-50/60 p-4 flex items-start gap-3 relative"
+      >
+        <div class="w-8 h-8 rounded-lg bg-amber-400 flex items-center justify-center shrink-0 text-amber-950">
+          👋
+        </div>
+        <div class="flex-1 min-w-0">
+          <p class="text-sm font-bold text-slate-900 leading-tight mb-1">
+            Tour de 10 segundos
+          </p>
+          <p class="text-xs text-slate-600 leading-snug">
+            Cambiá entre los 4 tabs de abajo para ver las distintas vistas de Deenex:
+            <span class="font-semibold">Ventas</span> en tiempo real,
+            <span class="font-semibold">Clientes</span> con su LTV,
+            <span class="font-semibold">Campañas</span> automatizadas y
+            <span class="font-semibold">Fidelización</span> por niveles.
+          </p>
+        </div>
+        <button
+          type="button"
+          @click="dismissTour"
+          class="text-xs font-bold text-amber-700 hover:text-amber-900 transition-colors shrink-0"
+          aria-label="Cerrar tour"
+        >
+          Entendido
+        </button>
+      </div>
+    </Transition>
+
     <!-- Browser chrome mock -->
     <div class="rounded-2xl border border-slate-200 shadow-xl shadow-slate-900/5 overflow-hidden bg-white mb-8">
       <div class="flex items-center gap-2 px-3 py-2 border-b border-slate-100 bg-slate-50/80">
@@ -112,14 +144,14 @@
               </div>
               <ul class="divide-y divide-slate-100">
                 <li v-for="c in topCustomers" :key="c.name" class="flex items-center gap-3 px-4 py-3">
-                  <div class="w-9 h-9 rounded-full flex items-center justify-center text-xs font-black text-white" :class="c.color">
-                    {{ c.initials }}
+                  <div class="w-9 h-9 rounded-full flex items-center justify-center text-lg shrink-0" :class="c.color">
+                    {{ c.emoji }}
                   </div>
                   <div class="flex-1 min-w-0">
                     <p class="text-sm font-bold text-slate-900 leading-tight truncate">{{ c.name }}</p>
                     <p class="text-[10px] text-slate-500 mt-0.5">{{ c.orders }} pedidos · último: {{ c.last }}</p>
                   </div>
-                  <span class="text-sm font-black tabular-nums text-emerald-600">USD {{ c.ltv.toLocaleString('es-AR') }}</span>
+                  <span class="text-sm font-black tabular-nums text-emerald-600 shrink-0">USD {{ c.ltv.toLocaleString('es-AR') }}</span>
                 </li>
               </ul>
             </div>
@@ -209,7 +241,7 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import {
   Lock, BarChart3, Users, Megaphone, Crown, Star, Award, Zap,
@@ -245,10 +277,10 @@ const salesByChannel = [
 ]
 
 const topCustomers = [
-  { name: 'María González', initials: 'MG', orders: 47, last: 'hoy', ltv: 1842, color: 'bg-rose-500' },
-  { name: 'Lautaro Sosa', initials: 'LS', orders: 38, last: 'ayer', ltv: 1421, color: 'bg-violet-500' },
-  { name: 'Agustina Robles', initials: 'AR', orders: 32, last: '2d', ltv: 1187, color: 'bg-sky-500' },
-  { name: 'Pablo Giménez', initials: 'PG', orders: 28, last: '3d', ltv: 968, color: 'bg-emerald-500' },
+  { name: 'María González', emoji: '👩‍🦰', orders: 47, last: 'hoy', ltv: 1842, color: 'bg-rose-100' },
+  { name: 'Lautaro Sosa', emoji: '🧑‍💻', orders: 38, last: 'ayer', ltv: 1421, color: 'bg-violet-100' },
+  { name: 'Agustina Robles', emoji: '👩‍🎓', orders: 32, last: '2d', ltv: 1187, color: 'bg-sky-100' },
+  { name: 'Pablo Giménez', emoji: '🧑‍🍳', orders: 28, last: '3d', ltv: 968, color: 'bg-emerald-100' },
 ]
 
 const campaigns = [
@@ -262,6 +294,21 @@ const loyaltyTiers = [
   { name: 'Plata', count: '1.364', bg: 'bg-slate-200', icon: Award, iconColor: 'text-slate-600' },
   { name: 'Oro', count: '142', bg: 'bg-amber-300', icon: Crown, iconColor: 'text-amber-800' },
 ]
+
+// Tour callout: solo aparece la primera vez. Lo persistimos en localStorage
+// para que el lead que vuelve no lo vea de nuevo.
+const TOUR_KEY = 'deenex_sandbox_tour_seen'
+const showTour = ref(false)
+onMounted(() => {
+  if (typeof window !== 'undefined' && !localStorage.getItem(TOUR_KEY)) {
+    showTour.value = true
+  }
+})
+function dismissTour() {
+  showTour.value = false
+  try { localStorage.setItem(TOUR_KEY, '1') } catch {}
+  onboarding.track('sandbox_tour_dismissed')
+}
 
 onboarding.track('sandbox_viewed', { brand: onboarding.state.business.brand })
 
@@ -285,6 +332,15 @@ function onContinue() {
 .tab-enter-from,
 .tab-leave-to {
   opacity: 0;
+}
+.tour-enter-active,
+.tour-leave-active {
+  transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.tour-enter-from,
+.tour-leave-to {
+  opacity: 0;
+  transform: translateY(-8px);
 }
 .scrollbar-hide::-webkit-scrollbar { display: none; }
 .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }

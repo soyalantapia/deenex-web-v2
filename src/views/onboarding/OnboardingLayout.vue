@@ -1,5 +1,14 @@
 <template>
   <div class="onboarding-shell min-h-screen bg-white">
+    <!-- Social proof live counter (top of page) -->
+    <div class="bg-slate-900 text-white py-1.5 px-4 text-center">
+      <p class="text-[11px] font-medium leading-snug">
+        <span class="inline-block w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse mr-1.5 -mt-0.5"></span>
+        <span class="font-bold text-emerald-400 tabular-nums">+{{ liveActivations }}</span>
+        cadenas activaron Deenex {{ activationWindow }}
+      </p>
+    </div>
+
     <!-- Top bar -->
     <header class="border-b border-slate-100 bg-white/80 backdrop-blur-md sticky top-0 z-50">
       <div class="max-w-6xl mx-auto px-4 sm:px-6 py-4 flex items-center justify-between gap-4">
@@ -39,66 +48,72 @@
           </RouterView>
         </div>
 
-        <!-- Side panel: contextual social proof + savings -->
-        <aside class="hidden lg:block sticky top-32">
-          <div class="bg-slate-50/60 border border-slate-200 rounded-3xl p-7 relative overflow-hidden">
-            <div class="absolute inset-0 bg-gradient-to-br from-primary/[0.05] to-transparent pointer-events-none"></div>
-            <div class="relative">
-              <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 text-primary text-[10px] font-bold uppercase tracking-wider mb-5">
-                <span class="w-1.5 h-1.5 rounded-full bg-primary animate-pulse"></span>
-                Trial 15 días
-              </div>
-              <h3 class="text-xl font-extrabold tracking-tighter text-slate-900 mb-3 leading-tight">
-                Sin cargo hoy.<br />
-                <span class="text-primary italic font-light">Cancelás cuando quieras.</span>
-              </h3>
-              <ul class="space-y-3 text-sm text-slate-600 leading-relaxed">
-                <li class="flex items-start gap-2.5">
-                  <span class="w-5 h-5 rounded-full bg-primary/10 flex items-center justify-center shrink-0 mt-0.5">
-                    <Check class="w-3 h-3 text-primary" />
-                  </span>
-                  Configurás tu marca, menú y zona de delivery en menos de 30 minutos.
-                </li>
-                <li class="flex items-start gap-2.5">
-                  <span class="w-5 h-5 rounded-full bg-primary/10 flex items-center justify-center shrink-0 mt-0.5">
-                    <Check class="w-3 h-3 text-primary" />
-                  </span>
-                  Cobramos con MercadoPago recién al día 16. Antes de eso, no nos pagás nada.
-                </li>
-                <li class="flex items-start gap-2.5">
-                  <span class="w-5 h-5 rounded-full bg-primary/10 flex items-center justify-center shrink-0 mt-0.5">
-                    <Check class="w-3 h-3 text-primary" />
-                  </span>
-                  Si no convence, te exportamos los datos y bajamos la cuenta sin preguntas.
-                </li>
-              </ul>
-
-              <div class="mt-7 pt-6 border-t border-slate-200/70">
-                <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3">
-                  Marcas que ya confían
-                </p>
-                <div class="flex items-center gap-3 flex-wrap">
-                  <span class="text-xs font-semibold text-slate-500">Palta</span>
-                  <span class="w-1 h-1 rounded-full bg-slate-300"></span>
-                  <span class="text-xs font-semibold text-slate-500">Hatsu</span>
-                  <span class="w-1 h-1 rounded-full bg-slate-300"></span>
-                  <span class="text-xs font-semibold text-slate-500">Coquitos</span>
-                  <span class="w-1 h-1 rounded-full bg-slate-300"></span>
-                  <span class="text-xs font-semibold text-slate-500">Monti</span>
-                  <span class="w-1 h-1 rounded-full bg-slate-300"></span>
-                  <span class="text-xs font-semibold text-slate-500">Glorias</span>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Resume hint if returning -->
-          <p v-if="hasProgress" class="mt-5 text-[11px] text-slate-400 leading-relaxed">
-            Tu progreso se guarda automáticamente. Podés cerrar la pestaña y volver cuando quieras.
-          </p>
-        </aside>
+        <!-- Side panel: contenido cambia según el step activo -->
+        <SidePanel
+          :mode="currentMode"
+          :has-progress="hasProgress"
+          :recommended-plan-commission="planCommissionLabel"
+        />
       </div>
     </main>
+
+    <!-- Exit intent modal — aparece UNA vez si el lead mueve el mouse hacia
+         arriba del viewport (típico cuando va a cerrar la tab) y tiene
+         progreso parcial. Diferente al exit modal del logo: este es
+         proactivo, lo dispara el detector. -->
+    <Teleport to="body">
+      <Transition name="exit-overlay">
+        <div
+          v-if="showExitIntent"
+          class="fixed inset-0 z-[9997] bg-slate-900/60 backdrop-blur-sm"
+          @click="dismissExitIntent"
+        ></div>
+      </Transition>
+      <Transition name="exit-modal">
+        <div
+          v-if="showExitIntent"
+          class="fixed inset-0 z-[9998] flex items-center justify-center p-4 pointer-events-none"
+        >
+          <div class="bg-white rounded-3xl shadow-2xl max-w-md w-full p-7 pointer-events-auto">
+            <div class="w-12 h-12 rounded-2xl bg-amber-400 flex items-center justify-center text-2xl mb-5">
+              👋
+            </div>
+            <h3 class="text-xl font-extrabold tracking-tight text-slate-900 mb-2">
+              Antes de irte, una cosa.
+            </h3>
+            <p class="text-sm text-slate-500 leading-relaxed mb-5">
+              Ya completaste {{ onboarding.state.meta.completedSteps.length }}/5 pasos.
+              Si volvés en las próximas 48 horas y activás tu trial, te regalamos
+              <span class="font-bold text-emerald-600">los primeros 30 días gratis</span>
+              en vez de 15.
+            </p>
+            <div class="rounded-2xl bg-slate-50 border border-slate-200 p-3 mb-5 flex items-center gap-3">
+              <Gift class="w-5 h-5 text-amber-500 shrink-0" />
+              <code class="flex-1 text-xs font-mono text-slate-700 truncate">DEENEX30</code>
+              <span class="text-[10px] font-black text-emerald-600 uppercase tracking-widest shrink-0">
+                Código aplicado
+              </span>
+            </div>
+            <div class="flex flex-col-reverse sm:flex-row sm:items-center sm:justify-end gap-2">
+              <button
+                type="button"
+                @click="dismissExitIntent"
+                class="px-5 py-2.5 rounded-xl text-sm font-semibold text-slate-500 hover:bg-slate-50 transition-colors"
+              >
+                Después
+              </button>
+              <button
+                type="button"
+                @click="continueWithBonus"
+                class="px-5 py-2.5 rounded-xl text-sm font-bold bg-primary text-white hover:bg-[#3c1fc9] transition-colors"
+              >
+                Continuar con el bonus →
+              </button>
+            </div>
+          </div>
+        </div>
+      </Transition>
+    </Teleport>
 
     <!-- Exit confirmation modal -->
     <Teleport to="body">
@@ -147,7 +162,8 @@
 <script setup>
 import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
 import { useRoute, RouterLink, RouterView } from 'vue-router'
-import { Check } from 'lucide-vue-next'
+import { Gift } from 'lucide-vue-next'
+import SidePanel from '@/components/onboarding/SidePanel.vue'
 import { useOnboarding } from '@/composables/useOnboarding'
 
 const route = useRoute()
@@ -172,6 +188,71 @@ const completionPct = computed(() => {
 })
 
 const hasProgress = computed(() => onboarding.state.meta.completedSteps.length > 0)
+
+const currentMode = computed(() => steps[activeStepIndex.value]?.key || 'identity')
+
+// Social proof: número aproximado de activaciones del día/semana. Es un
+// valor frontend-only por ahora — cuando exista endpoint /api/onboarding/stats
+// reemplazamos por live data. El número se "mueve" sutilmente para que se
+// sienta vivo, pero queda estable durante la sesión del lead.
+const liveActivations = ref(0)
+const activationWindow = ref('esta semana')
+function initSocialProof() {
+  // Base: 12 a 47 por día según horario. Determinístico por hora del día
+  // para que no parpadee al refrescar.
+  const hour = new Date().getHours()
+  const dayBase = hour >= 18 ? 47 : hour >= 12 ? 32 : hour >= 9 ? 18 : 12
+  // Pequeño jitter local pero estable durante toda la sesión (semilla = día)
+  const day = new Date().getDate()
+  const jitter = ((day * 17) % 11) - 5
+  liveActivations.value = Math.max(8, dayBase + jitter)
+  activationWindow.value = 'esta semana'
+
+  // Cada 25-40s sumamos 1 activación para que parezca vivo si la sesión es larga.
+  setInterval(() => {
+    if (Math.random() < 0.55) liveActivations.value += 1
+  }, 32_000)
+}
+
+// ── Exit intent: detecta cuando el mouse sale por arriba del viewport ──
+// Solo dispara UNA vez por sesión (persistencia en sessionStorage) y solo
+// si el lead tiene progreso parcial (no recién entró, no ya activó).
+const showExitIntent = ref(false)
+
+function onMouseLeave(e) {
+  // Solo nos importa cuando el mouse sale por arriba (Y <= 0).
+  if (e.clientY > 5) return
+  if (typeof window !== 'undefined' && sessionStorage.getItem('deenex_exit_intent_shown')) return
+  const completed = onboarding.state.meta.completedSteps
+  // Solo si ya hizo algo pero no terminó el trial
+  if (completed.length === 0 || completed.includes('trial')) return
+  // Y solo si no está en welcome
+  if (route.path === '/comenzar/listo') return
+
+  showExitIntent.value = true
+  try { sessionStorage.setItem('deenex_exit_intent_shown', '1') } catch {}
+  onboarding.track('exit_intent_shown', { last_step: steps[activeStepIndex.value]?.key })
+}
+
+function dismissExitIntent() {
+  showExitIntent.value = false
+  onboarding.track('exit_intent_dismissed')
+}
+
+function continueWithBonus() {
+  showExitIntent.value = false
+  onboarding.track('exit_intent_bonus_accepted', { code: 'DEENEX30' })
+  // Persistimos el bonus en localStorage para mostrarlo en el step de Trial.
+  try {
+    localStorage.setItem('deenex_bonus_code', 'DEENEX30')
+  } catch {}
+}
+
+const planCommissionLabel = computed(() => {
+  const tier = onboarding.recommendedPlan.value
+  // Devuelve string tipo "1,25%" — formato hispano para mostrar al lead.
+  return `${String(tier?.commissionPct ?? 1.25).replace('.', ',')}%`
+})
 
 const showExitModal = ref(false)
 function onExit() {
@@ -214,6 +295,7 @@ onMounted(() => {
   if (robotsTag) robotsTag.setAttribute('content', 'noindex, nofollow')
 
   applyStepHead()
+  initSocialProof()
 
   const variant = route.query.from || ''
   onboarding.ensureStarted(variant)
@@ -222,6 +304,7 @@ onMounted(() => {
   window.addEventListener('beforeunload', onBeforeUnload)
   window.addEventListener('pagehide', onPageHide)
   document.addEventListener('visibilitychange', onVisibilityChange)
+  document.addEventListener('mouseleave', onMouseLeave)
 })
 
 function onBeforeUnload(e) {
@@ -275,6 +358,7 @@ onUnmounted(() => {
   window.removeEventListener('beforeunload', onBeforeUnload)
   window.removeEventListener('pagehide', onPageHide)
   document.removeEventListener('visibilitychange', onVisibilityChange)
+  document.removeEventListener('mouseleave', onMouseLeave)
   if (visibilityTimer) clearTimeout(visibilityTimer)
 })
 </script>

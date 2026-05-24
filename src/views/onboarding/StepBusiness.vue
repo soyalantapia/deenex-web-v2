@@ -35,19 +35,28 @@
         </div>
       </div>
 
-      <!-- Slider locales -->
+      <!-- Slider + input combinado -->
       <div>
         <div class="flex items-baseline justify-between mb-3">
           <span class="text-[11px] font-bold text-slate-700 uppercase tracking-widest">
             ¿Cuántos locales operás?
           </span>
           <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">
-            Slider
+            Editá o usá el slider
           </span>
         </div>
         <div class="bg-slate-50/60 border border-slate-200 rounded-2xl p-5">
           <div class="flex items-baseline gap-2 mb-4">
-            <span class="text-5xl font-black text-primary tabular-nums tracking-tighter">{{ form.locations }}</span>
+            <input
+              v-model.number="form.locations"
+              type="number"
+              min="1"
+              max="500"
+              inputmode="numeric"
+              @blur="clampLocations"
+              class="text-5xl font-black text-primary tabular-nums tracking-tighter w-32 bg-transparent border-none outline-none focus:bg-white focus:ring-2 focus:ring-primary/30 rounded-lg px-2 -mx-2 transition-colors no-spinner"
+              aria-label="Cantidad de locales"
+            />
             <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">
               {{ form.locations === 1 ? 'local' : 'locales operativos' }}
             </span>
@@ -210,6 +219,13 @@ function validate(field) {
   }
 }
 
+// Si el usuario escribe un número fuera de rango en el input, lo normalizamos
+// al perder foco para que el slider y el computed del plan no se rompan.
+function clampLocations() {
+  const n = Number(form.locations) || 1
+  form.locations = Math.max(1, Math.min(500, Math.round(n)))
+}
+
 const isFormValid = computed(() => {
   return (
     form.brand.trim().length >= 2 &&
@@ -238,6 +254,17 @@ function onSubmit() {
 </script>
 
 <style scoped>
+/* Oculta los spinners del input number para que se vea como texto editable. */
+.no-spinner::-webkit-outer-spin-button,
+.no-spinner::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+.no-spinner {
+  -moz-appearance: textfield;
+  appearance: textfield;
+}
+
 .custom-range::-webkit-slider-thumb {
   -webkit-appearance: none;
   appearance: none;

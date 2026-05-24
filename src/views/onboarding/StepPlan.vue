@@ -49,7 +49,7 @@
             Tu ahorro estimado
           </p>
           <p class="text-3xl sm:text-4xl font-black tabular-nums tracking-tighter leading-none">
-            USD {{ formattedSavings }}
+            USD <AnimatedNumber :value="onboarding.savingsVsThirdParty.value" :duration="1400" />
             <span class="text-base font-bold text-white/80">/ mes</span>
           </p>
           <p class="text-sm text-white/90 mt-2 leading-snug">
@@ -91,7 +91,7 @@
           Sin Deenex
         </p>
         <p class="text-2xl font-black text-slate-400 line-through tabular-nums tracking-tighter mb-1">
-          USD {{ thirdPartyMonthly.toLocaleString('es-AR') }}
+          USD <AnimatedNumber :value="thirdPartyMonthly" :duration="1400" />
         </p>
         <p class="text-[11px] text-slate-400 leading-snug">
           Comisión típica de apps de terceros (25% sobre GMV).
@@ -102,7 +102,7 @@
           Con Deenex
         </p>
         <p class="text-2xl font-black text-primary tabular-nums tracking-tighter mb-1">
-          USD {{ deenexMonthly.toLocaleString('es-AR') }}
+          USD <AnimatedNumber :value="deenexMonthly" :duration="1400" />
         </p>
         <p class="text-[11px] text-slate-600 leading-snug">
           Fee fijo + {{ recommendedPlan.commissionPct }}% por venta procesada.
@@ -264,6 +264,7 @@
 import { reactive, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { TrendingDown, Zap } from 'lucide-vue-next'
+import AnimatedNumber from '@/components/onboarding/AnimatedNumber.vue'
 import StepActions from '@/components/onboarding/StepActions.vue'
 import { useOnboarding } from '@/composables/useOnboarding'
 
