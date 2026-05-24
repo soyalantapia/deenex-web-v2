@@ -9,11 +9,96 @@ const router = createRouter({
       component: () => import('../views/HomeView.vue'), // Lazy loading
     },
     {
+      // Auto-onboarding self-serve flow — 5 pasos con persistencia en localStorage.
+      // El layout vive en views/onboarding/OnboardingLayout.vue y los steps son
+      // children que rotan dentro de un <RouterView> con transition.
+      path: '/comenzar',
+      component: () => import('../views/onboarding/OnboardingLayout.vue'),
+      meta: { layout: 'onboarding', requiresOnboarding: true },
+      children: [
+        {
+          path: '',
+          name: 'onboarding-identity',
+          component: () => import('../views/onboarding/StepIdentity.vue'),
+          meta: { step: 'identity' },
+        },
+        {
+          path: 'negocio',
+          name: 'onboarding-business',
+          component: () => import('../views/onboarding/StepBusiness.vue'),
+          meta: { step: 'business', requires: 'identity' },
+        },
+        {
+          path: 'plan',
+          name: 'onboarding-plan',
+          component: () => import('../views/onboarding/StepPlan.vue'),
+          meta: { step: 'plan', requires: 'business' },
+        },
+        {
+          path: 'activar',
+          name: 'onboarding-trial',
+          component: () => import('../views/onboarding/StepTrial.vue'),
+          meta: { step: 'trial', requires: 'plan' },
+        },
+        {
+          path: 'listo',
+          name: 'onboarding-welcome',
+          component: () => import('../views/onboarding/StepWelcome.vue'),
+          meta: { step: 'welcome', requires: 'trial' },
+        },
+      ],
+    },
+    {
       path: '/:pathMatch(.*)*',
       name: 'not-found',
       component: () => import('../views/NotFoundView.vue'),
     },
   ],
+  scrollBehavior() {
+    // En el flow de onboarding, siempre arriba al cambiar de step.
+    return { top: 0, behavior: 'instant' }
+  },
+})
+
+// Step gating: si querés saltar a un step sin haber completado el anterior,
+// te redirigimos al primer step pendiente. Excepción: Enterprise puede llegar
+// directo a /comenzar/listo desde plan con ?enterprise=1.
+router.beforeEach((to, _from, next) => {
+  const required = to.meta?.requires
+  if (!required) return next()
+
+  // Acceso al estado sin acoplar al composable (evita import circular).
+  let completedSteps = []
+  try {
+    const raw =
+      typeof window !== 'undefined' ? window.localStorage.getItem('deenex_onboarding_v1') : null
+    if (raw) {
+      completedSteps = JSON.parse(raw)?.meta?.completedSteps || []
+    }
+  } catch {
+    completedSteps = []
+  }
+
+  // Welcome con flag enterprise está permitido aunque "trial" no esté completo,
+  // porque Enterprise saltea el step de checkout.
+  if (to.name === 'onboarding-welcome' && to.query.enterprise === '1') {
+    return next()
+  }
+
+  if (completedSteps.includes(required)) {
+    return next()
+  }
+
+  // Redirige al primer step pendiente.
+  const order = ['identity', 'business', 'plan', 'trial']
+  const pending = order.find((s) => !completedSteps.includes(s)) || 'identity'
+  const map = {
+    identity: '/comenzar',
+    business: '/comenzar/negocio',
+    plan: '/comenzar/plan',
+    trial: '/comenzar/activar',
+  }
+  return next(map[pending])
 })
 
 export default router

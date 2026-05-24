@@ -49,14 +49,14 @@
         con campañas por <span class="font-semibold text-slate-800">WhatsApp y Push Notifications</span>.
       </p>
 
-      <!-- CTAs -->
+      <!-- CTAs — primary: self-serve trial · secondary: scroll to product details -->
       <div :class="{ 'animate-rise': ready, 'opacity-0': !ready }"
         class="mt-9 mb-5 sm:mb-0 flex items-center justify-center gap-3 sm:gap-4" style="animation-delay:0.4s">
-        <a href="#agendar"
-          @click="trackEvent('click_comenzar_ahora')"
+        <RouterLink :to="{ path: '/comenzar', query: { from: 'home' } }"
+          @click="trackEvent('click_trial_start', { source: 'hero' })"
           class="btn-primary group inline-flex items-center gap-2 bg-primary text-white font-semibold rounded-xl px-4 py-2.5 sm:px-6 sm:py-3.5 text-[0.82rem] sm:text-[0.9rem] transition-all hover:bg-[#3c1fc9] shadow-lg shadow-primary/25 hover:shadow-primary/40 hover:-translate-y-0.5 relative overflow-hidden">
           <span class="btn-shimmer"></span>
-          Comenzar Ahora
+          Empezar 15 días gratis
           <span
             class="inline-flex items-center justify-center w-5 h-5 rounded-lg bg-white/15 transition-transform duration-300 group-hover:translate-x-0.5">
             <svg width="10" height="10" viewBox="0 0 13 13" fill="none">
@@ -64,7 +64,7 @@
                 stroke-linejoin="round" />
             </svg>
           </span>
-        </a>
+        </RouterLink>
 
         <a href="#infraestructura"
           class="group inline-flex items-center gap-2 px-3 py-2.5 sm:px-4 sm:py-3.5 text-[0.82rem] sm:text-[0.9rem] font-semibold text-slate-600 hover:text-primary transition-colors">
@@ -76,6 +76,13 @@
           </svg>
         </a>
       </div>
+
+      <!-- Trust line debajo del CTA -->
+      <p :class="{ 'animate-rise': ready, 'opacity-0': !ready }"
+        class="mt-3 text-[11px] text-slate-400 font-medium"
+        style="animation-delay:0.45s">
+        Sin tarjeta hoy · 15 días gratis · Cancelás cuando quieras
+      </p>
 
       <!-- Social Proof -->
       <div :class="{ 'animate-rise': ready, 'opacity-0': !ready }"
@@ -141,6 +148,7 @@
 
 <script setup>
 import { ref, onMounted } from 'vue'
+import { RouterLink } from 'vue-router'
 import { trackEvent } from '@/utils/analytics'
 const ready = ref(false)
 
