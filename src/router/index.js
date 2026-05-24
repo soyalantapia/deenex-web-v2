@@ -35,10 +35,17 @@ const router = createRouter({
           meta: { step: 'plan', requires: 'business' },
         },
         {
+          // Sandbox preview interactivo — el lead ve el producto antes de pagar.
+          path: 'preview',
+          name: 'onboarding-preview',
+          component: () => import('../views/onboarding/StepSandbox.vue'),
+          meta: { step: 'preview', requires: 'plan' },
+        },
+        {
           path: 'activar',
           name: 'onboarding-trial',
           component: () => import('../views/onboarding/StepTrial.vue'),
-          meta: { step: 'trial', requires: 'plan' },
+          meta: { step: 'trial', requires: 'preview' },
         },
         {
           path: 'listo',
@@ -47,6 +54,16 @@ const router = createRouter({
           meta: { step: 'welcome', requires: 'trial' },
         },
       ],
+    },
+    {
+      path: '/terminos',
+      name: 'terminos',
+      component: () => import('../views/LegalView.vue'),
+    },
+    {
+      path: '/privacidad',
+      name: 'privacidad',
+      component: () => import('../views/LegalView.vue'),
     },
     {
       path: '/:pathMatch(.*)*',
@@ -90,12 +107,13 @@ router.beforeEach((to, _from, next) => {
   }
 
   // Redirige al primer step pendiente.
-  const order = ['identity', 'business', 'plan', 'trial']
+  const order = ['identity', 'business', 'plan', 'preview', 'trial']
   const pending = order.find((s) => !completedSteps.includes(s)) || 'identity'
   const map = {
     identity: '/comenzar',
     business: '/comenzar/negocio',
     plan: '/comenzar/plan',
+    preview: '/comenzar/preview',
     trial: '/comenzar/activar',
   }
   return next(map[pending])

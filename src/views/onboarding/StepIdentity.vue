@@ -1,7 +1,15 @@
 <template>
+  <ResumeModal
+    :show="showResumeModal"
+    :progress-summary="progressSummary"
+    :total-steps="5"
+    @resume="onResume"
+    @start-over="onStartOver"
+    @decline="showResumeModal = false"
+  />
   <form @submit.prevent="onSubmit" novalidate v-autofocus>
     <p class="text-[11px] font-black text-primary uppercase tracking-[0.2em] mb-3">
-      Empezá gratis · Paso 1 de 5
+      Empezá gratis · Paso 1 de 6
     </p>
     <h1 class="text-[clamp(1.8rem,4vw,2.6rem)] font-extrabold tracking-tighter leading-[1.05] text-slate-900 mb-4">
       Decinos quién sos.<br />
@@ -78,11 +86,12 @@
 </template>
 
 <script setup>
-import { reactive, computed } from 'vue'
+import { reactive, ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import Field from '@/components/onboarding/Field.vue'
 import PhoneField from '@/components/onboarding/PhoneField.vue'
 import StepActions from '@/components/onboarding/StepActions.vue'
+import ResumeModal from '@/components/onboarding/ResumeModal.vue'
 import { useOnboarding } from '@/composables/useOnboarding'
 
 const router = useRouter()
@@ -90,6 +99,61 @@ const onboarding = useOnboarding()
 
 const form = reactive({ ...onboarding.state.identity })
 const errors = reactive({ firstName: '', lastName: '', email: '', whatsapp: '' })
+
+// ── Resume detection ─────────────────────────────────────────────────────
+const showResumeModal = ref(false)
+
+const progressSummary = computed(() => {
+  const state = onboarding.state
+  const completed = state.meta.completedSteps.length
+  const startedAt = state.meta.startedAt ? new Date(state.meta.startedAt) : null
+  const lastActivity = startedAt
+    ? new Intl.RelativeTimeFormat('es-AR', { numeric: 'auto' }).format(
+        Math.round((Date.now() - startedAt.getTime()) / 1000 / 60 / -1),
+        'minute'
+      )
+    : 'hace un momento'
+  return {
+    email: state.identity.email,
+    brand: state.business.brand,
+    locations: state.business.locations,
+    completedSteps: completed,
+    lastActivity,
+  }
+})
+
+onMounted(() => {
+  // Mostramos el modal solo si hay progreso real (al menos identity completed)
+  // y el lead no completó todos los steps todavía.
+  const completed = onboarding.state.meta.completedSteps
+  if (completed.includes('identity') && !completed.includes('trial')) {
+    showResumeModal.value = true
+    onboarding.track('resume_modal_shown', { completed_count: completed.length })
+  }
+})
+
+function onResume() {
+  showResumeModal.value = false
+  onboarding.track('resume_accepted', { completed_count: onboarding.state.meta.completedSteps.length })
+  // Saltar al primer step incompleto
+  const pending = ['business', 'plan', 'preview', 'trial'].find(
+    (s) => !onboarding.state.meta.completedSteps.includes(s)
+  )
+  const map = {
+    business: '/comenzar/negocio',
+    plan: '/comenzar/plan',
+    preview: '/comenzar/preview',
+    trial: '/comenzar/activar',
+  }
+  if (pending) router.push(map[pending])
+}
+
+function onStartOver() {
+  showResumeModal.value = false
+  onboarding.track('resume_declined', { completed_count: onboarding.state.meta.completedSteps.length })
+  onboarding.reset()
+  Object.assign(form, { firstName: '', lastName: '', email: '', whatsapp: '' })
+}
 
 function validate(field) {
   const value = (form[field] || '').trim()

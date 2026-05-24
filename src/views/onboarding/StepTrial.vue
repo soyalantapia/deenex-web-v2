@@ -1,7 +1,7 @@
 <template>
   <div>
     <p class="text-[11px] font-black text-primary uppercase tracking-[0.2em] mb-3">
-      Paso 4 de 5
+      Paso 5 de 6
     </p>
     <h1 class="text-[clamp(1.8rem,4vw,2.6rem)] font-extrabold tracking-tighter leading-[1.05] text-slate-900 mb-4">
       <template v-if="onboarding.greeting.value">{{ onboarding.greeting.value }}, activá<br /></template>
@@ -223,6 +223,23 @@ async function onActivate() {
     total: totalMonthly.value,
     method: paymentChoice.value,
   })
+
+  // Si el lead viene del experimento del Hero, registramos la conversión
+  // (cuál variante del CTA lo trajo hasta acá). Es la métrica clave.
+  try {
+    const assignments = JSON.parse(localStorage.getItem('deenex_experiments_v1') || '{}')
+    if (assignments.hero_cta_v1) {
+      const { trackEvent } = await import('@/utils/analytics')
+      trackEvent('experiment_conversion', {
+        experiment_id: 'hero_cta_v1',
+        variant_id: assignments.hero_cta_v1,
+        method: paymentChoice.value,
+        plan: onboarding.state.plan.key,
+      })
+    }
+  } catch {
+    // tracking failure should never block activation
+  }
 
   /*
    * Integración backend según el método elegido:

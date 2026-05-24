@@ -129,6 +129,18 @@ const savingsVsThirdParty = computed(() => {
   return Math.max(0, Math.round(thirdPartyFeeUsd - deenexFeeUsd))
 })
 
+// Break-even simple: ¿en cuántos días recuperás el fee mensual gracias al
+// ahorro vs apps de terceros? Si el ahorro mensual > fee fijo, el break-even
+// se calcula sobre el costo de Deenex completo en proporción al ahorro.
+const breakEvenDays = computed(() => {
+  const saving = savingsVsThirdParty.value
+  const monthlyCost = monthlyEstimateUsd.value
+  if (saving <= 0 || monthlyCost <= 0) return null
+  // Días equivalentes al costo mensual sobre el ahorro mensual, prorrateado a 30 días.
+  const days = Math.round((monthlyCost / saving) * 30)
+  return Math.max(1, Math.min(days, 30)) // capped a 1 mes para visual
+})
+
 // ── Fecha del primer cargo (today + trial length) ────────────────────────
 const TRIAL_DAYS = 15
 
@@ -209,7 +221,7 @@ const subdomainPreview = computed(() => {
 })
 
 // ── Step gating ──────────────────────────────────────────────────────────
-const STEP_ORDER = ['identity', 'business', 'plan', 'trial', 'welcome']
+const STEP_ORDER = ['identity', 'business', 'plan', 'preview', 'trial', 'welcome']
 
 function isStepUnlocked(stepKey) {
   if (stepKey === 'identity') return true
@@ -291,6 +303,7 @@ export function useOnboarding() {
     recommendedPlan,
     monthlyEstimateUsd,
     savingsVsThirdParty,
+    breakEvenDays,
     firstChargeDate,
     firstChargeDateFormatted,
     firstChargeDateShort,

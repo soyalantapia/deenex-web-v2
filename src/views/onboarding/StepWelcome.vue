@@ -12,7 +12,7 @@
       </div>
 
       <p class="text-[11px] font-black text-emerald-600 uppercase tracking-[0.2em] mb-3">
-        ¡Listo! · Paso 5 de 5
+        ¡Listo! · Paso 6 de 6
       </p>
 
       <h1 v-if="isEnterprise" class="text-[clamp(1.8rem,4vw,2.6rem)] font-extrabold tracking-tighter leading-[1.05] text-slate-900 mb-4">

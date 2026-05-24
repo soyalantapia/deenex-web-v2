@@ -157,6 +157,7 @@ const steps = [
   { key: 'identity', label: 'Vos', path: '/comenzar' },
   { key: 'business', label: 'Tu marca', path: '/comenzar/negocio' },
   { key: 'plan', label: 'Plan', path: '/comenzar/plan' },
+  { key: 'preview', label: 'Vista previa', path: '/comenzar/preview' },
   { key: 'trial', label: 'Activar', path: '/comenzar/activar' },
   { key: 'welcome', label: 'Listo', path: '/comenzar/listo' },
 ]
@@ -198,6 +199,7 @@ function applyStepHead() {
   const stepName = stepInfo?.key === 'identity' ? 'Tus datos'
     : stepInfo?.key === 'business' ? 'Tu marca'
     : stepInfo?.key === 'plan' ? 'Elegir plan'
+    : stepInfo?.key === 'preview' ? 'Vista previa'
     : stepInfo?.key === 'trial' ? 'Activar trial'
     : 'Listo'
   document.title = `Paso ${activeStepIndex.value + 1}/${steps.length} · ${stepName} · Deenex`
@@ -216,8 +218,10 @@ onMounted(() => {
   const variant = route.query.from || ''
   onboarding.ensureStarted(variant)
 
-  // Warning al cerrar la pestaña con progreso a medias
+  // Warning al cerrar la pestaña con progreso a medias + tracking de abandono
   window.addEventListener('beforeunload', onBeforeUnload)
+  window.addEventListener('pagehide', onPageHide)
+  document.addEventListener('visibilitychange', onVisibilityChange)
 })
 
 function onBeforeUnload(e) {
@@ -230,6 +234,37 @@ function onBeforeUnload(e) {
   }
 }
 
+// pagehide es más confiable que beforeunload para trackear (especialmente en
+// Safari y mobile). Lo usamos con sendBeacon-style tracking.
+function onPageHide() {
+  if (route.path === '/comenzar/listo') return
+  const completed = onboarding.state.meta.completedSteps
+  if (completed.length === 0 || completed.includes('trial')) return
+  onboarding.track('abandoned', {
+    last_step: steps[activeStepIndex.value]?.key,
+    completed_steps: completed.length,
+    persisted_in_storage: true,
+  })
+}
+
+// Si el usuario tabbea fuera por más de un timeout (40s), tracking de inactividad.
+let visibilityTimer = null
+function onVisibilityChange() {
+  if (document.visibilityState === 'hidden') {
+    visibilityTimer = setTimeout(() => {
+      const completed = onboarding.state.meta.completedSteps
+      if (completed.length > 0 && !completed.includes('trial') && route.path !== '/comenzar/listo') {
+        onboarding.track('tab_hidden_long', {
+          last_step: steps[activeStepIndex.value]?.key,
+        })
+      }
+    }, 40000)
+  } else if (visibilityTimer) {
+    clearTimeout(visibilityTimer)
+    visibilityTimer = null
+  }
+}
+
 onUnmounted(() => {
   // Restauramos title + robots para que el resto de la app no quede contaminada.
   document.title = previousMeta.title || 'Deenex | Tu canal propio'
@@ -238,6 +273,9 @@ onUnmounted(() => {
     robotsTag.setAttribute('content', previousMeta.robots)
   }
   window.removeEventListener('beforeunload', onBeforeUnload)
+  window.removeEventListener('pagehide', onPageHide)
+  document.removeEventListener('visibilitychange', onVisibilityChange)
+  if (visibilityTimer) clearTimeout(visibilityTimer)
 })
 </script>
 
