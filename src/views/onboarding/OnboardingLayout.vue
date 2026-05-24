@@ -11,13 +11,31 @@
 
     <!-- Top bar -->
     <header class="border-b border-slate-100 bg-white/80 backdrop-blur-md sticky top-0 z-50">
-      <div class="max-w-6xl mx-auto px-4 sm:px-6 py-4 flex items-center justify-between gap-4">
+      <!-- Mobile: header compacto. Solo logo, progress fina y counter. -->
+      <div class="sm:hidden px-4 py-3 flex items-center justify-between gap-3">
+        <button type="button" @click="onExit" class="shrink-0">
+          <img src="@/assets/images/nav-logo.webp" alt="Deenex" class="h-4 w-auto" />
+        </button>
+        <div class="flex-1 flex items-center gap-1">
+          <div
+            v-for="(step, i) in steps"
+            :key="step.key"
+            class="h-0.5 flex-1 rounded-full transition-colors"
+            :class="i <= activeStepIndex ? 'bg-primary' : 'bg-slate-200'"
+          />
+        </div>
+        <div class="text-[10px] font-bold text-slate-500 tabular-nums shrink-0">
+          {{ activeStepIndex + 1 }}<span class="text-slate-300">/{{ steps.length }}</span>
+        </div>
+      </div>
+
+      <!-- Desktop: header normal con todo expuesto. -->
+      <div class="hidden sm:flex max-w-6xl mx-auto px-6 py-4 items-center justify-between gap-4">
         <button type="button" @click="onExit" class="flex items-center gap-2 shrink-0 group">
           <img src="@/assets/images/nav-logo.webp" alt="Deenex" class="h-5 w-auto" />
         </button>
 
-        <!-- Progress segments -->
-        <div class="flex-1 max-w-md mx-auto hidden sm:flex items-center gap-1.5">
+        <div class="flex-1 max-w-md mx-auto flex items-center gap-1.5">
           <div
             v-for="(step, i) in steps"
             :key="step.key"
@@ -26,24 +44,35 @@
           />
         </div>
 
-        <!-- Step counter + Save&Exit -->
         <div class="flex items-center gap-3 shrink-0">
           <button
             v-if="canSaveAndExit"
             type="button"
             @click="showSaveModal = true"
-            class="hidden sm:inline-flex items-center gap-1.5 text-[11px] font-semibold text-slate-500 hover:text-slate-900 transition-colors"
+            class="inline-flex items-center gap-1.5 text-[11px] font-semibold text-slate-500 hover:text-slate-900 transition-colors"
           >
             <Save class="w-3 h-3" />
             Guardar y seguir después
           </button>
           <div class="text-[11px] font-bold text-slate-500 tracking-wider uppercase flex items-center gap-2">
-            <span class="hidden sm:inline">{{ completionPct }}%</span>
-            <span class="hidden sm:inline-block w-px h-3 bg-slate-200"></span>
+            <span>{{ completionPct }}%</span>
+            <span class="inline-block w-px h-3 bg-slate-200"></span>
             <span class="text-slate-900">{{ activeStepIndex + 1 }}</span>
             <span class="text-slate-400">/{{ steps.length }}</span>
           </div>
         </div>
+      </div>
+
+      <!-- Save&Exit mobile button: separado, en su propia fila bajo el header -->
+      <div v-if="canSaveAndExit" class="sm:hidden border-t border-slate-100 px-4 py-2 flex justify-end">
+        <button
+          type="button"
+          @click="showSaveModal = true"
+          class="inline-flex items-center gap-1.5 text-[10px] font-semibold text-slate-500 hover:text-slate-900 transition-colors"
+        >
+          <Save class="w-3 h-3" />
+          Guardar y seguir después
+        </button>
       </div>
     </header>
 

@@ -56,6 +56,13 @@ const router = createRouter({
       ],
     },
     {
+      // Demo público del dashboard. Conversion path para la variante "see_demo"
+      // del Hero CTA — el lead ve el producto antes de poner sus datos.
+      path: '/demo',
+      name: 'public-demo',
+      component: () => import('../views/PublicDemoView.vue'),
+    },
+    {
       path: '/terminos',
       name: 'terminos',
       component: () => import('../views/LegalView.vue'),

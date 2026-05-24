@@ -287,7 +287,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import {
   Lock, BarChart3, Users, Megaphone, Crown, Star, Award, Zap,
@@ -310,6 +310,12 @@ const tabs = [
   { key: 'loyalty', label: 'Fidelización', icon: Crown },
 ]
 const activeTab = ref('sales')
+
+// Si el lead cambia de tab antes de los 12s, dismiss del tour porque ya
+// está interactuando con el dashboard demo (no necesita el cartel).
+watch(activeTab, () => {
+  if (showTour.value) dismissTour({ reason: 'tab_change' })
+})
 
 // Datos demo seedeados — los KPIs ahora son reactivos para reflejar el
 // "pedido en vivo" que simula el lead. Cada KPI tiene un `flashing` que
@@ -392,18 +398,29 @@ const loyaltyTiers = [
 ]
 
 // Tour callout: solo aparece la primera vez. Lo persistimos en localStorage
-// para que el lead que vuelve no lo vea de nuevo.
+// para que el lead que vuelve no lo vea de nuevo. Auto-dismiss después de
+// 12s o si cambia de tab — antes ocupaba espacio si quedaba abierto.
 const TOUR_KEY = 'deenex_sandbox_tour_seen'
 const showTour = ref(false)
+let tourAutoDismissTimer = null
+
 onMounted(() => {
   if (typeof window !== 'undefined' && !localStorage.getItem(TOUR_KEY)) {
     showTour.value = true
+    // Auto-dismiss después de 12s — el lead ya tuvo tiempo de leer.
+    tourAutoDismissTimer = setTimeout(() => {
+      if (showTour.value) {
+        dismissTour({ reason: 'auto_timeout' })
+      }
+    }, 12_000)
   }
 })
-function dismissTour() {
+
+function dismissTour(meta = { reason: 'user_dismissed' }) {
   showTour.value = false
+  if (tourAutoDismissTimer) clearTimeout(tourAutoDismissTimer)
   try { localStorage.setItem(TOUR_KEY, '1') } catch {}
-  onboarding.track('sandbox_tour_dismissed')
+  onboarding.track('sandbox_tour_dismissed', meta)
 }
 
 onboarding.track('sandbox_viewed', { brand: onboarding.state.business.brand })

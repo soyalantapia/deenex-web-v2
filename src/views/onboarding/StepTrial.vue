@@ -157,7 +157,25 @@
       </div>
     </div>
 
-    <!-- Garantías -->
+    <!-- Trust badges inline — antes solo en sidebar desktop, ahora también
+         visibles en mobile donde el sidebar no aparece. -->
+    <div class="lg:hidden grid grid-cols-2 gap-2 mb-6">
+      <div
+        v-for="badge in mobileTrustBadges"
+        :key="badge.title"
+        class="rounded-xl border border-slate-200 bg-slate-50/40 p-3 flex items-start gap-2.5"
+      >
+        <component :is="badge.icon" class="w-4 h-4 shrink-0 mt-0.5" :class="badge.color" />
+        <div class="min-w-0">
+          <p class="text-[11px] font-bold text-slate-900 leading-tight">{{ badge.title }}</p>
+          <p class="text-[10px] text-slate-500 leading-snug mt-0.5">{{ badge.desc }}</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Garantías inline (ambos viewports) — corregido CUIT/RFC para no
+         prometer algo que no preguntamos. Lo capturamos opcional en el
+         primer billing cycle. -->
     <ul class="space-y-2 mb-8">
       <li class="flex items-start gap-2 text-xs text-slate-600 leading-relaxed">
         <Shield class="w-3.5 h-3.5 text-primary shrink-0 mt-0.5" />
@@ -169,7 +187,7 @@
       </li>
       <li class="flex items-start gap-2 text-xs text-slate-600 leading-relaxed">
         <FileText class="w-3.5 h-3.5 text-primary shrink-0 mt-0.5" />
-        Factura mensual automática a tu CUIT/RFC.
+        Te pedimos los datos fiscales antes del primer cargo (no ahora).
       </li>
     </ul>
 
@@ -224,6 +242,15 @@ const trialOrderCap = computed(() => {
   const l = Math.max(1, Number(onboarding.state.business.locations) || 1)
   return l <= 5 ? '500' : l <= 25 ? '1.500' : l <= 70 ? '3.500' : '8.000'
 })
+
+// Trust badges mobile — la versión inline que llena el gap del sidebar
+// desktop-only. Versión compacta para 390px.
+const mobileTrustBadges = [
+  { title: 'MercadoPago oficial', desc: 'Partner certificado.', icon: Shield, color: 'text-sky-500' },
+  { title: 'Cifrado AES-256', desc: 'Tus datos protegidos.', icon: Lock, color: 'text-emerald-500' },
+  { title: 'Garantía 30 días', desc: 'Devolución sin preguntas.', icon: FileText, color: 'text-amber-500' },
+  { title: 'Cancelás en 1 click', desc: 'Sin permanencia.', icon: Clock, color: 'text-violet-500' },
+]
 
 const planSummary = computed(() => {
   const key = onboarding.state.plan.key || onboarding.recommendedPlan.value.key

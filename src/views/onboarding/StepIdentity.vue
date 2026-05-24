@@ -77,13 +77,14 @@
 
 <script setup>
 import { reactive, ref, computed, onMounted } from 'vue'
-import { useRouter } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import Field from '@/components/onboarding/Field.vue'
 import PhoneField from '@/components/onboarding/PhoneField.vue'
 import StepActions from '@/components/onboarding/StepActions.vue'
 import ResumeModal from '@/components/onboarding/ResumeModal.vue'
 import { useOnboarding } from '@/composables/useOnboarding'
 
+const route = useRoute()
 const router = useRouter()
 const onboarding = useOnboarding()
 
@@ -125,9 +126,35 @@ const progressSummary = computed(() => {
 })
 
 onMounted(() => {
-  // Mostramos el modal solo si hay progreso real (al menos identity completed)
-  // y el lead no completó todos los steps todavía.
   const completed = onboarding.state.meta.completedSteps
+  const resumeToken = route.query.resume
+
+  // Si vienen con magic link (?resume=token), saltamos el modal y los
+  // mandamos directo al primer step incompleto. En producción, el backend
+  // valida el token y restaura el snapshot completo antes de redirigir;
+  // acá usamos el state ya persistido en localStorage (siempre disponible
+  // porque el lead viene del mismo dispositivo o ya se hidrató en boot).
+  if (resumeToken && completed.includes('identity') && !completed.includes('trial')) {
+    onboarding.track('resume_magic_link', {
+      token: String(resumeToken).slice(0, 8) + '…',
+      completed_count: completed.length,
+    })
+    const pending = ['business', 'plan', 'preview', 'trial'].find(
+      (s) => !completed.includes(s)
+    )
+    const map = {
+      business: '/comenzar/negocio',
+      plan: '/comenzar/plan',
+      preview: '/comenzar/preview',
+      trial: '/comenzar/activar',
+    }
+    if (pending && map[pending]) {
+      router.replace(map[pending])
+      return
+    }
+  }
+
+  // Caso normal: hay progreso parcial → modal de bienvenida.
   if (completed.includes('identity') && !completed.includes('trial')) {
     showResumeModal.value = true
     onboarding.track('resume_modal_shown', { completed_count: completed.length })

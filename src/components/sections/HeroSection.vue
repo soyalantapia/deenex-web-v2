@@ -52,7 +52,7 @@
       <!-- CTAs — primary: self-serve trial · secondary: scroll to product details -->
       <div :class="{ 'animate-rise': ready, 'opacity-0': !ready }"
         class="mt-9 mb-5 sm:mb-0 flex items-center justify-center gap-3 sm:gap-4" style="animation-delay:0.4s">
-        <RouterLink :to="{ path: '/comenzar', query: { from: 'home', exp: heroCta.variant.value.id } }"
+        <RouterLink :to="ctaTarget"
           @click="onCtaClick"
           :data-experiment="heroCta.variant.value.id"
           class="btn-primary group inline-flex items-center gap-2 bg-primary text-white font-semibold rounded-xl px-4 py-2.5 sm:px-6 sm:py-3.5 text-[0.82rem] sm:text-[0.9rem] transition-all hover:bg-[#3c1fc9] shadow-lg shadow-primary/25 hover:shadow-primary/40 hover:-translate-y-0.5 relative overflow-hidden">
@@ -148,7 +148,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { RouterLink } from 'vue-router'
 import { trackEvent } from '@/utils/analytics'
 import { useExperiment } from '@/composables/useExperiment'
@@ -156,14 +156,28 @@ import { useExperiment } from '@/composables/useExperiment'
 // A/B/C test del CTA primario del Hero. Cada variante mantiene la misma
 // promesa pero con framing distinto. La conversión se mide cuando el lead
 // completa el step 4 (StepTrial) — ahí firamos experiment_conversion.
+//
+// `target` controla a dónde lleva el click: la variante "see_demo" entra al
+// sandbox público (/demo) primero, las demás van directo al onboarding form.
+// Cuando el lead activa el trial desde /demo, lo sumamos como la misma
+// conversion del experimento — el tracking lo hace StepTrial igual.
 const heroCta = useExperiment('hero_cta_v1', [
-  { id: 'control', weight: 1, payload: { label: 'Empezar 15 días gratis' } },
-  { id: 'no_card', weight: 1, payload: { label: 'Probar Deenex sin tarjeta' } },
-  { id: 'see_demo', weight: 1, payload: { label: 'Ver demo del dashboard' } },
+  { id: 'control', weight: 1, payload: { label: 'Empezar 15 días gratis', target: '/comenzar' } },
+  { id: 'no_card', weight: 1, payload: { label: 'Probar Deenex sin tarjeta', target: '/comenzar' } },
+  { id: 'see_demo', weight: 1, payload: { label: 'Ver demo del dashboard', target: '/demo' } },
 ])
 
+const ctaTarget = computed(() => ({
+  path: heroCta.variant.value.payload.target || '/comenzar',
+  query: { from: 'home', exp: heroCta.variant.value.id },
+}))
+
 function onCtaClick() {
-  trackEvent('click_trial_start', { source: 'hero', variant: heroCta.variant.value.id })
+  trackEvent('click_trial_start', {
+    source: 'hero',
+    variant: heroCta.variant.value.id,
+    target: heroCta.variant.value.payload.target || '/comenzar',
+  })
 }
 const ready = ref(false)
 

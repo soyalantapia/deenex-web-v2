@@ -39,18 +39,38 @@
     </div>
 
     <!-- Trial info — descriptivo, no agresivo. Antes era countdown ansiogénico. -->
-    <div v-if="!isEnterprise" class="rounded-2xl bg-slate-50 border border-slate-200 p-5 mb-6 flex items-center gap-4">
-      <Clock class="w-7 h-7 text-primary shrink-0" />
-      <div class="flex-1 min-w-0">
-        <p class="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-1">
-          Tu trial es hasta el
-        </p>
-        <p class="text-base font-bold text-slate-900 leading-tight">
-          {{ onboarding.firstChargeDateFormatted.value }}
-        </p>
-        <p class="text-xs text-slate-500 leading-snug mt-1">
-          Cancelás en 1 click hasta esa fecha sin cargos.
-        </p>
+    <div v-if="!isEnterprise" class="rounded-2xl bg-slate-50 border border-slate-200 p-5 mb-6">
+      <div class="flex items-start gap-4">
+        <Clock class="w-7 h-7 text-primary shrink-0 mt-0.5" />
+        <div class="flex-1 min-w-0">
+          <p class="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-1">
+            Tu trial es hasta el
+          </p>
+          <p class="text-base font-bold text-slate-900 leading-tight">
+            {{ onboarding.firstChargeDateFormatted.value }}
+          </p>
+          <p class="text-xs text-slate-500 leading-snug mt-1">
+            Cancelás en 1 click hasta esa fecha sin cargos.
+          </p>
+        </div>
+      </div>
+      <!-- Monto del próximo cargo explícito (antes faltaba). -->
+      <div class="mt-4 pt-4 border-t border-slate-200/70 flex items-baseline justify-between gap-3">
+        <div>
+          <p class="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-1">
+            Primer cargo
+          </p>
+          <p class="text-sm text-slate-700">
+            <span class="font-bold tabular-nums">USD {{ planSummary.monthlyFee }}</span>
+            <span class="text-slate-400">/ mes</span>
+            <span class="text-slate-300 mx-1">·</span>
+            <span class="font-semibold tabular-nums">+{{ planSummary.commissionPct }}%</span>
+            <span class="text-slate-400"> por venta</span>
+          </p>
+        </div>
+        <span class="text-[10px] font-bold text-emerald-600 uppercase tracking-widest whitespace-nowrap">
+          {{ daysUntilFirstCharge }} días
+        </span>
       </div>
     </div>
 
@@ -149,21 +169,52 @@
       </a>
     </div>
 
-    <!-- Email verification reminder -->
-    <div v-if="!isEnterprise" class="rounded-xl border border-amber-200 bg-amber-50/40 p-4 flex items-start gap-3 mb-8">
-      <Mail class="w-5 h-5 text-amber-500 shrink-0 mt-0.5" />
-      <div class="min-w-0">
-        <p class="text-xs font-bold text-slate-900 leading-tight">
-          Confirmá tu email para acceder
-        </p>
-        <p class="text-[11px] text-slate-500 leading-snug mt-1">
-          Te mandamos un link a <span class="font-semibold text-slate-700">{{ onboarding.state.identity.email }}</span>.
-          Si no lo ves, revisá spam o
-          <button type="button" @click="resendMagicLink" class="text-amber-700 font-semibold underline hover:text-amber-900">
-            reenviá el link
-          </button>.
-        </p>
+    <!-- Email verification reminder + preview del email que llega -->
+    <div v-if="!isEnterprise" class="rounded-xl border border-amber-200 bg-amber-50/40 overflow-hidden mb-8">
+      <div class="p-4 flex items-start gap-3">
+        <Mail class="w-5 h-5 text-amber-500 shrink-0 mt-0.5" />
+        <div class="min-w-0 flex-1">
+          <p class="text-xs font-bold text-slate-900 leading-tight">
+            Confirmá tu email para acceder
+          </p>
+          <p class="text-[11px] text-slate-500 leading-snug mt-1">
+            Te mandamos un link a <span class="font-semibold text-slate-700">{{ onboarding.state.identity.email }}</span>.
+            Si no lo ves, revisá spam o
+            <button type="button" @click="resendMagicLink" class="text-amber-700 font-semibold underline hover:text-amber-900">
+              reenviá el link
+            </button>.
+          </p>
+        </div>
+        <button
+          type="button"
+          @click="emailPreviewOpen = !emailPreviewOpen"
+          class="text-[10px] font-bold text-slate-500 hover:text-slate-900 transition-colors whitespace-nowrap"
+        >
+          {{ emailPreviewOpen ? 'Ocultar' : 'Ver preview' }}
+        </button>
       </div>
+      <!-- Preview del email — colapsable -->
+      <Transition name="email-preview">
+        <div v-if="emailPreviewOpen" class="border-t border-amber-200 bg-white p-4 text-xs">
+          <div class="rounded-lg border border-slate-200 overflow-hidden">
+            <div class="px-3 py-2 bg-slate-50 border-b border-slate-200 flex items-center gap-2">
+              <div class="w-5 h-5 rounded-md bg-primary flex items-center justify-center text-white text-[8px] font-black">D</div>
+              <div class="flex-1 min-w-0">
+                <p class="text-[10px] font-bold text-slate-900 truncate">Tu cuenta de Deenex está lista</p>
+                <p class="text-[9px] text-slate-500 truncate">de Deenex &lt;hola@deenex.tech&gt; a {{ onboarding.state.identity.email }}</p>
+              </div>
+            </div>
+            <div class="p-4 text-[11px] text-slate-700 leading-relaxed">
+              <p class="font-bold text-slate-900 mb-2">¡Hola {{ onboarding.greeting.value || 'amigo' }}!</p>
+              <p class="mb-3">Tu cuenta de Deenex para <strong>{{ onboarding.state.business.brand }}</strong> está activa. Entrá al dashboard con un click:</p>
+              <div class="bg-primary text-white text-center px-4 py-2 rounded-lg text-[10px] font-bold mb-3">
+                → Entrar a {{ onboarding.subdomainPreview.value }}.deenex.app
+              </div>
+              <p class="text-[10px] text-slate-500">El link expira en 24h. Si no lo pediste, ignorá este mail.</p>
+            </div>
+          </div>
+        </div>
+      </Transition>
     </div>
 
     <!-- Refer-a-friend block ────────────────────────────────────────── -->
@@ -197,7 +248,7 @@
               {{ copied ? '¡Copiado!' : 'Copiar' }}
             </button>
           </div>
-          <div class="flex items-center gap-2 mt-3">
+          <div class="flex items-center gap-2 mt-3 flex-wrap">
             <a
               :href="whatsappShareUrl"
               target="_blank"
@@ -217,7 +268,51 @@
               <Mail class="w-3 h-3" />
               Compartir por email
             </a>
+            <span class="w-px h-3 bg-slate-200"></span>
+            <button
+              type="button"
+              @click="toggleReferralPreview"
+              class="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-500 hover:text-slate-700 transition-colors"
+            >
+              <Eye class="w-3 h-3" />
+              {{ referralPreviewOpen ? 'Ocultar preview' : 'Ver lo que reciben' }}
+            </button>
           </div>
+
+          <!-- Preview: lo que ve el amigo cuando abre el link de referido -->
+          <Transition name="referral-preview">
+            <div v-if="referralPreviewOpen" class="mt-4 rounded-2xl bg-white border-2 border-slate-200 overflow-hidden">
+              <!-- Mock browser bar -->
+              <div class="px-3 py-1.5 border-b border-slate-100 bg-slate-50/80 flex items-center gap-1.5">
+                <span class="w-1.5 h-1.5 rounded-full bg-rose-400"></span>
+                <span class="w-1.5 h-1.5 rounded-full bg-amber-400"></span>
+                <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+                <div class="flex-1 ml-2 text-[9px] font-mono text-slate-400 truncate">
+                  deenex.tech/r/{{ referralCode }}
+                </div>
+              </div>
+              <!-- Mock hero -->
+              <div class="p-5 bg-gradient-to-br from-primary/[0.04] to-transparent">
+                <div class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-700 text-[9px] font-black uppercase tracking-widest mb-3">
+                  <Gift class="w-2.5 h-2.5" />
+                  {{ greeting || 'Tu amigo' }} te invitó · 25% off
+                </div>
+                <p class="text-base font-extrabold tracking-tight text-slate-900 leading-tight mb-1.5">
+                  Te dejó el primer mes con<br />
+                  <span class="text-emerald-600">25% off en Deenex.</span>
+                </p>
+                <p class="text-[11px] text-slate-500 leading-snug mb-3">
+                  Activá tu cuenta antes del {{ referralExpiry }} y arrancás con el descuento aplicado automáticamente al primer cargo.
+                </p>
+                <div class="bg-primary text-white text-center px-3 py-2 rounded-lg text-[10px] font-bold">
+                  Activar mi trial con 25% off →
+                </div>
+                <p class="text-[9px] text-slate-400 mt-2 italic">
+                  Vista previa · así lo ven tus contactos
+                </p>
+              </div>
+            </div>
+          </Transition>
         </div>
       </div>
     </div>
@@ -241,7 +336,7 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { Check, CalendarDays, ArrowRight, MessageCircle, Mail, Clock } from 'lucide-vue-next'
+import { Check, CalendarDays, ArrowRight, MessageCircle, Mail, Clock, Gift, Eye } from 'lucide-vue-next'
 import ConfettiCanvas from '@/components/onboarding/ConfettiCanvas.vue'
 import { useOnboarding } from '@/composables/useOnboarding'
 
@@ -293,11 +388,22 @@ function trackNextStepClick(key) {
 }
 
 // ── Referral ─────────────────────────────────────────────────────────────
+// Código único: slug + nonce random de 5 chars. Evita colisiones entre
+// dos marcas con el mismo nombre (ej. "Glorias" en BA vs Córdoba).
+const REFERRAL_NONCE_KEY = 'deenex_referral_nonce'
+function getOrCreateNonce() {
+  if (typeof window === 'undefined') return 'abcde'
+  let n = localStorage.getItem(REFERRAL_NONCE_KEY)
+  if (!n) {
+    n = Math.random().toString(36).slice(2, 7)
+    try { localStorage.setItem(REFERRAL_NONCE_KEY, n) } catch {}
+  }
+  return n
+}
 const referralCode = computed(() => {
-  // Código simple basado en el subdomain del lead. En producción esto vendría
-  // de la API con un ID único por cuenta.
   const slug = onboarding.subdomainPreview.value
-  return slug && slug !== 'tu-marca' ? slug : 'amigo'
+  const base = slug && slug !== 'tu-marca' ? slug : 'amigo'
+  return `${base}-${getOrCreateNonce()}`
 })
 const referralLink = computed(() => `https://deenex.tech/r/${referralCode.value}`)
 const copied = ref(false)
@@ -323,6 +429,37 @@ const emailShareUrl = computed(() => {
 function trackShare(channel) {
   onboarding.track('referral_share', { channel, code: referralCode.value })
 }
+
+// Preview de lo que recibe el amigo invitado. Colapsable.
+const referralPreviewOpen = ref(false)
+const greeting = computed(() => onboarding.greeting.value)
+// Vencimiento simulado: 30 días desde hoy. En producción lo decide el backend
+// cuando crea el link de referido (`/api/onboarding/referral/create`).
+const referralExpiry = computed(() => {
+  const d = new Date()
+  d.setDate(d.getDate() + 30)
+  return new Intl.DateTimeFormat('es-AR', { day: 'numeric', month: 'short' }).format(d)
+})
+function toggleReferralPreview() {
+  referralPreviewOpen.value = !referralPreviewOpen.value
+  if (referralPreviewOpen.value) {
+    onboarding.track('referral_preview_opened', { code: referralCode.value })
+  }
+}
+
+// ── Resumen del plan + monto del próximo cargo ──────────────────────────
+const planSummary = computed(() => {
+  const key = onboarding.state.plan.key || onboarding.recommendedPlan.value.key
+  return onboarding.PLAN_TIERS.find((t) => t.key === key) || onboarding.recommendedPlan.value
+})
+
+const daysUntilFirstCharge = computed(() => {
+  const diff = onboarding.firstChargeDate.value.getTime() - Date.now()
+  return Math.max(0, Math.ceil(diff / (1000 * 60 * 60 * 24)))
+})
+
+// Email preview toggle
+const emailPreviewOpen = ref(false)
 
 const playConfetti = ref(false)
 
@@ -390,3 +527,41 @@ function trackCsmClick() {
 }
 
 </script>
+
+<style scoped>
+/* Colapsable del email preview — slide suave para no romper el reading flow. */
+.email-preview-enter-active,
+.email-preview-leave-active {
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  overflow: hidden;
+}
+.email-preview-enter-from,
+.email-preview-leave-to {
+  opacity: 0;
+  max-height: 0;
+  transform: translateY(-4px);
+}
+.email-preview-enter-to,
+.email-preview-leave-from {
+  opacity: 1;
+  max-height: 400px;
+}
+
+/* Referral preview — slide+fade. max-height más alto porque incluye un mock hero. */
+.referral-preview-enter-active,
+.referral-preview-leave-active {
+  transition: all 0.32s cubic-bezier(0.16, 1, 0.3, 1);
+  overflow: hidden;
+}
+.referral-preview-enter-from,
+.referral-preview-leave-to {
+  opacity: 0;
+  max-height: 0;
+  transform: translateY(-4px);
+}
+.referral-preview-enter-to,
+.referral-preview-leave-from {
+  opacity: 1;
+  max-height: 500px;
+}
+</style>

@@ -117,20 +117,21 @@
           </div>
         </div>
 
-        <!-- Founder quote -->
+        <!-- Mensaje del equipo Deenex -->
         <div class="rounded-2xl border border-slate-200 bg-white p-5">
           <div class="flex items-start gap-3 mb-3">
-            <div class="w-9 h-9 rounded-full bg-gradient-to-br from-primary to-[#3c1fc9] flex items-center justify-center text-white text-xs font-black shrink-0">
-              MV
+            <div class="w-9 h-9 rounded-full bg-gradient-to-br from-primary to-[#3c1fc9] flex items-center justify-center text-white shrink-0">
+              <img src="@/assets/images/nav-logo.webp" alt="Deenex" class="h-3 w-auto brightness-0 invert" />
             </div>
             <div class="min-w-0">
-              <p class="text-xs font-bold text-slate-900 leading-tight">Mateo Vázquez</p>
-              <p class="text-[10px] text-slate-500 font-medium">Founder · Deenex</p>
+              <p class="text-xs font-bold text-slate-900 leading-tight">Equipo fundador</p>
+              <p class="text-[10px] text-slate-500 font-medium">Deenex</p>
             </div>
           </div>
           <blockquote class="text-xs text-slate-600 leading-relaxed italic">
             "Construimos Deenex porque vimos a las marcas con las que trabajábamos
-            perder 30% de su margen con apps de terceros. Probalo, te va a sorprender."
+            perder 30% de su margen con apps de terceros. Probalo y vas a entender
+            por qué nos despertamos cada día para esto."
           </blockquote>
         </div>
       </div>

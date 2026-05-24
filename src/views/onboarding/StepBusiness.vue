@@ -23,15 +23,36 @@
           required
           @blur="validate('brand')"
         />
-        <!-- Subdomain preview live -->
+        <!-- Subdomain preview live + availability check -->
         <div
           v-if="onboarding.subdomainPreview.value && onboarding.subdomainPreview.value !== 'tu-marca'"
-          class="mt-2 flex items-center gap-2 px-3 py-2 rounded-lg bg-primary/[0.04] border border-primary/10"
+          class="mt-2 flex items-center gap-2 px-3 py-2 rounded-lg border transition-colors"
+          :class="domainAvailable === false
+            ? 'bg-amber-50 border-amber-200'
+            : 'bg-primary/[0.04] border-primary/10'"
         >
-          <span class="text-[10px] font-bold text-primary uppercase tracking-widest">Tu app</span>
-          <code class="text-xs font-mono text-slate-700">
-            {{ onboarding.subdomainPreview.value }}<span class="text-slate-400">.deenex.app</span>
+          <span class="text-[10px] font-bold uppercase tracking-widest"
+            :class="domainAvailable === false ? 'text-amber-700' : 'text-primary'"
+          >
+            Tu app
+          </span>
+          <code class="text-xs font-mono flex-1 min-w-0 truncate"
+            :class="domainAvailable === false ? 'text-amber-800' : 'text-slate-700'"
+          >
+            {{ effectiveSubdomain }}<span class="text-slate-400">.deenex.app</span>
           </code>
+          <span v-if="domainChecking" class="w-3 h-3 border-2 border-primary/30 border-t-primary rounded-full animate-spin shrink-0"></span>
+          <span v-else-if="domainAvailable === true" class="inline-flex items-center gap-1 text-[10px] font-bold text-emerald-600 shrink-0">
+            <Check class="w-3 h-3" />Disponible
+          </span>
+          <button
+            v-else-if="domainAvailable === false"
+            type="button"
+            @click="acceptSuggestion"
+            class="text-[10px] font-bold text-amber-700 hover:text-amber-900 underline shrink-0"
+          >
+            Usar sugerencia
+          </button>
         </div>
       </div>
 
@@ -54,7 +75,7 @@
               max="500"
               inputmode="numeric"
               @blur="clampLocations"
-              class="text-5xl font-black text-primary tabular-nums tracking-tighter w-32 bg-transparent border-none outline-none focus:bg-white focus:ring-2 focus:ring-primary/30 rounded-lg px-2 -mx-2 transition-colors no-spinner"
+              class="text-5xl font-black text-primary tabular-nums tracking-tighter w-32 bg-transparent border-2 border-transparent outline-none focus:bg-white focus:border-primary focus:shadow-md focus:shadow-primary/10 rounded-lg px-2 -mx-2 transition-all no-spinner"
               aria-label="Cantidad de locales"
             />
             <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">
@@ -161,7 +182,7 @@
 </template>
 
 <script setup>
-import { reactive, computed, watch } from 'vue'
+import { reactive, ref, computed, watch, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { Check } from 'lucide-vue-next'
 import Field from '@/components/onboarding/Field.vue'
@@ -180,6 +201,7 @@ const form = reactive({
   locations: onboarding.state.business.locations || 1,
   pos: onboarding.state.business.pos,
   channels: [...onboarding.state.business.channels],
+  acceptedSuggestion: '', // override del subdomain si el original estaba tomado
 })
 
 // Mantenemos sincronizado el subdomain preview con el state global mientras
@@ -188,8 +210,72 @@ watch(
   () => form.brand,
   (val) => {
     onboarding.state.business.brand = val
+    triggerSubdomainCheck()
   }
 )
+
+// ── Subdomain availability check ────────────────────────────────────────
+// Lista hardcoded de slugs ya "tomados" — en producción esto sería una API.
+const TAKEN_SUBDOMAINS = new Set([
+  'palta', 'hatsu', 'coquitos', 'monti', 'glorias', 'quem',
+  'demo', 'admin', 'app', 'api', 'test', 'staging',
+])
+
+const domainChecking = ref(false)
+const domainAvailable = ref(null) // null = sin chequear · true · false
+const domainSuggestion = ref('')
+let domainCheckTimer = null
+
+function triggerSubdomainCheck() {
+  if (domainCheckTimer) clearTimeout(domainCheckTimer)
+  const slug = onboarding.subdomainPreview.value
+  if (!slug || slug === 'tu-marca' || slug.length < 2) {
+    domainChecking.value = false
+    domainAvailable.value = null
+    return
+  }
+  domainChecking.value = true
+  domainAvailable.value = null
+  // Debounce + simulación API. Cuando exista, reemplazar por
+  // GET /api/onboarding/subdomain-availability?slug={slug}
+  domainCheckTimer = setTimeout(() => {
+    domainChecking.value = false
+    if (TAKEN_SUBDOMAINS.has(slug)) {
+      domainAvailable.value = false
+      domainSuggestion.value = `${slug}-${suggestionSuffix()}`
+    } else {
+      domainAvailable.value = true
+      domainSuggestion.value = ''
+    }
+  }, 550)
+}
+
+function suggestionSuffix() {
+  // Heurística simple: sufijo geo si captamos uno por país del WhatsApp,
+  // o nro random como fallback.
+  const wa = onboarding.state.identity.whatsapp || ''
+  if (wa.startsWith('+54')) return 'ar'
+  if (wa.startsWith('+52')) return 'mx'
+  if (wa.startsWith('+56')) return 'cl'
+  return String(Math.floor(Math.random() * 99) + 1)
+}
+
+const effectiveSubdomain = computed(() => {
+  // Si el lead aceptó la sugerencia, mostramos esa.
+  return form.acceptedSuggestion || onboarding.subdomainPreview.value
+})
+
+function acceptSuggestion() {
+  if (!domainSuggestion.value) return
+  // Persistimos como override del subdomain.
+  form.acceptedSuggestion = domainSuggestion.value
+  domainAvailable.value = true
+  onboarding.track('subdomain_suggestion_accepted', { slug: domainSuggestion.value })
+}
+
+onMounted(() => {
+  triggerSubdomainCheck()
+})
 
 const errors = reactive({ brand: '', channels: '' })
 

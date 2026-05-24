@@ -11,6 +11,12 @@
   >
     <RouterView />
     <WhatsAppFloatingButton v-if="showLanding && isReady" />
+    <!--
+      TrialBanner: solo en landing. Aparece si el lead ya activó su trial pero
+      todavía no llegó al primer cargo. El componente decide internamente si
+      se muestra (lee state desde useOnboarding).
+    -->
+    <TrialBanner v-if="showLanding && isReady" />
   </div>
 </template>
 
@@ -19,6 +25,7 @@ import { ref, computed } from 'vue'
 import { RouterView, useRoute } from 'vue-router'
 import LoadingScreen from '@/components/common/LoadingScreen.vue'
 import WhatsAppFloatingButton from '@/components/common/WhatsAppFloatingButton.vue'
+import TrialBanner from '@/components/common/TrialBanner.vue'
 
 const isReady = ref(false)
 const route = useRoute()
