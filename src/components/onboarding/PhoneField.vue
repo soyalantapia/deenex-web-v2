@@ -1,5 +1,5 @@
 <template>
-  <label class="block">
+  <label class="block" ref="rootEl">
     <span class="block text-[11px] font-bold text-slate-700 uppercase tracking-widest mb-2">
       {{ label }}
       <span v-if="required" class="text-primary">·</span>
@@ -12,12 +12,14 @@
     >
       <button
         type="button"
-        @click="open = !open"
+        @click.prevent="open = !open"
         class="flex items-center gap-1.5 px-3 border-r border-slate-200 bg-slate-50/60 text-sm font-semibold text-slate-700 hover:bg-slate-100 shrink-0"
+        :aria-expanded="open"
+        aria-label="Cambiar país"
       >
         <span class="text-base leading-none">{{ selectedCountry.flag }}</span>
         <span class="tabular-nums">{{ selectedCountry.dial }}</span>
-        <ChevronDown class="w-3 h-3 text-slate-400" />
+        <ChevronDown class="w-3 h-3 text-slate-400 transition-transform" :class="open ? 'rotate-180' : ''" />
       </button>
       <input
         :value="localValue"
@@ -32,23 +34,25 @@
     </div>
 
     <!-- Country dropdown -->
-    <div
-      v-if="open"
-      class="mt-2 rounded-xl border border-slate-200 bg-white shadow-lg overflow-hidden"
-    >
-      <button
-        v-for="c in countries"
-        :key="c.code"
-        type="button"
-        @click="pickCountry(c.code)"
-        class="w-full flex items-center gap-3 px-4 py-2.5 text-left hover:bg-slate-50 transition-colors"
-        :class="c.code === selectedCountry.code ? 'bg-primary/[0.04] text-primary' : 'text-slate-700'"
+    <Transition name="dropdown">
+      <div
+        v-if="open"
+        class="mt-2 rounded-xl border border-slate-200 bg-white shadow-lg overflow-hidden"
       >
-        <span class="text-base leading-none">{{ c.flag }}</span>
-        <span class="text-sm font-semibold tabular-nums w-12">{{ c.dial }}</span>
-        <span class="text-sm">{{ c.name }}</span>
-      </button>
-    </div>
+        <button
+          v-for="c in countries"
+          :key="c.code"
+          type="button"
+          @click.prevent="pickCountry(c.code)"
+          class="w-full flex items-center gap-3 px-4 py-2.5 text-left hover:bg-slate-50 transition-colors"
+          :class="c.code === selectedCountry.code ? 'bg-primary/[0.04] text-primary' : 'text-slate-700'"
+        >
+          <span class="text-base leading-none">{{ c.flag }}</span>
+          <span class="text-sm font-semibold tabular-nums w-12">{{ c.dial }}</span>
+          <span class="text-sm">{{ c.name }}</span>
+        </button>
+      </div>
+    </Transition>
 
     <p v-if="error" class="mt-1.5 text-xs text-rose-500 font-medium">{{ error }}</p>
     <p v-else-if="hint" class="mt-1.5 text-xs text-slate-400 font-medium">{{ hint }}</p>
@@ -56,8 +60,10 @@
 </template>
 
 <script setup>
-import { ref, computed, watch } from 'vue'
+import { ref, computed, watch, onMounted, onUnmounted } from 'vue'
 import { ChevronDown } from 'lucide-vue-next'
+
+const rootEl = ref(null)
 
 const props = defineProps({
   modelValue: { type: String, default: '' },
@@ -120,4 +126,40 @@ function composeValue() {
   if (!local) return ''
   return `${selectedCountry.value.dial} ${local}`
 }
+
+// Cierra el dropdown si hacés click afuera del componente.
+function onDocumentClick(e) {
+  if (!open.value || !rootEl.value) return
+  if (!rootEl.value.contains(e.target)) {
+    open.value = false
+  }
+}
+
+// Cierra con tecla Escape.
+function onKeydown(e) {
+  if (e.key === 'Escape' && open.value) open.value = false
+}
+
+onMounted(() => {
+  document.addEventListener('mousedown', onDocumentClick)
+  document.addEventListener('keydown', onKeydown)
+})
+
+onUnmounted(() => {
+  document.removeEventListener('mousedown', onDocumentClick)
+  document.removeEventListener('keydown', onKeydown)
+})
 </script>
+
+<style scoped>
+.dropdown-enter-active,
+.dropdown-leave-active {
+  transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+  transform-origin: top;
+}
+.dropdown-enter-from,
+.dropdown-leave-to {
+  opacity: 0;
+  transform: translateY(-6px) scale(0.97);
+}
+</style>

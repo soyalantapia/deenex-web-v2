@@ -1,5 +1,5 @@
 <template>
-  <form @submit.prevent="onSubmit" novalidate>
+  <form @submit.prevent="onSubmit" novalidate v-autofocus>
     <p class="text-[11px] font-black text-primary uppercase tracking-[0.2em] mb-3">
       Empezá gratis · Paso 1 de 5
     </p>

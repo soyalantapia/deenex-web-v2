@@ -1,5 +1,5 @@
 <template>
-  <form @submit.prevent="onSubmit" novalidate>
+  <form @submit.prevent="onSubmit" novalidate v-autofocus>
     <p class="text-[11px] font-black text-primary uppercase tracking-[0.2em] mb-3">
       Paso 2 de 5
     </p>
@@ -13,15 +13,27 @@
     </p>
 
     <div class="space-y-8">
-      <Field
-        v-model="form.brand"
-        label="Nombre de la marca"
-        name="brand"
-        placeholder="Palta · Hatsu · La Trattoria"
-        :error="errors.brand"
-        required
-        @blur="validate('brand')"
-      />
+      <div>
+        <Field
+          v-model="form.brand"
+          label="Nombre de la marca"
+          name="brand"
+          placeholder="Palta · Hatsu · La Trattoria"
+          :error="errors.brand"
+          required
+          @blur="validate('brand')"
+        />
+        <!-- Subdomain preview live -->
+        <div
+          v-if="onboarding.subdomainPreview.value && onboarding.subdomainPreview.value !== 'tu-marca'"
+          class="mt-2 flex items-center gap-2 px-3 py-2 rounded-lg bg-primary/[0.04] border border-primary/10"
+        >
+          <span class="text-[10px] font-bold text-primary uppercase tracking-widest">Tu app</span>
+          <code class="text-xs font-mono text-slate-700">
+            {{ onboarding.subdomainPreview.value }}<span class="text-slate-400">.deenex.app</span>
+          </code>
+        </div>
+      </div>
 
       <!-- Slider locales -->
       <div>
@@ -140,7 +152,7 @@
 </template>
 
 <script setup>
-import { reactive, computed } from 'vue'
+import { reactive, computed, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { Check } from 'lucide-vue-next'
 import Field from '@/components/onboarding/Field.vue'
@@ -150,12 +162,25 @@ import { useOnboarding } from '@/composables/useOnboarding'
 const router = useRouter()
 const onboarding = useOnboarding()
 
+// Smart pre-fill: si la marca está vacía pero el email es corporativo, sugerimos
+// inferida del dominio. El usuario la puede cambiar a su gusto.
+const inferredBrand = onboarding.inferBrandFromEmail(onboarding.state.identity.email)
+
 const form = reactive({
-  brand: onboarding.state.business.brand,
+  brand: onboarding.state.business.brand || inferredBrand,
   locations: onboarding.state.business.locations || 1,
   pos: onboarding.state.business.pos,
   channels: [...onboarding.state.business.channels],
 })
+
+// Mantenemos sincronizado el subdomain preview con el state global mientras
+// el usuario tipea, para que el badge `tu-marca.deenex.app` reaccione en vivo.
+watch(
+  () => form.brand,
+  (val) => {
+    onboarding.state.business.brand = val
+  }
+)
 
 const errors = reactive({ brand: '', channels: '' })
 

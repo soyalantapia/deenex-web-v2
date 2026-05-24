@@ -59,28 +59,83 @@
       </div>
     </div>
 
-    <!-- Selector método de pago: MP único por ahora -->
+    <!-- Selector método: MP recurrente vs trial sin tarjeta -->
     <div class="mb-6">
       <span class="block text-[11px] font-bold text-slate-700 uppercase tracking-widest mb-3">
-        Método de pago
+        Cómo activamos tu cuenta
       </span>
-      <div class="border-2 border-primary bg-primary/[0.04] rounded-2xl p-5 flex items-center gap-4">
-        <div class="w-12 h-12 rounded-xl bg-white border border-slate-200 flex items-center justify-center shrink-0">
-          <!-- Logo MP simplificado -->
-          <svg viewBox="0 0 80 80" class="w-7 h-7" aria-label="MercadoPago">
-            <circle cx="40" cy="40" r="36" fill="#009EE3" />
-            <path d="M22 44c4-8 12-12 18-12s14 4 18 12c-4 4-10 6-18 6s-14-2-18-6z" fill="#FFD600" />
-          </svg>
-        </div>
-        <div class="flex-1 min-w-0">
-          <p class="text-sm font-bold text-slate-900">MercadoPago</p>
-          <p class="text-xs text-slate-500 mt-0.5 leading-snug">
-            Tarjeta de crédito o dinero en cuenta. Procesamos por Argentina y México.
-          </p>
-        </div>
-        <div class="w-5 h-5 rounded-full bg-primary flex items-center justify-center shrink-0">
-          <Check class="w-3 h-3 text-white" />
-        </div>
+
+      <div class="space-y-2.5">
+        <!-- Opción 1: MercadoPago -->
+        <button
+          type="button"
+          @click="paymentChoice = 'mercadopago'"
+          class="w-full text-left rounded-2xl border-2 p-5 transition-all"
+          :class="paymentChoice === 'mercadopago'
+            ? 'border-primary bg-primary/[0.04]'
+            : 'border-slate-200 hover:border-slate-300'"
+        >
+          <div class="flex items-start gap-4">
+            <div class="w-12 h-12 rounded-xl bg-white border border-slate-200 flex items-center justify-center shrink-0">
+              <svg viewBox="0 0 80 80" class="w-7 h-7" aria-label="MercadoPago">
+                <circle cx="40" cy="40" r="36" fill="#009EE3" />
+                <path d="M22 44c4-8 12-12 18-12s14 4 18 12c-4 4-10 6-18 6s-14-2-18-6z" fill="#FFD600" />
+              </svg>
+            </div>
+            <div class="flex-1 min-w-0">
+              <div class="flex items-center gap-2">
+                <p class="text-sm font-bold text-slate-900">MercadoPago — Recomendado</p>
+                <span class="text-[9px] font-black text-emerald-600 bg-emerald-100 px-2 py-0.5 rounded-full uppercase tracking-wider whitespace-nowrap">
+                  Sin interrupciones
+                </span>
+              </div>
+              <p class="text-xs text-slate-500 mt-1 leading-snug">
+                Tarjeta o dinero en cuenta. El día {{ onboarding.firstChargeDateShort.value }}
+                te cobramos USD {{ totalMonthly }} automáticamente. Sin pasos extra.
+              </p>
+            </div>
+            <div
+              class="w-5 h-5 rounded-full flex items-center justify-center shrink-0 mt-1 border-2"
+              :class="paymentChoice === 'mercadopago'
+                ? 'bg-primary border-primary'
+                : 'bg-white border-slate-300'"
+            >
+              <Check v-if="paymentChoice === 'mercadopago'" class="w-3 h-3 text-white" />
+            </div>
+          </div>
+        </button>
+
+        <!-- Opción 2: Sin tarjeta -->
+        <button
+          type="button"
+          @click="paymentChoice = 'email_only'"
+          class="w-full text-left rounded-2xl border-2 p-5 transition-all"
+          :class="paymentChoice === 'email_only'
+            ? 'border-primary bg-primary/[0.04]'
+            : 'border-slate-200 hover:border-slate-300'"
+        >
+          <div class="flex items-start gap-4">
+            <div class="w-12 h-12 rounded-xl bg-amber-50 border border-amber-100 flex items-center justify-center shrink-0">
+              <Sparkles class="w-5 h-5 text-amber-500" />
+            </div>
+            <div class="flex-1 min-w-0">
+              <p class="text-sm font-bold text-slate-900">Activar sin tarjeta</p>
+              <p class="text-xs text-slate-500 mt-1 leading-snug">
+                Validamos tu cuenta por email. Tenés 15 días para probarla; al día 16
+                te pedimos el método de pago si querés seguir.
+                <span class="text-amber-600 font-semibold">Funciones avanzadas pueden estar limitadas.</span>
+              </p>
+            </div>
+            <div
+              class="w-5 h-5 rounded-full flex items-center justify-center shrink-0 mt-1 border-2"
+              :class="paymentChoice === 'email_only'
+                ? 'bg-primary border-primary'
+                : 'bg-white border-slate-300'"
+            >
+              <Check v-if="paymentChoice === 'email_only'" class="w-3 h-3 text-white" />
+            </div>
+          </div>
+        </button>
       </div>
     </div>
 
@@ -107,7 +162,7 @@
     >
       <span v-if="loading" class="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></span>
       <template v-else>
-        Activar mi cuenta con MercadoPago
+        {{ activateButtonLabel }}
         <ArrowRight class="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
       </template>
     </button>
@@ -130,12 +185,21 @@
 <script setup>
 import { ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
-import { Check, Shield, Clock, FileText, ArrowRight } from 'lucide-vue-next'
+import { Check, Shield, Clock, FileText, ArrowRight, Sparkles } from 'lucide-vue-next'
 import { useOnboarding } from '@/composables/useOnboarding'
 
 const router = useRouter()
 const onboarding = useOnboarding()
 const loading = ref(false)
+
+// 'mercadopago' (default · recommended) | 'email_only' (no card, limited features)
+const paymentChoice = ref('mercadopago')
+
+const activateButtonLabel = computed(() =>
+  paymentChoice.value === 'mercadopago'
+    ? 'Activar mi cuenta con MercadoPago'
+    : 'Activar mi trial sin tarjeta'
+)
 
 const planSummary = computed(() => {
   const key = onboarding.state.plan.key || onboarding.recommendedPlan.value.key
@@ -154,24 +218,32 @@ const totalMonthly = computed(() => {
 
 async function onActivate() {
   loading.value = true
-  onboarding.track('mp_checkout_initiated', {
+  onboarding.track('activation_initiated', {
     plan: onboarding.state.plan.key,
     total: totalMonthly.value,
+    method: paymentChoice.value,
   })
 
   /*
-   * Punto de integración con MercadoPago:
-   *   POST /api/onboarding/checkout-preference
-   *   body: { planKey, addLoyalty, locations, identity, business }
-   *   response: { preferenceId, initPoint }
-   *   redirect: window.location.href = initPoint
+   * Integración backend según el método elegido:
    *
-   * Por ahora, simulamos la activación local. Cuando el backend esté listo,
-   * reemplazar el setTimeout por la llamada al API + redirect a MP Checkout.
+   *   paymentChoice === 'mercadopago':
+   *     POST /api/onboarding/checkout-preference
+   *     body: { planKey, addLoyalty, locations, identity, business }
+   *     response: { preferenceId, initPoint }
+   *     redirect: window.location.href = initPoint
+   *
+   *   paymentChoice === 'email_only':
+   *     POST /api/onboarding/activate-trial
+   *     body: { identity, business, plan, addLoyalty, deferredPayment: true }
+   *     response: { tenantId, magicLink }
+   *     Email con magic link al lead. Sin redirect.
+   *
+   * Hoy simulamos local. Cuando esté el backend, reemplazar el setTimeout.
    */
   await new Promise((r) => setTimeout(r, 1400))
 
-  onboarding.markTrialActivated('mercadopago', 'stub_pref_' + Date.now())
+  onboarding.markTrialActivated(paymentChoice.value, 'stub_pref_' + Date.now())
   router.push('/comenzar/listo')
 }
 </script>

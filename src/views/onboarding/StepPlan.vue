@@ -150,6 +150,26 @@
       </div>
     </div>
 
+    <!-- Testimonial inline: refuerza el savings con voz real ──────────-->
+    <figure
+      v-if="!isEnterprise"
+      class="relative rounded-2xl border border-slate-200 bg-white p-5 mb-8 overflow-hidden"
+    >
+      <div class="absolute left-0 top-4 bottom-4 w-[3px] rounded-full bg-primary"></div>
+      <blockquote class="text-sm text-slate-600 leading-relaxed italic pl-3">
+        "Recuperamos clientes que compraban por apps de terceros y los volvimos a
+        fidelizar en nuestro propio ámbito. En 60 días el ROI ya era positivo."
+      </blockquote>
+      <figcaption class="mt-3 pl-3 flex items-center justify-between gap-2">
+        <span class="text-[11px] font-bold text-slate-500 tracking-wide uppercase">
+          — Marcos Aldazábal, Socio y Fundador
+        </span>
+        <span class="text-[10px] font-black text-primary/60 tracking-wider uppercase">
+          Palta
+        </span>
+      </figcaption>
+    </figure>
+
     <!-- Comparison de TODOS los planes (visible, no escondido) ─────────-->
     <div v-if="!isEnterprise" class="mb-8">
       <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3">

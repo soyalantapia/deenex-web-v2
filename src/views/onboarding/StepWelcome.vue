@@ -1,6 +1,9 @@
 <template>
   <div>
-    <!-- Confetti header -->
+    <!-- Confetti cañón doble — solo cuando no es Enterprise -->
+    <ConfettiCanvas v-if="!isEnterprise && playConfetti" :duration="3500" :particle-count="160" />
+
+    <!-- Header con check + sparks -->
     <div class="relative mb-8">
       <div class="w-16 h-16 rounded-2xl bg-emerald-500 flex items-center justify-center mb-6 relative">
         <Check class="w-8 h-8 text-white" stroke-width="3" />
@@ -113,9 +116,10 @@
 </template>
 
 <script setup>
-import { computed, onMounted } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { Check, CalendarDays, ArrowRight } from 'lucide-vue-next'
+import ConfettiCanvas from '@/components/onboarding/ConfettiCanvas.vue'
 import { useOnboarding } from '@/composables/useOnboarding'
 
 const route = useRoute()
@@ -165,6 +169,8 @@ function trackNextStepClick(key) {
   onboarding.track('next_step_click', { step: key })
 }
 
+const playConfetti = ref(false)
+
 onMounted(() => {
   if (isEnterprise.value) {
     onboarding.track('enterprise_request_submitted', {
@@ -174,6 +180,10 @@ onMounted(() => {
     onboarding.track('welcome_viewed', {
       plan: onboarding.state.plan.key,
     })
+    // Pequeño delay para que el confetti dispare después del paint inicial.
+    setTimeout(() => {
+      playConfetti.value = true
+    }, 200)
   }
 })
 

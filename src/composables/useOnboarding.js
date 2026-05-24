@@ -161,6 +161,53 @@ const greeting = computed(() => {
   return name ? `${name}` : ''
 })
 
+// ── Smart inference helpers ──────────────────────────────────────────────
+const GENERIC_EMAIL_DOMAINS = new Set([
+  'gmail.com', 'hotmail.com', 'outlook.com', 'yahoo.com', 'icloud.com',
+  'live.com', 'me.com', 'protonmail.com', 'aol.com', 'msn.com',
+])
+
+/**
+ * A partir del email corporativo, infiere un nombre de marca probable.
+ * `marcos@palta.com.ar` → 'Palta'
+ * `juan@grupocofradia.com` → 'Grupocofradia' (que el usuario podrá corregir)
+ * `juan@gmail.com` → '' (no inferimos de dominios genéricos)
+ */
+function inferBrandFromEmail(email) {
+  if (!email || typeof email !== 'string') return ''
+  const m = email.trim().toLowerCase().match(/@([^@]+)$/)
+  if (!m) return ''
+  const domain = m[1]
+  if (GENERIC_EMAIL_DOMAINS.has(domain)) return ''
+  // Tomar la parte principal del dominio (antes del primer punto).
+  const first = domain.split('.')[0] || ''
+  if (!first || first.length < 2) return ''
+  return first.charAt(0).toUpperCase() + first.slice(1)
+}
+
+/**
+ * Convierte el nombre de marca a un subdomain seguro.
+ * 'La Trattoria' → 'la-trattoria'
+ * 'Palta!' → 'palta'
+ */
+function slugifyBrand(brand) {
+  if (!brand) return ''
+  return brand
+    .toString()
+    .normalize('NFD')
+    .replace(/[̀-ͯ]/g, '') // strip accents
+    .toLowerCase()
+    .replace(/[^a-z0-9\s-]/g, '')
+    .trim()
+    .replace(/\s+/g, '-')
+    .slice(0, 30)
+}
+
+const subdomainPreview = computed(() => {
+  const slug = slugifyBrand(state.business.brand)
+  return slug || 'tu-marca'
+})
+
 // ── Step gating ──────────────────────────────────────────────────────────
 const STEP_ORDER = ['identity', 'business', 'plan', 'trial', 'welcome']
 
@@ -248,6 +295,9 @@ export function useOnboarding() {
     firstChargeDateFormatted,
     firstChargeDateShort,
     greeting,
+    inferBrandFromEmail,
+    slugifyBrand,
+    subdomainPreview,
     currentStep,
     isStepUnlocked,
     ensureStarted,
