@@ -4,7 +4,8 @@
       Paso 2 de 5
     </p>
     <h1 class="text-[clamp(1.8rem,4vw,2.6rem)] font-extrabold tracking-tighter leading-[1.05] text-slate-900 mb-4">
-      Contanos de tu marca.<br />
+      <template v-if="onboarding.greeting.value">{{ onboarding.greeting.value }}, contanos<br /></template>
+      <template v-else>Contanos </template>de tu marca.<br />
       <span class="text-primary italic font-light">Te recomendamos el plan en base a eso.</span>
     </h1>
     <p class="text-base text-slate-500 leading-relaxed mb-10 max-w-md">
@@ -160,16 +161,22 @@ const errors = reactive({ brand: '', channels: '' })
 
 const posOptions = [
   { value: 'maxirest', label: 'Maxirest' },
+  { value: 'fudo', label: 'Fudo' },
   { value: 'odoo', label: 'Odoo' },
+  { value: 'bsale', label: 'Bsale' },
+  { value: 'tango', label: 'Tango' },
   { value: 'other', label: 'Otro POS' },
   { value: 'none', label: 'No tengo POS' },
+  { value: 'unsure', label: 'Aún no sé' },
 ]
 
 const channelOptions = [
   { value: 'salon', label: 'Salón con mesas', desc: 'Atendés en el local con mozos.' },
   { value: 'takeaway', label: 'Take Away', desc: 'Pedido al mostrador o por QR.' },
   { value: 'delivery_own', label: 'Delivery propio', desc: 'Tenés flota o repartidores.' },
-  { value: 'delivery_third', label: 'PedidosYa / Rappi', desc: 'Vendés por apps de terceros.' },
+  { value: 'delivery_third', label: 'PedidosYa / Rappi / Uber Eats', desc: 'Apps de terceros con comisión.' },
+  { value: 'glovo', label: 'Glovo', desc: 'Si operás en LATAM con Glovo activo.' },
+  { value: 'whatsapp', label: 'WhatsApp', desc: 'Pedidos por mensaje sin sistema.' },
 ]
 
 function validate(field) {

@@ -13,11 +13,13 @@
       </p>
 
       <h1 v-if="isEnterprise" class="text-[clamp(1.8rem,4vw,2.6rem)] font-extrabold tracking-tighter leading-[1.05] text-slate-900 mb-4">
-        Tu solicitud Enterprise<br />
+        <template v-if="onboarding.greeting.value">{{ onboarding.greeting.value }}, tu solicitud<br /></template>
+        <template v-else>Tu solicitud </template>Enterprise<br />
         <span class="text-primary italic font-light">ya está en revisión.</span>
       </h1>
       <h1 v-else class="text-[clamp(1.8rem,4vw,2.6rem)] font-extrabold tracking-tighter leading-[1.05] text-slate-900 mb-4">
-        Tu cuenta está activa.<br />
+        <template v-if="onboarding.greeting.value">¡Listo, {{ onboarding.greeting.value }}!<br /></template>
+        <template v-else>Tu cuenta está activa.<br /></template>
         <span class="text-primary italic font-light">Empezás a operar ahora.</span>
       </h1>
 
@@ -33,27 +35,32 @@
       </p>
     </div>
 
-    <!-- Next steps -->
+    <!-- Next steps — cada uno linkea al app a la sección concreta -->
     <div v-if="!isEnterprise" class="space-y-3 mb-8">
       <p class="text-[11px] font-black text-slate-400 uppercase tracking-widest mb-3">
-        Lo que sigue
+        Lo que sigue · Tenés 15 días para configurar todo
       </p>
-      <div
+      <a
         v-for="(step, i) in nextSteps"
         :key="step.title"
-        class="border border-slate-200 rounded-2xl p-5 flex items-start gap-4 hover:border-slate-300 transition-colors"
+        :href="`${dashboardUrl}${step.path}`"
+        @click="trackNextStepClick(step.key)"
+        class="group border border-slate-200 rounded-2xl p-5 flex items-start gap-4 hover:border-primary hover:bg-primary/[0.02] transition-colors"
       >
-        <div class="w-9 h-9 rounded-lg bg-primary/10 text-primary flex items-center justify-center shrink-0 font-bold text-sm">
+        <div class="w-9 h-9 rounded-lg bg-primary/10 text-primary flex items-center justify-center shrink-0 font-bold text-sm group-hover:bg-primary group-hover:text-white transition-colors">
           {{ i + 1 }}
         </div>
         <div class="flex-1 min-w-0">
-          <p class="text-sm font-bold text-slate-900 leading-tight mb-1">{{ step.title }}</p>
+          <p class="text-sm font-bold text-slate-900 leading-tight mb-1 flex items-center gap-2">
+            {{ step.title }}
+            <ArrowRight class="w-3 h-3 text-slate-300 group-hover:text-primary group-hover:translate-x-0.5 transition-all" />
+          </p>
           <p class="text-xs text-slate-500 leading-relaxed">{{ step.desc }}</p>
         </div>
-        <span class="text-[10px] font-semibold text-slate-400 uppercase tracking-wider shrink-0 mt-1">
+        <span class="text-[10px] font-semibold text-slate-400 uppercase tracking-wider shrink-0 mt-1 whitespace-nowrap">
           ~{{ step.time }}
         </span>
-      </div>
+      </a>
     </div>
 
     <!-- CTAs -->
@@ -125,26 +132,38 @@ const calendarUrl = import.meta.env.VITE_CALENDAR_URL || '#'
 
 const nextSteps = [
   {
+    key: 'branding',
     title: 'Subí tu logo y colores',
     desc: 'Brandeamos automáticamente tu app, web y emails con tu identidad visual.',
     time: '2 min',
+    path: '/settings/branding',
   },
   {
+    key: 'menu',
     title: 'Importá tu menú',
     desc: 'Pegá desde Excel o subí un CSV. Te ayudamos a categorizar y precios.',
     time: '10 min',
+    path: '/menu/import',
   },
   {
+    key: 'delivery',
     title: 'Configurá tu zona de delivery',
     desc: 'Dibujás los polígonos directo sobre el mapa. Hasta 5 zonas por local.',
     time: '5 min',
+    path: '/settings/delivery-zones',
   },
   {
+    key: 'integrations',
     title: 'Conectá MercadoPago y WhatsApp',
     desc: 'Tokens en 1 click. Activamos cobros y notificaciones al instante.',
     time: '3 min',
+    path: '/settings/integrations',
   },
 ]
+
+function trackNextStepClick(key) {
+  onboarding.track('next_step_click', { step: key })
+}
 
 onMounted(() => {
   if (isEnterprise.value) {

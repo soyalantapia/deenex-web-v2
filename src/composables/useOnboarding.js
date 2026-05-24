@@ -129,6 +129,38 @@ const savingsVsThirdParty = computed(() => {
   return Math.max(0, Math.round(thirdPartyFeeUsd - deenexFeeUsd))
 })
 
+// ── Fecha del primer cargo (today + trial length) ────────────────────────
+const TRIAL_DAYS = 15
+
+const firstChargeDate = computed(() => {
+  // Si el trial ya está activado, usamos esa fecha como ancla. Si no, calculamos
+  // desde hoy para mostrar al lead una proyección.
+  const anchor = state.trial.activatedAt ? new Date(state.trial.activatedAt) : new Date()
+  const charge = new Date(anchor)
+  charge.setDate(charge.getDate() + TRIAL_DAYS)
+  return charge
+})
+
+const firstChargeDateFormatted = computed(() => {
+  return new Intl.DateTimeFormat('es-AR', {
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric',
+  }).format(firstChargeDate.value)
+})
+
+const firstChargeDateShort = computed(() => {
+  return new Intl.DateTimeFormat('es-AR', { day: 'numeric', month: 'long' }).format(
+    firstChargeDate.value
+  )
+})
+
+// ── Personalización ──────────────────────────────────────────────────────
+const greeting = computed(() => {
+  const name = (state.identity.firstName || '').trim()
+  return name ? `${name}` : ''
+})
+
 // ── Step gating ──────────────────────────────────────────────────────────
 const STEP_ORDER = ['identity', 'business', 'plan', 'trial', 'welcome']
 
@@ -208,9 +240,14 @@ export function useOnboarding() {
     state,
     PLAN_TIERS,
     STEP_ORDER,
+    TRIAL_DAYS,
     recommendedPlan,
     monthlyEstimateUsd,
     savingsVsThirdParty,
+    firstChargeDate,
+    firstChargeDateFormatted,
+    firstChargeDateShort,
+    greeting,
     currentStep,
     isStepUnlocked,
     ensureStarted,

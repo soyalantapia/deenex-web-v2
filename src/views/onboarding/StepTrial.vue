@@ -4,12 +4,14 @@
       Paso 4 de 5
     </p>
     <h1 class="text-[clamp(1.8rem,4vw,2.6rem)] font-extrabold tracking-tighter leading-[1.05] text-slate-900 mb-4">
-      Activá tu trial.<br />
+      <template v-if="onboarding.greeting.value">{{ onboarding.greeting.value }}, activá<br /></template>
+      <template v-else>Activá </template>tu trial.<br />
       <span class="text-primary italic font-light">No cobramos nada hoy.</span>
     </h1>
     <p class="text-base text-slate-500 leading-relaxed mb-8 max-w-md">
       Necesitamos tu método de pago para reservar tu cuenta. El primer cargo
-      es <span class="font-bold text-slate-900">el día 16</span>, y si cancelás antes no te cobramos nunca.
+      es <span class="font-bold text-slate-900">el {{ onboarding.firstChargeDateFormatted.value }}</span>,
+      y si cancelás antes no te cobramos nunca.
     </p>
 
     <!-- Resumen del plan -->
@@ -50,7 +52,7 @@
         <span class="text-xl font-black text-emerald-600 tabular-nums">USD 0,00</span>
       </div>
       <div class="mt-2 flex justify-between items-baseline">
-        <span class="text-xs text-slate-400">A partir del día 16</span>
+        <span class="text-xs text-slate-400">A partir del {{ onboarding.firstChargeDateShort.value }}</span>
         <span class="text-xs font-bold text-slate-500 tabular-nums">
           USD {{ totalMonthly }} / mes
         </span>

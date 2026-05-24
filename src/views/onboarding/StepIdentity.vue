@@ -50,14 +50,9 @@
         @blur="validate('email')"
       />
 
-      <Field
+      <PhoneField
         v-model="form.whatsapp"
         label="WhatsApp"
-        type="tel"
-        name="whatsapp"
-        autocomplete="tel"
-        inputmode="tel"
-        placeholder="11 5555-5555"
         hint="Nuestro CSM te escribe en el primer día para ayudarte con el setup."
         :error="errors.whatsapp"
         required
@@ -86,6 +81,7 @@
 import { reactive, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import Field from '@/components/onboarding/Field.vue'
+import PhoneField from '@/components/onboarding/PhoneField.vue'
 import StepActions from '@/components/onboarding/StepActions.vue'
 import { useOnboarding } from '@/composables/useOnboarding'
 

@@ -81,7 +81,7 @@
       <p :class="{ 'animate-rise': ready, 'opacity-0': !ready }"
         class="mt-3 text-[11px] text-slate-400 font-medium"
         style="animation-delay:0.45s">
-        Sin tarjeta hoy · 15 días gratis · Cancelás cuando quieras
+        Sin cargo durante 15 días · Cancelás en 1 click · Setup en menos de 30 min
       </p>
 
       <!-- Social Proof -->
