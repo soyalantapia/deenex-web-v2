@@ -1,26 +1,27 @@
 <template>
-  <div class="rounded-2xl border border-slate-200 bg-white p-5 mb-4">
-    <div class="flex items-center justify-between gap-3 mb-4">
-      <div>
-        <p class="text-[10px] font-black text-primary uppercase tracking-widest mb-1">
-          Calculadora personalizada
+  <div class="rounded-2xl border-2 border-primary/20 bg-primary/[0.02] p-5 mb-4">
+    <div class="flex items-center justify-between gap-3 mb-1">
+      <div class="flex items-center gap-2">
+        <Calculator class="w-4 h-4 text-primary" />
+        <p class="text-[10px] font-black text-primary uppercase tracking-widest">
+          Antes de ver el ahorro, ajustá los números
         </p>
-        <h3 class="text-base font-bold text-slate-900 leading-tight">
-          Ajustá los números con tus reales
-        </h3>
       </div>
       <button
         type="button"
         @click="resetToDefaults"
         class="text-[10px] font-bold uppercase tracking-wider text-slate-400 hover:text-slate-700 transition-colors whitespace-nowrap"
-        v-if="hasUserEdits"
+        v-if="onboarding.hasCustomRoiInputs.value"
       >
         Volver a defaults
       </button>
     </div>
+    <h3 class="text-base font-bold text-slate-900 leading-tight mb-4">
+      Tus números reales hacen mejor la proyección
+    </h3>
 
     <!-- Inputs -->
-    <div class="grid grid-cols-2 gap-3 mb-4">
+    <div class="grid grid-cols-2 gap-3">
       <label class="block">
         <span class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1.5">
           Ticket promedio
@@ -30,11 +31,11 @@
           <input
             v-model.number="form.ticket"
             type="number"
-            min="5"
+            min="3"
             max="200"
             step="1"
             @blur="onInputBlur('ticket')"
-            class="w-full pl-11 pr-3 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-sm font-bold text-slate-900 tabular-nums focus:outline-none focus:border-primary focus:bg-white transition-colors no-spinner"
+            class="w-full pl-11 pr-3 py-2.5 rounded-xl bg-white border border-slate-200 text-sm font-bold text-slate-900 tabular-nums focus:outline-none focus:border-primary transition-colors no-spinner"
             aria-label="Ticket promedio en USD"
           />
         </div>
@@ -46,110 +47,77 @@
         <input
           v-model.number="form.ordersPerLocation"
           type="number"
-          min="50"
-          max="5000"
+          min="20"
+          max="10000"
           step="50"
           @blur="onInputBlur('ordersPerLocation')"
-          class="w-full px-3 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-sm font-bold text-slate-900 tabular-nums focus:outline-none focus:border-primary focus:bg-white transition-colors no-spinner"
+          class="w-full px-3 py-2.5 rounded-xl bg-white border border-slate-200 text-sm font-bold text-slate-900 tabular-nums focus:outline-none focus:border-primary transition-colors no-spinner"
           aria-label="Pedidos por local por mes"
         />
       </label>
     </div>
 
-    <!-- Output: GMV + savings -->
-    <div class="grid grid-cols-3 gap-3 pt-4 border-t border-slate-100">
-      <div>
-        <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">GMV mensual</p>
-        <p class="text-sm font-black text-slate-900 tabular-nums">
-          USD <AnimatedNumber :value="customGmv" :duration="700" />
-        </p>
-      </div>
-      <div>
-        <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">3rd parties</p>
-        <p class="text-sm font-black text-rose-500 tabular-nums">
-          -USD <AnimatedNumber :value="customThirdPartyFee" :duration="700" />
-        </p>
-      </div>
-      <div>
-        <p class="text-[10px] font-bold text-emerald-600 uppercase tracking-widest mb-1">Ahorro Deenex</p>
-        <p class="text-sm font-black text-emerald-600 tabular-nums">
-          +USD <AnimatedNumber :value="customSavings" :duration="700" />
-        </p>
-      </div>
-    </div>
-
     <p class="text-[10px] text-slate-400 leading-snug mt-3 italic">
-      Cálculo basado en tus {{ onboarding.state.business.locations }} {{ onboarding.state.business.locations === 1 ? 'local' : 'locales' }} ·
-      plan {{ recommendedPlan.name }} ({{ recommendedPlan.commissionPct }}% comisión).
-      Comparado contra el 25% promedio de apps de terceros.
+      Estos números los usamos para proyectar tu ahorro de abajo con tus cifras
+      reales. Si los dejás vacíos, usamos un promedio conservador del rubro.
     </p>
   </div>
 </template>
 
 <script setup>
-import { reactive, computed, watch } from 'vue'
-import AnimatedNumber from '@/components/onboarding/AnimatedNumber.vue'
+import { reactive, watch, onMounted } from 'vue'
+import { Calculator } from 'lucide-vue-next'
 import { useOnboarding } from '@/composables/useOnboarding'
 
 const onboarding = useOnboarding()
 
-// Defaults: derivados del state (mismas asunciones que el cálculo "estimado")
-const defaultOrdersPerLocation = computed(() => {
-  const l = Math.max(1, Number(onboarding.state.business.locations) || 1)
-  return l <= 5 ? 300 : l <= 25 ? 800 : l <= 70 ? 1500 : 3000
-})
-
 const form = reactive({
-  ticket: 15,
-  ordersPerLocation: defaultOrdersPerLocation.value,
+  ticket: onboarding.state.business.avgTicketUsd || onboarding.defaultAvgTicketUsd,
+  ordersPerLocation:
+    onboarding.state.business.ordersPerLocation ||
+    onboarding.computeDefaultOrders(Math.max(1, onboarding.state.business.locations || 1)),
 })
 
-const hasUserEdits = computed(() => {
-  return form.ticket !== 15 || form.ordersPerLocation !== defaultOrdersPerLocation.value
-})
-
-// Si cambian las ubicaciones afuera (volver al step 2), resincronizamos el
-// default de pedidos — pero solo si el usuario no editó manualmente.
-watch(defaultOrdersPerLocation, (next) => {
-  if (!hasUserEdits.value) {
-    form.ordersPerLocation = next
-  }
-})
+// Sincronizamos en vivo hacia el state global — el hero del Step 3 reactivo
+// al cambio porque depende de los mismos computeds.
+watch(
+  () => [form.ticket, form.ordersPerLocation],
+  ([t, o]) => {
+    onboarding.state.business.avgTicketUsd = Number(t) || null
+    onboarding.state.business.ordersPerLocation = Number(o) || null
+  },
+  { deep: true }
+)
 
 function onInputBlur(field) {
-  // Normalizamos a rangos seguros para que no haya valores absurdos.
   if (field === 'ticket') {
-    form.ticket = Math.max(5, Math.min(200, Number(form.ticket) || 15))
+    form.ticket = Math.max(3, Math.min(200, Number(form.ticket) || onboarding.defaultAvgTicketUsd))
   } else if (field === 'ordersPerLocation') {
-    form.ordersPerLocation = Math.max(50, Math.min(5000, Math.round(Number(form.ordersPerLocation) || 300)))
+    form.ordersPerLocation = Math.max(20, Math.min(10000, Math.round(Number(form.ordersPerLocation) || 280)))
   }
   onboarding.track('roi_calculator_edited', { field, value: form[field] })
 }
 
 function resetToDefaults() {
-  form.ticket = 15
-  form.ordersPerLocation = defaultOrdersPerLocation.value
+  form.ticket = onboarding.defaultAvgTicketUsd
+  form.ordersPerLocation = onboarding.computeDefaultOrders(
+    Math.max(1, onboarding.state.business.locations || 1)
+  )
   onboarding.track('roi_calculator_reset')
 }
 
-// ── Cálculos derivados ───────────────────────────────────────────────────
-const recommendedPlan = computed(() => onboarding.recommendedPlan.value)
-
-const customGmv = computed(() => {
-  const locations = Math.max(1, Number(onboarding.state.business.locations) || 1)
-  return Math.round(locations * form.ordersPerLocation * form.ticket)
+onMounted(() => {
+  // Sincronizar al mount por si los defaults cambiaron por el N de locales
+  // (ej: volvieron al Step 2 y cambiaron de 10 a 80 locales).
+  if (!onboarding.state.business.avgTicketUsd) {
+    form.ticket = onboarding.defaultAvgTicketUsd
+  }
+  if (!onboarding.state.business.ordersPerLocation) {
+    form.ordersPerLocation = onboarding.computeDefaultOrders(
+      Math.max(1, onboarding.state.business.locations || 1)
+    )
+  }
 })
-
-const customThirdPartyFee = computed(() => Math.round(customGmv.value * 0.25))
-
-const customDeenexFee = computed(() => {
-  const tier = recommendedPlan.value
-  const fee = tier.monthlyFee || 0
-  const commission = customGmv.value * (tier.commissionPct / 100)
-  return Math.round(fee + commission)
-})
-
-const customSavings = computed(() => Math.max(0, customThirdPartyFee.value - customDeenexFee.value))
 </script>
 
 <style scoped>

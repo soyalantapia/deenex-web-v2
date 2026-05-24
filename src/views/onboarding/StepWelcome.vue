@@ -38,23 +38,19 @@
       </p>
     </div>
 
-    <!-- Trial countdown — visualiza el tiempo restante en vivo -->
-    <div v-if="!isEnterprise" class="rounded-2xl bg-gradient-to-br from-primary to-[#3c1fc9] text-white p-5 mb-6 relative overflow-hidden">
-      <div class="absolute inset-0 bg-gradient-to-tr from-white/10 to-transparent pointer-events-none"></div>
-      <div class="relative flex items-center gap-4">
-        <Clock class="w-8 h-8 text-white/80 shrink-0" />
-        <div class="flex-1 min-w-0">
-          <p class="text-[10px] font-black uppercase tracking-widest text-white/60 mb-1">
-            Tu trial expira en
-          </p>
-          <p class="text-2xl font-black tabular-nums tracking-tight">
-            {{ countdown.days }} días, {{ countdown.hours }}h {{ countdown.minutes }}m
-          </p>
-          <p class="text-xs text-white/70 leading-snug mt-1">
-            Primer cargo el {{ onboarding.firstChargeDateFormatted.value }} ·
-            cancelás en 1 click.
-          </p>
-        </div>
+    <!-- Trial info — descriptivo, no agresivo. Antes era countdown ansiogénico. -->
+    <div v-if="!isEnterprise" class="rounded-2xl bg-slate-50 border border-slate-200 p-5 mb-6 flex items-center gap-4">
+      <Clock class="w-7 h-7 text-primary shrink-0" />
+      <div class="flex-1 min-w-0">
+        <p class="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-1">
+          Tu trial es hasta el
+        </p>
+        <p class="text-base font-bold text-slate-900 leading-tight">
+          {{ onboarding.firstChargeDateFormatted.value }}
+        </p>
+        <p class="text-xs text-slate-500 leading-snug mt-1">
+          Cancelás en 1 click hasta esa fecha sin cargos.
+        </p>
       </div>
     </div>
 
@@ -239,22 +235,11 @@
       </a>
     </div>
 
-    <!-- Reset hint para devs -->
-    <p class="mt-10 text-[11px] text-slate-300 leading-relaxed">
-      ¿Querés empezar de nuevo?
-      <button
-        type="button"
-        @click="onReset"
-        class="underline hover:text-slate-500 transition-colors"
-      >
-        Borrar mi progreso
-      </button>
-    </p>
   </div>
 </template>
 
 <script setup>
-import { ref, computed, onMounted, onUnmounted } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { Check, CalendarDays, ArrowRight, MessageCircle, Mail, Clock } from 'lucide-vue-next'
 import ConfettiCanvas from '@/components/onboarding/ConfettiCanvas.vue'
@@ -341,24 +326,6 @@ function trackShare(channel) {
 
 const playConfetti = ref(false)
 
-// ── Countdown to first charge (live) ────────────────────────────────────
-const countdown = ref({ days: 15, hours: 0, minutes: 0 })
-let countdownTimer = null
-
-function recomputeCountdown() {
-  const target = onboarding.firstChargeDate.value
-  const diffMs = target.getTime() - Date.now()
-  if (diffMs <= 0) {
-    countdown.value = { days: 0, hours: 0, minutes: 0 }
-    return
-  }
-  const totalMinutes = Math.floor(diffMs / 60_000)
-  countdown.value = {
-    days: Math.floor(totalMinutes / 60 / 24),
-    hours: Math.floor((totalMinutes / 60) % 24),
-    minutes: totalMinutes % 60,
-  }
-}
 
 // ── Provisioning steps — sequential reveal simulando el setup backend ──
 // En producción, los disparan webhooks del backend (cuenta creada · MP linkeada
@@ -411,13 +378,7 @@ onMounted(() => {
       playConfetti.value = true
     }, 200)
     startProvisioning()
-    recomputeCountdown()
-    countdownTimer = setInterval(recomputeCountdown, 60_000)
   }
-})
-
-onUnmounted(() => {
-  if (countdownTimer) clearInterval(countdownTimer)
 })
 
 function trackDashboardClick() {
@@ -428,10 +389,4 @@ function trackCsmClick() {
   onboarding.track('csm_click', { from: 'welcome' })
 }
 
-function onReset() {
-  if (confirm('¿Borrás todo el progreso del onboarding?')) {
-    onboarding.reset()
-    router.push('/comenzar')
-  }
-}
 </script>

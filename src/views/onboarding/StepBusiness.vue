@@ -201,7 +201,6 @@ const posOptions = [
   { value: 'tango', label: 'Tango' },
   { value: 'other', label: 'Otro POS' },
   { value: 'none', label: 'No tengo POS' },
-  { value: 'unsure', label: 'Aún no sé' },
 ]
 
 const channelOptions = [

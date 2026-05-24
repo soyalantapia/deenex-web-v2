@@ -22,38 +22,26 @@
     </p>
 
     <div class="space-y-5">
-      <div class="grid sm:grid-cols-2 gap-4">
-        <Field
-          v-model="form.firstName"
-          label="Nombre"
-          name="firstName"
-          autocomplete="given-name"
-          placeholder="Marcos"
-          :error="errors.firstName"
-          required
-          @blur="validate('firstName')"
-        />
-        <Field
-          v-model="form.lastName"
-          label="Apellido"
-          name="lastName"
-          autocomplete="family-name"
-          placeholder="Aldazábal"
-          :error="errors.lastName"
-          required
-          @blur="validate('lastName')"
-        />
-      </div>
+      <Field
+        v-model="form.fullName"
+        label="Tu nombre"
+        name="fullName"
+        autocomplete="name"
+        placeholder="Marcos Aldazábal"
+        :error="errors.fullName"
+        required
+        @blur="validate('fullName')"
+      />
 
       <Field
         v-model="form.email"
-        label="Email corporativo"
+        label="Tu email"
         type="email"
         name="email"
         autocomplete="email"
         inputmode="email"
         placeholder="marcos@palta.com.ar"
-        hint="Te mandamos las credenciales acá."
+        hint="Te mandamos el magic link acá. Si no es corporativo, igual sirve."
         :error="errors.email"
         required
         @blur="validate('email')"
@@ -99,8 +87,20 @@ import { useOnboarding } from '@/composables/useOnboarding'
 const router = useRouter()
 const onboarding = useOnboarding()
 
-const form = reactive({ ...onboarding.state.identity })
-const errors = reactive({ firstName: '', lastName: '', email: '', whatsapp: '' })
+// Inicializamos con fullName si existe, o concatenando first+last del state viejo
+// (para que leads que volvieron de una versión anterior no pierdan datos).
+const initialFullName =
+  onboarding.state.identity.fullName ||
+  [onboarding.state.identity.firstName, onboarding.state.identity.lastName]
+    .filter(Boolean)
+    .join(' ')
+
+const form = reactive({
+  fullName: initialFullName,
+  email: onboarding.state.identity.email,
+  whatsapp: onboarding.state.identity.whatsapp,
+})
+const errors = reactive({ fullName: '', email: '', whatsapp: '' })
 
 // ── Resume detection ─────────────────────────────────────────────────────
 const showResumeModal = ref(false)
@@ -154,15 +154,14 @@ function onStartOver() {
   showResumeModal.value = false
   onboarding.track('resume_declined', { completed_count: onboarding.state.meta.completedSteps.length })
   onboarding.reset()
-  Object.assign(form, { firstName: '', lastName: '', email: '', whatsapp: '' })
+  Object.assign(form, { fullName: '', email: '', whatsapp: '' })
 }
 
 function validate(field) {
   const value = (form[field] || '').trim()
   switch (field) {
-    case 'firstName':
-    case 'lastName':
-      errors[field] = value.length < 2 ? 'Mínimo 2 caracteres.' : ''
+    case 'fullName':
+      errors.fullName = value.length < 2 ? 'Mínimo 2 caracteres.' : ''
       break
     case 'email':
       errors.email = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value) ? '' : 'Necesitamos un email válido.'
@@ -176,13 +175,12 @@ function validate(field) {
 }
 
 function validateAll() {
-  ;['firstName', 'lastName', 'email', 'whatsapp'].forEach(validate)
+  ;['fullName', 'email', 'whatsapp'].forEach(validate)
 }
 
 const isFormValid = computed(() => {
   return (
-    form.firstName.trim().length >= 2 &&
-    form.lastName.trim().length >= 2 &&
+    form.fullName.trim().length >= 2 &&
     /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email.trim()) &&
     form.whatsapp.replace(/\D/g, '').length >= 8 &&
     Object.values(errors).every((e) => !e)
@@ -192,9 +190,13 @@ const isFormValid = computed(() => {
 function onSubmit() {
   validateAll()
   if (!isFormValid.value) return
+  // Derivamos first/last del fullName para mantener compat con `greeting`.
+  const trimmed = form.fullName.trim()
+  const parts = trimmed.split(/\s+/)
   onboarding.setIdentity({
-    firstName: form.firstName.trim(),
-    lastName: form.lastName.trim(),
+    fullName: trimmed,
+    firstName: parts[0] || '',
+    lastName: parts.slice(1).join(' '),
     email: form.email.trim().toLowerCase(),
     whatsapp: form.whatsapp.trim(),
   })

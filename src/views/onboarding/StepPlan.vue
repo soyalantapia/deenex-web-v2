@@ -34,7 +34,10 @@
       </div>
     </div>
 
-    <!-- HERO: ahorro destacado (lead magnet #1) ──────────────────────── -->
+    <!-- 1️⃣ PRIMERO: calculadora ROI editable. Le pedimos los números reales -->
+    <RoiCalculator v-if="!isEnterprise" />
+
+    <!-- 2️⃣ DESPUÉS: savings hero proyectado con sus números ──────────── -->
     <div
       v-if="onboarding.savingsVsThirdParty.value > 0 && !isEnterprise"
       class="relative bg-emerald-500 text-white rounded-3xl p-6 mb-4 overflow-hidden"
@@ -46,15 +49,16 @@
         </div>
         <div class="min-w-0 flex-1">
           <p class="text-[10px] font-black uppercase tracking-widest text-white/70 mb-1">
-            Tu ahorro estimado
+            Tu ahorro proyectado
+            <span v-if="onboarding.hasCustomRoiInputs.value" class="text-emerald-100 ml-1">· con tus números</span>
           </p>
           <p class="text-3xl sm:text-4xl font-black tabular-nums tracking-tighter leading-none">
-            USD <AnimatedNumber :value="onboarding.savingsVsThirdParty.value" :duration="1400" />
+            USD <AnimatedNumber :value="onboarding.savingsVsThirdParty.value" :duration="1100" />
             <span class="text-base font-bold text-white/80">/ mes</span>
           </p>
           <p class="text-sm text-white/90 mt-2 leading-snug">
             vs lo que te cobrarían PedidosYa, Rappi o Uber Eats por el mismo volumen
-            ({{ assumedOrdersPerMonth.toLocaleString('es-AR') }} pedidos · 25% de comisión).
+            ({{ totalOrdersLabel }} pedidos · ticket USD {{ onboarding.effectiveTicket.value }} · 25% de comisión).
           </p>
 
           <!-- Break-even visual -->
@@ -80,9 +84,6 @@
         </div>
       </div>
     </div>
-
-    <!-- Calculadora ROI editable: lead ajusta su ticket + pedidos reales ── -->
-    <RoiCalculator v-if="!isEnterprise" />
 
     <!-- Comparison Sin Deenex vs Con Deenex ──────────────────────────── -->
     <div
@@ -290,23 +291,15 @@ const selectablePlans = computed(() => onboarding.PLAN_TIERS)
 
 const formattedSavings = computed(() => onboarding.savingsVsThirdParty.value.toLocaleString('es-AR'))
 
-// ── Comparison math: necesario para mostrar Sin Deenex vs Con Deenex ──
-const assumedOrdersPerMonth = computed(() => {
+// Reutilizamos los computeds del composable, que ya respetan los inputs
+// editados por el lead en la calculadora (single source of truth).
+const totalOrdersLabel = computed(() => {
   const locations = Math.max(1, Number(onboarding.state.business.locations) || 1)
-  const perLocation = locations <= 5 ? 300 : locations <= 25 ? 800 : locations <= 70 ? 1500 : 3000
-  return locations * perLocation
+  return (locations * onboarding.effectiveOrders.value).toLocaleString('es-AR')
 })
 
-const monthlyGmv = computed(() => assumedOrdersPerMonth.value * 15) // ticket promedio USD 15
-
-const thirdPartyMonthly = computed(() => Math.round(monthlyGmv.value * 0.25))
-
-const deenexMonthly = computed(() => {
-  const tier = recommendedPlan.value
-  const fee = tier.monthlyFee || 0
-  const commission = monthlyGmv.value * (tier.commissionPct / 100)
-  return Math.round(fee + commission)
-})
+const thirdPartyMonthly = computed(() => onboarding.thirdPartyMonthlyFee.value)
+const deenexMonthly = computed(() => onboarding.deenexMonthlyCost.value)
 
 // Si el lead seleccionó apps de terceros como canal actual, ofrecemos un
 // mensaje de migración asistida que aumenta la conversión en ese segmento.

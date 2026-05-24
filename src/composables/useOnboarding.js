@@ -19,7 +19,8 @@ const STORAGE_KEY = 'deenex_onboarding_v1'
 const DEFAULT_STATE = {
   // Step 1
   identity: {
-    firstName: '',
+    fullName: '', // un solo campo "Nombre" (antes era firstName + lastName)
+    firstName: '', // derivado de fullName.split(' ')[0] — mantenido por compat con greeting
     lastName: '',
     email: '',
     whatsapp: '',
@@ -30,6 +31,9 @@ const DEFAULT_STATE = {
     locations: 1,
     pos: '', // 'maxirest' | 'odoo' | 'other' | 'none'
     channels: [], // ['salon', 'takeaway', 'delivery_own', 'delivery_third']
+    // ROI inputs reales del lead (editados en Step Plan)
+    avgTicketUsd: null, // null = usar default por volumen
+    ordersPerLocation: null,
   },
   // Step 3
   plan: {
@@ -118,15 +122,43 @@ const monthlyEstimateUsd = computed(() => {
  * Esto es una aproximación de marketing — el cálculo real lo hace el equipo
  * comercial. Pero da una idea conservadora.
  */
-const savingsVsThirdParty = computed(() => {
-  const tier = recommendedPlan.value
+// Defaults de "ticket promedio" y "pedidos por local-mes" usados cuando el
+// lead no editó la calculadora todavía. Conservadores a propósito: queremos
+// que el lead vea un número creíble, no un overpromise.
+const defaultAvgTicketUsd = 12 // bajado de 15 para ser más conservador
+const computeDefaultOrders = (locations) =>
+  locations <= 5 ? 280 : locations <= 25 ? 650 : locations <= 70 ? 1200 : 2400
+
+const effectiveTicket = computed(() => {
+  const t = Number(state.business.avgTicketUsd)
+  return t > 0 ? t : defaultAvgTicketUsd
+})
+
+const effectiveOrders = computed(() => {
+  const o = Number(state.business.ordersPerLocation)
+  return o > 0 ? o : computeDefaultOrders(Math.max(1, Number(state.business.locations) || 1))
+})
+
+const monthlyGmvLead = computed(() => {
   const locations = Math.max(1, Number(state.business.locations) || 1)
-  const ordersPerLocation = locations <= 5 ? 300 : locations <= 25 ? 800 : locations <= 70 ? 1500 : 3000
-  const ticketUsd = 15
-  const monthlyGmv = locations * ordersPerLocation * ticketUsd
-  const thirdPartyFeeUsd = monthlyGmv * 0.25
-  const deenexFeeUsd = (tier.monthlyFee || 0) + monthlyGmv * (tier.commissionPct / 100)
-  return Math.max(0, Math.round(thirdPartyFeeUsd - deenexFeeUsd))
+  return locations * effectiveOrders.value * effectiveTicket.value
+})
+
+const thirdPartyMonthlyFee = computed(() => Math.round(monthlyGmvLead.value * 0.25))
+
+const deenexMonthlyCost = computed(() => {
+  const tier = recommendedPlan.value
+  const fee = tier.monthlyFee || 0
+  const commission = monthlyGmvLead.value * (tier.commissionPct / 100)
+  return Math.round(fee + commission)
+})
+
+const savingsVsThirdParty = computed(() => {
+  return Math.max(0, Math.round(thirdPartyMonthlyFee.value - deenexMonthlyCost.value))
+})
+
+const hasCustomRoiInputs = computed(() => {
+  return Boolean(state.business.avgTicketUsd || state.business.ordersPerLocation)
 })
 
 // Break-even simple: ¿en cuántos días recuperás el fee mensual gracias al
@@ -304,6 +336,14 @@ export function useOnboarding() {
     monthlyEstimateUsd,
     savingsVsThirdParty,
     breakEvenDays,
+    defaultAvgTicketUsd,
+    computeDefaultOrders,
+    effectiveTicket,
+    effectiveOrders,
+    monthlyGmvLead,
+    thirdPartyMonthlyFee,
+    deenexMonthlyCost,
+    hasCustomRoiInputs,
     firstChargeDate,
     firstChargeDateFormatted,
     firstChargeDateShort,

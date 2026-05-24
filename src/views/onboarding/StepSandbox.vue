@@ -9,9 +9,9 @@
       <span class="text-primary italic font-light">Tocá cualquier sección, es interactivo.</span>
     </h1>
     <p class="text-base text-slate-500 leading-relaxed mb-6 max-w-md">
-      Datos demo de un restaurante ficticio. Cuando actives tu cuenta, vas a ver
-      <span class="font-bold text-slate-900">los datos reales de {{ onboarding.state.business.brand || 'tu marca' }}</span>
-      con su branding aplicado.
+      Datos demo de una {{ industry.industry.value.label }} {{ industry.industry.value.emoji }} con
+      <span class="font-bold text-slate-900">la marca {{ brandLabel }}</span>
+      aplicada. Cuando actives, son los datos reales de tu operación.
     </p>
 
     <!-- Tour callout: aparece la primera vez que ven el sandbox -->
@@ -243,7 +243,7 @@
                 <Crown class="w-6 h-6 text-amber-900" />
               </div>
               <p class="text-[10px] font-black text-white/60 uppercase tracking-widest mb-1">Programa de fidelización</p>
-              <p class="text-xl font-black mb-1">Club {{ onboarding.state.business.brand || 'Palta' }}</p>
+              <p class="text-xl font-black mb-1">Club {{ brandLabel }}</p>
               <p class="text-xs text-white/80 leading-relaxed max-w-xs">
                 3 niveles · puntos por pedido · cupones de cumpleaños · wallet personalizada.
               </p>
@@ -295,9 +295,13 @@ import {
 } from 'lucide-vue-next'
 import StepActions from '@/components/onboarding/StepActions.vue'
 import { useOnboarding } from '@/composables/useOnboarding'
+import { useIndustry } from '@/composables/useIndustry'
 
 const router = useRouter()
 const onboarding = useOnboarding()
+const industry = useIndustry()
+
+const brandLabel = computed(() => onboarding.state.business.brand || 'Tu marca')
 
 const tabs = [
   { key: 'sales', label: 'Ventas', icon: BarChart3 },
@@ -321,20 +325,17 @@ const salesKpis = ref([
 const latestOrder = ref(null)
 const simulating = ref(false)
 
-const DEMO_ORDERS = [
-  { customer: 'Tomás Acuña', items: ['Hamburguesa clásica', 'Coca 500ml', 'Papas grandes'], channel: 'Delivery propio', total: 18 },
-  { customer: 'Camila Ferreyra', items: ['Pizza muzzarella', 'Limonada'], channel: 'Take Away', total: 12 },
-  { customer: 'Joaquín Vargas', items: ['Wrap pollo', 'Smoothie verde', 'Brownie'], channel: 'Salón · Mesa 7', total: 22 },
-  { customer: 'Lucía Méndez', items: ['Empanadas x6', 'Agua tónica'], channel: 'Mostrador', total: 14 },
-  { customer: 'Diego Castro', items: ['Sushi combinado', 'Cerveza artesanal'], channel: 'Delivery propio', total: 28 },
-]
+// Demo orders se obtienen del industry resolver — adaptados al rubro real
+// del lead (empanadas → empanadas, sushi → sushi, etc).
+const DEMO_ORDERS = computed(() => industry.industry.value.sampleOrders)
 
 async function simulateOrder() {
   simulating.value = true
   // Pequeño delay para que se sienta como una operación real
   await new Promise((r) => setTimeout(r, 850))
 
-  const pick = DEMO_ORDERS[Math.floor(Math.random() * DEMO_ORDERS.length)]
+  const orders = DEMO_ORDERS.value
+  const pick = orders[Math.floor(Math.random() * orders.length)]
   latestOrder.value = pick
 
   // Actualizamos los KPIs como reaccionarían en producción real.
@@ -374,11 +375,15 @@ const topCustomers = [
   { name: 'Pablo Giménez', emoji: '🧑‍🍳', orders: 28, last: '3d', ltv: 968, color: 'bg-emerald-100' },
 ]
 
-const campaigns = [
-  { title: 'Recuperación 30d sin compra', audience: '1.247 clientes · WhatsApp + Push', openRate: 68, status: 'active', icon: Send },
-  { title: 'Combo fin de semana', audience: '3.847 clientes · Push notification', openRate: 41, status: 'active', icon: MessageCircle },
-  { title: 'Cumpleaños del mes', audience: '124 clientes · Email', openRate: 0, status: 'draft', icon: Sparkles },
-]
+// Campaigns también vienen del industry resolver — adaptadas al rubro.
+const ICON_BY_INDEX = [Send, MessageCircle, Sparkles]
+const campaigns = computed(() =>
+  industry.industry.value.sampleCampaigns.map((c, i) => ({
+    ...c,
+    status: c.status || 'active',
+    icon: ICON_BY_INDEX[i] || Send,
+  }))
+)
 
 const loyaltyTiers = [
   { name: 'Bronce', count: '2.341', bg: 'bg-amber-100', icon: Star, iconColor: 'text-amber-600' },
