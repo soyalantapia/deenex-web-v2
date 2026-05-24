@@ -38,6 +38,26 @@
       </p>
     </div>
 
+    <!-- Trial countdown — visualiza el tiempo restante en vivo -->
+    <div v-if="!isEnterprise" class="rounded-2xl bg-gradient-to-br from-primary to-[#3c1fc9] text-white p-5 mb-6 relative overflow-hidden">
+      <div class="absolute inset-0 bg-gradient-to-tr from-white/10 to-transparent pointer-events-none"></div>
+      <div class="relative flex items-center gap-4">
+        <Clock class="w-8 h-8 text-white/80 shrink-0" />
+        <div class="flex-1 min-w-0">
+          <p class="text-[10px] font-black uppercase tracking-widest text-white/60 mb-1">
+            Tu trial expira en
+          </p>
+          <p class="text-2xl font-black tabular-nums tracking-tight">
+            {{ countdown.days }} días, {{ countdown.hours }}h {{ countdown.minutes }}m
+          </p>
+          <p class="text-xs text-white/70 leading-snug mt-1">
+            Primer cargo el {{ onboarding.firstChargeDateFormatted.value }} ·
+            cancelás en 1 click.
+          </p>
+        </div>
+      </div>
+    </div>
+
     <!-- Next steps — cada uno linkea al app a la sección concreta -->
     <div v-if="!isEnterprise" class="space-y-3 mb-8">
       <p class="text-[11px] font-black text-slate-400 uppercase tracking-widest mb-3">
@@ -66,14 +86,59 @@
       </a>
     </div>
 
+    <!-- Provisioning checklist — qué pasa después que el lead activó -->
+    <div v-if="!isEnterprise" class="rounded-2xl border border-slate-200 bg-slate-50/40 p-5 mb-6">
+      <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3">
+        Estado de tu cuenta
+      </p>
+      <ul class="space-y-2.5">
+        <li
+          v-for="task in provisioningTasks"
+          :key="task.label"
+          class="flex items-center gap-3 text-sm"
+        >
+          <span
+            class="w-5 h-5 rounded-full flex items-center justify-center shrink-0 transition-colors"
+            :class="task.status === 'done'
+              ? 'bg-emerald-500'
+              : task.status === 'doing'
+                ? 'bg-primary/10'
+                : 'bg-slate-200'"
+          >
+            <Check v-if="task.status === 'done'" class="w-3 h-3 text-white" stroke-width="3" />
+            <span
+              v-else-if="task.status === 'doing'"
+              class="w-3 h-3 rounded-full border-2 border-primary border-t-transparent animate-spin"
+            ></span>
+          </span>
+          <span :class="task.status === 'done' ? 'text-slate-900 font-semibold' : task.status === 'doing' ? 'text-slate-700' : 'text-slate-400'">
+            {{ task.label }}
+          </span>
+        </li>
+      </ul>
+      <p v-if="provisioningTasks.every(t => t.status === 'done')" class="mt-4 pt-4 border-t border-slate-200/70 text-xs text-emerald-600 font-bold">
+        ✓ Listo. Te mandamos un magic link a {{ onboarding.state.identity.email }} para entrar al dashboard.
+      </p>
+    </div>
+
     <!-- CTAs -->
     <div v-if="!isEnterprise" class="flex flex-col sm:flex-row gap-3 mb-8">
+      <button
+        v-if="!provisioningComplete"
+        type="button"
+        disabled
+        class="group flex-1 inline-flex items-center justify-center gap-2 bg-slate-200 text-slate-500 font-bold rounded-xl px-6 py-4 text-sm cursor-not-allowed"
+      >
+        <span class="w-4 h-4 border-2 border-slate-400 border-t-transparent rounded-full animate-spin"></span>
+        Preparando tu dashboard…
+      </button>
       <a
+        v-else
         :href="dashboardUrl"
         @click="trackDashboardClick"
         class="group flex-1 inline-flex items-center justify-center gap-2 bg-primary hover:bg-[#3c1fc9] text-white font-bold rounded-xl px-6 py-4 text-sm transition-all shadow-md shadow-primary/25 hover:shadow-primary/40 hover:-translate-y-0.5"
       >
-        Ir al dashboard
+        Entrar al dashboard
         <ArrowRight class="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
       </a>
       <a
@@ -86,6 +151,23 @@
         <CalendarDays class="w-3.5 h-3.5" />
         Agendar Customer Success
       </a>
+    </div>
+
+    <!-- Email verification reminder -->
+    <div v-if="!isEnterprise" class="rounded-xl border border-amber-200 bg-amber-50/40 p-4 flex items-start gap-3 mb-8">
+      <Mail class="w-5 h-5 text-amber-500 shrink-0 mt-0.5" />
+      <div class="min-w-0">
+        <p class="text-xs font-bold text-slate-900 leading-tight">
+          Confirmá tu email para acceder
+        </p>
+        <p class="text-[11px] text-slate-500 leading-snug mt-1">
+          Te mandamos un link a <span class="font-semibold text-slate-700">{{ onboarding.state.identity.email }}</span>.
+          Si no lo ves, revisá spam o
+          <button type="button" @click="resendMagicLink" class="text-amber-700 font-semibold underline hover:text-amber-900">
+            reenviá el link
+          </button>.
+        </p>
+      </div>
     </div>
 
     <!-- Refer-a-friend block ────────────────────────────────────────── -->
@@ -172,9 +254,9 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { Check, CalendarDays, ArrowRight, MessageCircle, Mail } from 'lucide-vue-next'
+import { Check, CalendarDays, ArrowRight, MessageCircle, Mail, Clock } from 'lucide-vue-next'
 import ConfettiCanvas from '@/components/onboarding/ConfettiCanvas.vue'
 import { useOnboarding } from '@/composables/useOnboarding'
 
@@ -259,6 +341,62 @@ function trackShare(channel) {
 
 const playConfetti = ref(false)
 
+// ── Countdown to first charge (live) ────────────────────────────────────
+const countdown = ref({ days: 15, hours: 0, minutes: 0 })
+let countdownTimer = null
+
+function recomputeCountdown() {
+  const target = onboarding.firstChargeDate.value
+  const diffMs = target.getTime() - Date.now()
+  if (diffMs <= 0) {
+    countdown.value = { days: 0, hours: 0, minutes: 0 }
+    return
+  }
+  const totalMinutes = Math.floor(diffMs / 60_000)
+  countdown.value = {
+    days: Math.floor(totalMinutes / 60 / 24),
+    hours: Math.floor((totalMinutes / 60) % 24),
+    minutes: totalMinutes % 60,
+  }
+}
+
+// ── Provisioning steps — sequential reveal simulando el setup backend ──
+// En producción, los disparan webhooks del backend (cuenta creada · MP linkeada
+// · subdomain provisioning · branding generado · magic link enviado).
+const provisioningTasks = ref([
+  { key: 'account', label: 'Cuenta creada y guardada', status: 'doing' },
+  { key: 'subdomain', label: `Reservamos ${onboarding.subdomainPreview.value}.deenex.app`, status: 'pending' },
+  { key: 'mp', label: 'Vinculación con MercadoPago', status: 'pending' },
+  { key: 'magic', label: 'Magic link enviado por email', status: 'pending' },
+])
+
+const provisioningComplete = computed(() =>
+  provisioningTasks.value.every((t) => t.status === 'done')
+)
+
+function startProvisioning() {
+  // Avanza los pasos de a uno cada ~700ms. En producción cada paso es un
+  // webhook real (account.created, subdomain.provisioned, mp.linked,
+  // magic_link.sent) que el frontend escucha por SSE/polling.
+  const delays = [800, 1400, 1100, 900]
+  provisioningTasks.value.forEach((task, i) => {
+    setTimeout(() => {
+      task.status = 'done'
+      if (provisioningTasks.value[i + 1]) {
+        provisioningTasks.value[i + 1].status = 'doing'
+      } else {
+        onboarding.track('provisioning_complete')
+      }
+    }, delays.slice(0, i + 1).reduce((a, b) => a + b, 0))
+  })
+}
+
+function resendMagicLink() {
+  onboarding.track('magic_link_resend_requested')
+  // Stub: en producción POST /api/onboarding/magic-link/resend
+  alert('Te reenviamos el magic link a ' + onboarding.state.identity.email)
+}
+
 onMounted(() => {
   if (isEnterprise.value) {
     onboarding.track('enterprise_request_submitted', {
@@ -272,7 +410,14 @@ onMounted(() => {
     setTimeout(() => {
       playConfetti.value = true
     }, 200)
+    startProvisioning()
+    recomputeCountdown()
+    countdownTimer = setInterval(recomputeCountdown, 60_000)
   }
+})
+
+onUnmounted(() => {
+  if (countdownTimer) clearInterval(countdownTimer)
 })
 
 function trackDashboardClick() {

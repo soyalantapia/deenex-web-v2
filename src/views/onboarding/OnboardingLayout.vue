@@ -26,12 +26,23 @@
           />
         </div>
 
-        <!-- Step counter + completion -->
-        <div class="text-[11px] font-bold text-slate-500 tracking-wider uppercase shrink-0 flex items-center gap-2">
-          <span class="hidden sm:inline">{{ completionPct }}%</span>
-          <span class="hidden sm:inline-block w-px h-3 bg-slate-200"></span>
-          <span class="text-slate-900">{{ activeStepIndex + 1 }}</span>
-          <span class="text-slate-400">/{{ steps.length }}</span>
+        <!-- Step counter + Save&Exit -->
+        <div class="flex items-center gap-3 shrink-0">
+          <button
+            v-if="canSaveAndExit"
+            type="button"
+            @click="showSaveModal = true"
+            class="hidden sm:inline-flex items-center gap-1.5 text-[11px] font-semibold text-slate-500 hover:text-slate-900 transition-colors"
+          >
+            <Save class="w-3 h-3" />
+            Guardar y seguir después
+          </button>
+          <div class="text-[11px] font-bold text-slate-500 tracking-wider uppercase flex items-center gap-2">
+            <span class="hidden sm:inline">{{ completionPct }}%</span>
+            <span class="hidden sm:inline-block w-px h-3 bg-slate-200"></span>
+            <span class="text-slate-900">{{ activeStepIndex + 1 }}</span>
+            <span class="text-slate-400">/{{ steps.length }}</span>
+          </div>
         </div>
       </div>
     </header>
@@ -56,6 +67,83 @@
         />
       </div>
     </main>
+
+    <!-- Save & exit modal — guarda progreso y manda magic link al email -->
+    <Teleport to="body">
+      <Transition name="exit-overlay">
+        <div
+          v-if="showSaveModal"
+          class="fixed inset-0 z-[9997] bg-slate-900/50 backdrop-blur-sm"
+          @click="showSaveModal = false"
+        ></div>
+      </Transition>
+      <Transition name="exit-modal">
+        <div
+          v-if="showSaveModal"
+          class="fixed inset-0 z-[9998] flex items-center justify-center p-4 pointer-events-none"
+        >
+          <div class="bg-white rounded-3xl shadow-2xl max-w-md w-full p-7 pointer-events-auto">
+            <div v-if="!saveSent">
+              <div class="w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center mb-5">
+                <Save class="w-6 h-6 text-primary" />
+              </div>
+              <h3 class="text-xl font-extrabold tracking-tight text-slate-900 mb-2">
+                Te mandamos un link para retomar
+              </h3>
+              <p class="text-sm text-slate-500 leading-relaxed mb-5">
+                Te enviamos un link único a tu email. Lo abrís cuando quieras y
+                volvés exactamente donde lo dejaste — desde cualquier dispositivo.
+              </p>
+              <input
+                v-model="saveEmail"
+                type="email"
+                inputmode="email"
+                autocomplete="email"
+                placeholder="tu@email.com"
+                class="w-full px-4 py-3 rounded-xl bg-white border-2 border-slate-200 focus:border-primary text-base text-slate-900 placeholder-slate-300 mb-4 focus:outline-none"
+              />
+              <div class="flex flex-col-reverse sm:flex-row sm:items-center sm:justify-end gap-2">
+                <button
+                  type="button"
+                  @click="showSaveModal = false"
+                  class="px-5 py-2.5 rounded-xl text-sm font-semibold text-slate-500 hover:bg-slate-50 transition-colors"
+                >
+                  Cancelar
+                </button>
+                <button
+                  type="button"
+                  @click="sendSaveLink"
+                  :disabled="!validSaveEmail"
+                  class="px-5 py-2.5 rounded-xl text-sm font-bold bg-primary text-white hover:bg-[#3c1fc9] transition-colors disabled:bg-slate-300 disabled:cursor-not-allowed"
+                >
+                  Mandarme el link →
+                </button>
+              </div>
+            </div>
+            <div v-else>
+              <div class="w-12 h-12 rounded-2xl bg-emerald-500 flex items-center justify-center mb-5">
+                <Check class="w-6 h-6 text-white" stroke-width="3" />
+              </div>
+              <h3 class="text-xl font-extrabold tracking-tight text-slate-900 mb-2">
+                ¡Listo!
+              </h3>
+              <p class="text-sm text-slate-500 leading-relaxed mb-5">
+                Te mandamos el link a
+                <span class="font-bold text-slate-900">{{ saveEmail }}</span>.
+                Si no lo ves en 5 minutos, revisá spam.
+              </p>
+              <RouterLink
+                to="/"
+                @click="showSaveModal = false; saveSent = false"
+                class="block w-full text-center px-5 py-3 rounded-xl text-sm font-bold bg-slate-900 text-white hover:bg-slate-800 transition-colors"
+              >
+                Salir al inicio
+              </RouterLink>
+            </div>
+          </div>
+        </div>
+      </Transition>
+    </Teleport>
 
     <!-- Exit intent modal — aparece UNA vez si el lead mueve el mouse hacia
          arriba del viewport (típico cuando va a cerrar la tab) y tiene
@@ -162,7 +250,7 @@
 <script setup>
 import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
 import { useRoute, RouterLink, RouterView } from 'vue-router'
-import { Gift } from 'lucide-vue-next'
+import { Gift, Save, Check } from 'lucide-vue-next'
 import SidePanel from '@/components/onboarding/SidePanel.vue'
 import { useOnboarding } from '@/composables/useOnboarding'
 
@@ -253,6 +341,42 @@ const planCommissionLabel = computed(() => {
   // Devuelve string tipo "1,25%" — formato hispano para mostrar al lead.
   return `${String(tier?.commissionPct ?? 1.25).replace('.', ',')}%`
 })
+
+// ── Save & exit ───────────────────────────────────────────────────────────
+// Solo mostramos el botón si el lead empezó pero todavía no terminó el trial,
+// y no está en welcome (no tiene sentido guardar después de activar).
+const canSaveAndExit = computed(() => {
+  const completed = onboarding.state.meta.completedSteps
+  return (
+    completed.length > 0 &&
+    !completed.includes('trial') &&
+    route.path !== '/comenzar/listo'
+  )
+})
+
+const showSaveModal = ref(false)
+const saveEmail = ref(onboarding.state.identity.email || '')
+const saveSent = ref(false)
+const validSaveEmail = computed(() => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(saveEmail.value.trim()))
+
+async function sendSaveLink() {
+  if (!validSaveEmail.value) return
+  onboarding.track('save_and_exit_requested', {
+    email: saveEmail.value,
+    last_step: steps[activeStepIndex.value]?.key,
+  })
+  /*
+   * Backend integration:
+   *   POST /api/onboarding/save-progress
+   *   body: { email, snapshot: onboarding.state }
+   *   response: { resumeUrl, expiresAt }
+   *   El backend manda un email con un link único + token al resumeUrl.
+   *
+   * Hoy: simulamos el envío con un setTimeout y mostramos confirmación.
+   */
+  await new Promise((r) => setTimeout(r, 600))
+  saveSent.value = true
+}
 
 const showExitModal = ref(false)
 function onExit() {

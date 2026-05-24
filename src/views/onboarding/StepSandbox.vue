@@ -84,11 +84,37 @@
         <Transition name="tab" mode="out-in">
           <!-- VENTAS -->
           <div v-if="activeTab === 'sales'" key="sales" class="space-y-5">
+            <!-- Botón "Recibir pedido demo" -->
+            <div class="rounded-xl border border-dashed border-primary/30 bg-primary/[0.03] p-3 flex items-center gap-3">
+              <div class="w-9 h-9 rounded-lg bg-primary/10 flex items-center justify-center text-lg shrink-0">
+                ⚡
+              </div>
+              <div class="flex-1 min-w-0">
+                <p class="text-xs font-bold text-slate-900 leading-tight">Simulá un pedido en vivo</p>
+                <p class="text-[10px] text-slate-500 leading-snug">
+                  Tocá el botón y vas a ver cómo entra al dashboard.
+                </p>
+              </div>
+              <button
+                type="button"
+                @click="simulateOrder"
+                :disabled="simulating"
+                class="px-3 py-2 rounded-lg bg-primary text-white text-xs font-bold whitespace-nowrap hover:bg-[#3c1fc9] transition-colors shadow-sm shadow-primary/25 disabled:opacity-60 disabled:cursor-not-allowed"
+              >
+                <span v-if="simulating" class="inline-flex items-center gap-1.5">
+                  <span class="w-3 h-3 border-2 border-white/30 border-t-white rounded-full animate-spin"></span>
+                  Procesando…
+                </span>
+                <span v-else>Recibir pedido demo →</span>
+              </button>
+            </div>
+
             <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
               <div
                 v-for="kpi in salesKpis"
                 :key="kpi.label"
-                class="rounded-xl border border-slate-200 bg-white p-3"
+                class="rounded-xl border border-slate-200 bg-white p-3 relative overflow-hidden transition-all"
+                :class="kpi.flashing ? 'border-emerald-400 bg-emerald-50/40' : ''"
               >
                 <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">{{ kpi.label }}</p>
                 <p class="text-lg font-black tabular-nums text-slate-900">{{ kpi.value }}</p>
@@ -97,6 +123,26 @@
                 </p>
               </div>
             </div>
+
+            <!-- Pedido más reciente (aparece al simular) -->
+            <Transition name="order-pop">
+              <div v-if="latestOrder" class="rounded-xl border-2 border-emerald-300 bg-emerald-50/60 p-4 flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-emerald-500 flex items-center justify-center text-white shrink-0">
+                  <ShoppingBag class="w-5 h-5" />
+                </div>
+                <div class="flex-1 min-w-0">
+                  <p class="text-sm font-bold text-slate-900 leading-tight">
+                    Nuevo pedido · {{ latestOrder.customer }}
+                  </p>
+                  <p class="text-[11px] text-slate-500 leading-snug">
+                    {{ latestOrder.items.join(' · ') }} · {{ latestOrder.channel }}
+                  </p>
+                </div>
+                <span class="text-base font-black text-emerald-600 tabular-nums shrink-0">
+                  USD {{ latestOrder.total }}
+                </span>
+              </div>
+            </Transition>
             <div class="rounded-xl border border-slate-200 bg-white p-4">
               <div class="flex items-center justify-between mb-3">
                 <span class="text-xs font-bold text-slate-700 uppercase tracking-wider">Ventas por canal · Esta semana</span>
@@ -245,7 +291,7 @@ import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import {
   Lock, BarChart3, Users, Megaphone, Crown, Star, Award, Zap,
-  Send, MessageCircle, Sparkles,
+  Send, MessageCircle, Sparkles, ShoppingBag,
 } from 'lucide-vue-next'
 import StepActions from '@/components/onboarding/StepActions.vue'
 import { useOnboarding } from '@/composables/useOnboarding'
@@ -261,14 +307,59 @@ const tabs = [
 ]
 const activeTab = ref('sales')
 
-// Datos demo seedeados — pensados para que se vean realistas pero claramente
-// "demo" (la nota verde arriba es explícita).
-const salesKpis = [
-  { label: 'Facturación', value: 'USD 3.165', delta: '+8.4%' },
-  { label: 'Pedidos', value: '207', delta: '+12 (6%)' },
-  { label: 'Ticket prom', value: 'USD 14.92', delta: '+1.2%' },
-  { label: 'Nuevos', value: '38', delta: '+5' },
+// Datos demo seedeados — los KPIs ahora son reactivos para reflejar el
+// "pedido en vivo" que simula el lead. Cada KPI tiene un `flashing` que
+// se enciende brevemente cuando entra un pedido nuevo.
+const salesKpis = ref([
+  { label: 'Facturación', value: 'USD 3.165', delta: '+8.4%', flashing: false, raw: 3165 },
+  { label: 'Pedidos', value: '207', delta: '+12 (6%)', flashing: false, raw: 207 },
+  { label: 'Ticket prom', value: 'USD 14.92', delta: '+1.2%', flashing: false, raw: 14.92 },
+  { label: 'Nuevos', value: '38', delta: '+5', flashing: false, raw: 38 },
+])
+
+// Pedido demo más reciente (aparece animado abajo de los KPIs)
+const latestOrder = ref(null)
+const simulating = ref(false)
+
+const DEMO_ORDERS = [
+  { customer: 'Tomás Acuña', items: ['Hamburguesa clásica', 'Coca 500ml', 'Papas grandes'], channel: 'Delivery propio', total: 18 },
+  { customer: 'Camila Ferreyra', items: ['Pizza muzzarella', 'Limonada'], channel: 'Take Away', total: 12 },
+  { customer: 'Joaquín Vargas', items: ['Wrap pollo', 'Smoothie verde', 'Brownie'], channel: 'Salón · Mesa 7', total: 22 },
+  { customer: 'Lucía Méndez', items: ['Empanadas x6', 'Agua tónica'], channel: 'Mostrador', total: 14 },
+  { customer: 'Diego Castro', items: ['Sushi combinado', 'Cerveza artesanal'], channel: 'Delivery propio', total: 28 },
 ]
+
+async function simulateOrder() {
+  simulating.value = true
+  // Pequeño delay para que se sienta como una operación real
+  await new Promise((r) => setTimeout(r, 850))
+
+  const pick = DEMO_ORDERS[Math.floor(Math.random() * DEMO_ORDERS.length)]
+  latestOrder.value = pick
+
+  // Actualizamos los KPIs como reaccionarían en producción real.
+  const k = salesKpis.value
+  k[0].raw += pick.total
+  k[0].value = `USD ${k[0].raw.toLocaleString('es-AR')}`
+  k[1].raw += 1
+  k[1].value = String(k[1].raw)
+  k[2].raw = k[0].raw / k[1].raw
+  k[2].value = `USD ${k[2].raw.toFixed(2)}`
+  if (Math.random() < 0.3) {
+    k[3].raw += 1
+    k[3].value = String(k[3].raw)
+  }
+
+  // Flash visual de KPIs
+  k.forEach((kpi) => (kpi.flashing = true))
+  setTimeout(() => {
+    k.forEach((kpi) => (kpi.flashing = false))
+  }, 1400)
+
+  simulating.value = false
+  onboarding.track('sandbox_order_simulated', { total: pick.total, channel: pick.channel })
+}
+
 const salesByChannel = [
   { name: 'Salón', pct: 85, amount: 1342, color: 'bg-primary' },
   { name: 'Take Away', pct: 62, amount: 985, color: 'bg-violet-400' },
@@ -341,6 +432,22 @@ function onContinue() {
 .tour-leave-to {
   opacity: 0;
   transform: translateY(-8px);
+}
+
+/* Pop animation para el nuevo pedido que entra al dashboard */
+.order-pop-enter-active {
+  transition: all 0.45s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.order-pop-leave-active {
+  transition: all 0.25s ease;
+}
+.order-pop-enter-from {
+  opacity: 0;
+  transform: translateY(-10px) scale(0.92);
+}
+.order-pop-leave-to {
+  opacity: 0;
+  transform: translateY(8px);
 }
 .scrollbar-hide::-webkit-scrollbar { display: none; }
 .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }

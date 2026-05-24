@@ -1,13 +1,14 @@
 <template>
-  <ResumeModal
-    :show="showResumeModal"
-    :progress-summary="progressSummary"
-    :total-steps="5"
-    @resume="onResume"
-    @start-over="onStartOver"
-    @decline="showResumeModal = false"
-  />
-  <form @submit.prevent="onSubmit" novalidate v-autofocus>
+  <div>
+    <ResumeModal
+      :show="showResumeModal"
+      :progress-summary="progressSummary"
+      :total-steps="5"
+      @resume="onResume"
+      @start-over="onStartOver"
+      @decline="showResumeModal = false"
+    />
+    <form @submit.prevent="onSubmit" novalidate v-autofocus>
     <p class="text-[11px] font-black text-primary uppercase tracking-[0.2em] mb-3">
       Empezá gratis · Paso 1 de 6
     </p>
@@ -82,7 +83,8 @@
       <a href="/privacidad" class="underline hover:text-slate-600">política de privacidad</a>.
       Nunca compartimos tus datos.
     </p>
-  </form>
+    </form>
+  </div>
 </template>
 
 <script setup>

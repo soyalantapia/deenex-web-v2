@@ -81,6 +81,9 @@
       </div>
     </div>
 
+    <!-- Calculadora ROI editable: lead ajusta su ticket + pedidos reales ── -->
+    <RoiCalculator v-if="!isEnterprise" />
+
     <!-- Comparison Sin Deenex vs Con Deenex ──────────────────────────── -->
     <div
       v-if="!isEnterprise"
@@ -265,6 +268,7 @@ import { reactive, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { TrendingDown, Zap } from 'lucide-vue-next'
 import AnimatedNumber from '@/components/onboarding/AnimatedNumber.vue'
+import RoiCalculator from '@/components/onboarding/RoiCalculator.vue'
 import StepActions from '@/components/onboarding/StepActions.vue'
 import { useOnboarding } from '@/composables/useOnboarding'
 
