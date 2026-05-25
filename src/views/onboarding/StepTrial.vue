@@ -1,5 +1,14 @@
 <template>
   <div>
+    <!-- ActivationOverlay: simulación visual de creación de la cuenta.
+         Se monta solo cuando el lead toca "Activar". Cuando termina el
+         provisioning emit @complete y recién ahí navegamos a welcome. -->
+    <ActivationOverlay
+      :show="showActivationOverlay"
+      :brand="onboarding.state.business.brand || 'tu marca'"
+      :subdomain="onboarding.subdomainPreview.value"
+      @complete="onProvisioningComplete"
+    />
     <p class="text-[11px] font-black text-primary uppercase tracking-[0.2em] mb-3">
       Paso 5 de 6
     </p>
@@ -185,10 +194,13 @@ import { ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { Check, Shield, Clock, FileText, ArrowRight, Lock } from 'lucide-vue-next'
 import { useOnboarding } from '@/composables/useOnboarding'
+import ActivationOverlay from '@/components/onboarding/ActivationOverlay.vue'
 
 const router = useRouter()
 const onboarding = useOnboarding()
 const loading = ref(false)
+// Controla el modal full-screen de simulación de provisioning post-activación.
+const showActivationOverlay = ref(false)
 
 // MercadoPago como único método. El "email_only" fue removido — necesitamos
 // método de pago al activar para garantizar cobranza al día 16 sin fricción.
@@ -252,25 +264,28 @@ async function onActivate() {
   }
 
   /*
-   * Integración backend según el método elegido:
-   *
-   *   paymentChoice === 'mercadopago':
-   *     POST /api/onboarding/checkout-preference
-   *     body: { planKey, addLoyalty, locations, identity, business }
-   *     response: { preferenceId, initPoint }
-   *     redirect: window.location.href = initPoint
-   *
-   *   paymentChoice === 'email_only':
-   *     POST /api/onboarding/activate-trial
-   *     body: { identity, business, plan, addLoyalty, deferredPayment: true }
-   *     response: { tenantId, magicLink }
-   *     Email con magic link al lead. Sin redirect.
-   *
-   * Hoy simulamos local. Cuando esté el backend, reemplazar el setTimeout.
+   * Integración backend (cuando exista):
+   *   POST /api/onboarding/checkout-preference → MercadoPago preference + tenantId
+   *   El backend dispara los webhooks de provisioning en orden:
+   *   account.created → subdomain.provisioned → branding.generated →
+   *   loyalty.configured → channels.linked → magic_link.sent
+   *   El ActivationOverlay escucha esos webhooks (vía SSE/polling) y avanza
+   *   los pasos. Hoy es simulado con setTimeout.
    */
-  await new Promise((r) => setTimeout(r, 1400))
+  // Pequeño beat para que el botón muestre el spinner antes del overlay.
+  await new Promise((r) => setTimeout(r, 600))
 
+  // Marcamos el trial como activado ANTES de mostrar el overlay para que
+  // el state quede consistente si el lead refresca durante el provisioning.
   onboarding.markTrialActivated(paymentChoice.value, 'stub_pref_' + Date.now())
+
+  // Mostramos el overlay con la simulación. La navegación al welcome ocurre
+  // cuando ActivationOverlay emit @complete (después de todos los pasos).
+  showActivationOverlay.value = true
+}
+
+function onProvisioningComplete() {
+  showActivationOverlay.value = false
   router.push('/comenzar/listo')
 }
 </script>

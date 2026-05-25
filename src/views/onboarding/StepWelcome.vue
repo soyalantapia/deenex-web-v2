@@ -522,14 +522,16 @@ const emailPreviewOpen = ref(false)
 const playConfetti = ref(false)
 
 
-// ── Provisioning steps — sequential reveal simulando el setup backend ──
-// En producción, los disparan webhooks del backend (cuenta creada · MP linkeada
-// · subdomain provisioning · branding generado · magic link enviado).
+// ── Provisioning steps — TODOS done desde el inicio en Welcome ─────────
+// El provisioning visual se hace ahora en ActivationOverlay (modal que
+// aparece después del click "Activar" en StepTrial). Cuando el lead llega
+// a Welcome, todos los pasos están terminados. Esta lista se muestra como
+// confirmación, no como progress en vivo.
 const provisioningTasks = ref([
-  { key: 'account', label: 'Cuenta creada y guardada', status: 'doing' },
-  { key: 'subdomain', label: `Reservamos ${onboarding.subdomainPreview.value}.deenex.app`, status: 'pending' },
-  { key: 'mp', label: 'Vinculación con MercadoPago', status: 'pending' },
-  { key: 'magic', label: 'Magic link enviado por email', status: 'pending' },
+  { key: 'account', label: 'Cuenta creada y guardada', status: 'done' },
+  { key: 'subdomain', label: `Reservamos ${onboarding.subdomainPreview.value}.deenex.app`, status: 'done' },
+  { key: 'mp', label: 'Vinculación con MercadoPago', status: 'done' },
+  { key: 'magic', label: 'Magic link enviado por email', status: 'done' },
 ])
 
 const provisioningComplete = computed(() =>
@@ -544,22 +546,9 @@ const provisioningProgress = computed(() => {
   return { total, done, pct: Math.round((done / total) * 100) }
 })
 
-function startProvisioning() {
-  // Avanza los pasos de a uno cada ~700ms. En producción cada paso es un
-  // webhook real (account.created, subdomain.provisioned, mp.linked,
-  // magic_link.sent) que el frontend escucha por SSE/polling.
-  const delays = [800, 1400, 1100, 900]
-  provisioningTasks.value.forEach((task, i) => {
-    setTimeout(() => {
-      task.status = 'done'
-      if (provisioningTasks.value[i + 1]) {
-        provisioningTasks.value[i + 1].status = 'doing'
-      } else {
-        onboarding.track('provisioning_complete')
-      }
-    }, delays.slice(0, i + 1).reduce((a, b) => a + b, 0))
-  })
-}
+// startProvisioning() removido — el provisioning visual ahora lo hace
+// ActivationOverlay en el step anterior (después de "Activar cuenta").
+// Cuando el lead llega a Welcome todos los tasks están done desde el inicio.
 
 function resendMagicLink() {
   onboarding.track('magic_link_resend_requested')
@@ -580,7 +569,9 @@ onMounted(() => {
     setTimeout(() => {
       playConfetti.value = true
     }, 200)
-    startProvisioning()
+    // startProvisioning() ya no se llama: el provisioning visual lo hace
+    // ActivationOverlay en el step anterior. Cuando llega acá, todo está done.
+    onboarding.track('provisioning_complete')
   }
 })
 
