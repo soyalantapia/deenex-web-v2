@@ -10,14 +10,16 @@
     <p class="text-[11px] font-black text-primary uppercase tracking-[0.2em] mb-3">
       Paso 3 de 5
     </p>
+    <!-- Sin <br /> entre el greeting y "cuánto ahorrás" — el lead lee la
+         frase como una sola idea ("Alan, mirá cuánto ahorrás."). El span
+         italic primary sigue dando el énfasis visual sin partir la línea. -->
     <h1 class="text-[clamp(1.8rem,4vw,2.6rem)] font-extrabold tracking-tighter leading-[1.05] text-slate-900 mb-4">
       <template v-if="onboarding.greeting.value">
-        {{ onboarding.greeting.value }}, mirá<br />
+        {{ onboarding.greeting.value }}, mirá
         <span class="text-primary italic font-light">cuánto ahorrás.</span>
       </template>
       <template v-else>
-        Cuánto vas<br />
-        <span class="text-primary italic font-light">a ahorrar.</span>
+        Cuánto vas <span class="text-primary italic font-light">a ahorrar.</span>
       </template>
     </h1>
     <p class="text-base text-slate-500 leading-relaxed mb-6 max-w-md">

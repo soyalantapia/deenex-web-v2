@@ -14,8 +14,9 @@
       </template>
     </h1>
     <p class="text-base text-slate-500 leading-relaxed mb-6 max-w-md">
-      Para tus
-      <span class="font-bold text-slate-900">{{ onboarding.state.business.locations }} {{ onboarding.state.business.locations === 1 ? 'local' : 'locales' }}</span>.
+      Pricing por volumen de pedidos. Estimás
+      <span class="font-bold text-slate-900 tabular-nums">{{ totalMonthlyOrders.toLocaleString('es-AR') }} pedidos/mes</span>
+      ({{ onboarding.state.business.locations }} {{ onboarding.state.business.locations === 1 ? 'local' : 'locales' }} × {{ onboarding.effectiveOrders.value }} pedidos).
       Activás gratis hoy y pagás solo si te convence al día 16.
     </p>
 
@@ -277,16 +278,26 @@ function effectiveFee(tier) {
 
 const recommendedPlan = computed(() => onboarding.recommendedPlan.value)
 
+// Total estimado de pedidos/mes = locales × pedidos por local. Usado para
+// mostrar en el subtítulo y para que el lead entienda por qué le tocó X plan.
+const totalMonthlyOrders = computed(() => {
+  const locations = Math.max(1, Number(onboarding.state.business.locations) || 1)
+  return locations * onboarding.effectiveOrders.value
+})
+
 const effectivePlanKey = computed(() => form.planKey || recommendedPlan.value.key)
 
 const isEnterprise = computed(() => effectivePlanKey.value === 'enterprise')
 
 const selectablePlans = computed(() => onboarding.PLAN_TIERS)
 
+// Label de volumen ahora muestra el rango de PEDIDOS (la métrica de pricing
+// real) en lugar de "X-Y locales". Resuelve la pregunta clave del lead:
+// "¿en cuál caigo yo?" — porque los locales son ambiguos, los pedidos no.
 function planVolumeLabel(tier) {
-  if (tier.key === 'enterprise') return '200+ locales'
-  if (tier.minLocations === tier.maxLocations) return `${tier.minLocations} local`
-  return `${tier.minLocations}–${tier.maxLocations} locales`
+  if (tier.key === 'enterprise') return '75.000+ pedidos/mes'
+  if (tier.minOrders === 0) return `Hasta ${tier.maxOrders.toLocaleString('es-AR')} pedidos/mes`
+  return `${tier.minOrders.toLocaleString('es-AR')}–${tier.maxOrders.toLocaleString('es-AR')} pedidos/mes`
 }
 
 function onSubmit() {

@@ -10,7 +10,7 @@
     <MarketingSection class="v-reveal" />
     <SuccessCaseSection class="v-reveal" />
     <DemoVideoSection class="v-reveal" />
-    <!-- <PricingSection class="v-reveal" /> -->
+    <PricingPlans2026Section class="v-reveal" />
     <FAQSection class="v-reveal" />
     <CalendarSection class="v-reveal" />
     <Footer />
@@ -28,7 +28,7 @@ import InfraSection from '@/components/sections/InfraSection.vue'
 import LogisticsSection from '@/components/sections/LogisticsSection.vue'
 import MarketingSection from '@/components/sections/MarketingSection.vue'
 import LoyaltySection from '@/components/sections/LoyaltySection.vue'
-import PricingSection from '@/components/sections/PricingSection.vue'
+import PricingPlans2026Section from '@/components/sections/PricingPlans2026Section.vue'
 import CalendarSection from '@/components/sections/CalendarSection.vue'
 import SuccessCaseSection from '@/components/sections/SuccessCaseSection.vue'
 import FAQSection from '@/components/sections/FAQSection.vue'

@@ -167,41 +167,73 @@ watch(
   { deep: true }
 )
 
-// ── Plan recommendation engine — matches the Pricing 2026 table ─────────
+// ── Plan recommendation engine — Pricing 2026 por VOLUMEN DE PEDIDOS ────
+// El lead paga según pedidos totales/mes (más cercano a su ingreso real)
+// no según locales. Una marca con 3 locales facturando alto puede estar en
+// Growth; una con 12 locales pequeños puede estar en Starter.
+//
+// Cálculo: pedidos totales = locations × ordersPerLocation (effectiveOrders).
+// Default: 300 pedidos/local para marcas nuevas — el slider en Step Savings
+// permite ajustarlo. Mantenemos `minLocations/maxLocations` solo para mostrar
+// "para X-Y locales" como referencia visual, pero el engine usa orders.
+//
 // keyFeatures: 2 features clave que diferencian un plan del anterior. No
-// es la lista completa (esa vive en /pricing) — solo el "upgrade" visible
-// para que el lead entienda al toque qué le da pagar más.
+// es la lista completa (esa vive en /pricing) — solo el "upgrade" visible.
 const PLAN_TIERS = [
   {
-    key: 'starter', name: 'Starter', minLocations: 1, maxLocations: 5,
+    key: 'starter', name: 'Starter',
+    minOrders: 0, maxOrders: 1500,
+    minLocations: 1, maxLocations: 5,
     monthlyFee: 29, commissionPct: 1.5,
     keyFeatures: ['Self-service · 1 admin', 'Soporte por email'],
   },
   {
-    key: 'growth', name: 'Growth', minLocations: 6, maxLocations: 25,
+    key: 'growth', name: 'Growth',
+    minOrders: 1501, maxOrders: 7500,
+    minLocations: 4, maxLocations: 25,
     monthlyFee: 119, commissionPct: 1.25,
     keyFeatures: ['CSM compartido · 3 admins', 'Branding propio + dominio'],
   },
   {
-    key: 'scale', name: 'Scale', minLocations: 26, maxLocations: 70,
+    key: 'scale', name: 'Scale',
+    minOrders: 7501, maxOrders: 25000,
+    minLocations: 12, maxLocations: 70,
     monthlyFee: 269, commissionPct: 1.0,
     keyFeatures: ['CSM dedicado 4h/mes · 10 admins', 'API pública + webhooks'],
   },
   {
-    key: 'pro', name: 'Pro', minLocations: 71, maxLocations: 200,
+    key: 'pro', name: 'Pro',
+    minOrders: 25001, maxOrders: 75000,
+    minLocations: 30, maxLocations: 200,
     monthlyFee: 449, commissionPct: 0.75,
     keyFeatures: ['CSM 24/7 · admins ilimitados', 'Multi-región + SSO'],
   },
   {
-    key: 'enterprise', name: 'Enterprise', minLocations: 201, maxLocations: Infinity,
+    key: 'enterprise', name: 'Enterprise',
+    minOrders: 75001, maxOrders: Infinity,
+    minLocations: 100, maxLocations: Infinity,
     monthlyFee: null, commissionPct: 0.5,
     keyFeatures: ['SLA 99,9% + soporte L3', 'Integraciones custom + on-prem'],
   },
 ]
 
+// Default 300 pedidos/local cuando el lead todavía no editó. Single source
+// para que Step Savings y la recomendación se vean consistentes.
+const DEFAULT_ORDERS_PER_LOCATION = 300
+
 const recommendedPlan = computed(() => {
-  const n = Math.max(1, Number(state.business.locations) || 1)
-  return PLAN_TIERS.find((t) => n >= t.minLocations && n <= t.maxLocations) || PLAN_TIERS[0]
+  // Volumen total = locales × pedidos/local efectivos (lo que el lead editó
+  // en RoiCalculator, o el default 300). Esto es la métrica clave.
+  const locations = Math.max(1, Number(state.business.locations) || 1)
+  const perLocation =
+    Number(state.business.ordersPerLocation) > 0
+      ? Number(state.business.ordersPerLocation)
+      : DEFAULT_ORDERS_PER_LOCATION
+  const totalOrders = locations * perLocation
+  return (
+    PLAN_TIERS.find((t) => totalOrders >= t.minOrders && totalOrders <= t.maxOrders) ||
+    PLAN_TIERS[0]
+  )
 })
 
 // Descuento por billing anual. Estándar SaaS: 20% off para incentivar
@@ -239,12 +271,14 @@ const annualSavingsUsd = computed(() => {
  * Esto es una aproximación de marketing — el cálculo real lo hace el equipo
  * comercial. Pero da una idea conservadora.
  */
-// Defaults de "ticket promedio" y "pedidos por local-mes" usados cuando el
-// lead no editó la calculadora todavía. Conservadores a propósito: queremos
-// que el lead vea un número creíble, no un overpromise.
-const defaultAvgTicketUsd = 12 // bajado de 15 para ser más conservador
-const computeDefaultOrders = (locations) =>
-  locations <= 5 ? 280 : locations <= 25 ? 650 : locations <= 70 ? 1200 : 2400
+// Defaults conservadores. Para PEDIDOS por local·mes usamos un único valor
+// base (300) porque el modelo de pricing 2026 es por VOLUMEN TOTAL de
+// pedidos: si el lead nunca edita, asumimos 300 × locales. Esto:
+//   1) Es consistente con DEFAULT_ORDERS_PER_LOCATION del recommendedPlan.
+//   2) Es honesto — no inflamos números por tier de locales.
+//   3) Habilita al lead a editarlo en RoiCalculator → cambia tier en vivo.
+const defaultAvgTicketUsd = 12
+const computeDefaultOrders = () => DEFAULT_ORDERS_PER_LOCATION
 
 const effectiveTicket = computed(() => {
   const t = Number(state.business.avgTicketUsd)
@@ -253,7 +287,7 @@ const effectiveTicket = computed(() => {
 
 const effectiveOrders = computed(() => {
   const o = Number(state.business.ordersPerLocation)
-  return o > 0 ? o : computeDefaultOrders(Math.max(1, Number(state.business.locations) || 1))
+  return o > 0 ? o : computeDefaultOrders()
 })
 
 const monthlyGmvLead = computed(() => {

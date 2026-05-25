@@ -41,8 +41,8 @@
         </div>
       </label>
       <label class="block">
-        <span class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1.5">
-          Pedidos / local · mes
+        <span class="block text-[10px] font-bold text-primary uppercase tracking-widest mb-1.5">
+          Pedidos / local · mes ★
         </span>
         <input
           v-model.number="form.ordersPerLocation"
@@ -51,15 +51,16 @@
           max="10000"
           step="50"
           @blur="onInputBlur('ordersPerLocation')"
-          class="w-full px-3 py-2.5 rounded-xl bg-white border border-slate-200 text-sm font-bold text-slate-900 tabular-nums focus:outline-none focus:border-primary transition-colors no-spinner"
+          class="w-full px-3 py-2.5 rounded-xl bg-white border-2 border-primary/30 text-sm font-bold text-slate-900 tabular-nums focus:outline-none focus:border-primary transition-colors no-spinner"
           aria-label="Pedidos por local por mes"
         />
       </label>
     </div>
 
     <p class="text-[10px] text-slate-400 leading-snug mt-3 italic">
-      Estos números los usamos para proyectar tu ahorro de abajo con tus cifras
-      reales. Si los dejás vacíos, usamos un promedio conservador del rubro.
+      ★ Tus pedidos/mes determinan el plan recomendado. Default conservador
+      <span class="font-bold text-slate-600">300 pedidos/local</span>;
+      si tu volumen es mayor, ajustá para ver tu plan real.
     </p>
   </div>
 </template>
@@ -71,11 +72,15 @@ import { useOnboarding } from '@/composables/useOnboarding'
 
 const onboarding = useOnboarding()
 
+// El pricing 2026 se calcula por VOLUMEN TOTAL de pedidos (locales ×
+// pedidos/local). Default: 300 pedidos/local — sirve como punto de partida
+// honesto para marcas nuevas. El lead lo ajusta acá en vivo y la tier
+// recomendada se actualiza al toque (es reactiva al state).
 const form = reactive({
   ticket: onboarding.state.business.avgTicketUsd || onboarding.defaultAvgTicketUsd,
   ordersPerLocation:
     onboarding.state.business.ordersPerLocation ||
-    onboarding.computeDefaultOrders(Math.max(1, onboarding.state.business.locations || 1)),
+    onboarding.computeDefaultOrders(),
 })
 
 // Sincronizamos en vivo hacia el state global — el hero del Step 3 reactivo
@@ -100,22 +105,18 @@ function onInputBlur(field) {
 
 function resetToDefaults() {
   form.ticket = onboarding.defaultAvgTicketUsd
-  form.ordersPerLocation = onboarding.computeDefaultOrders(
-    Math.max(1, onboarding.state.business.locations || 1)
-  )
+  form.ordersPerLocation = onboarding.computeDefaultOrders()
   onboarding.track('roi_calculator_reset')
 }
 
 onMounted(() => {
-  // Sincronizar al mount por si los defaults cambiaron por el N de locales
-  // (ej: volvieron al Step 2 y cambiaron de 10 a 80 locales).
+  // Sincronizar al mount con los defaults globales (sin parametrizar por
+  // locales — ahora el default es 300 fijo, el lead lo ajusta a su realidad).
   if (!onboarding.state.business.avgTicketUsd) {
     form.ticket = onboarding.defaultAvgTicketUsd
   }
   if (!onboarding.state.business.ordersPerLocation) {
-    form.ordersPerLocation = onboarding.computeDefaultOrders(
-      Math.max(1, onboarding.state.business.locations || 1)
-    )
+    form.ordersPerLocation = onboarding.computeDefaultOrders()
   }
 })
 </script>

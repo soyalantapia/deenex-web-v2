@@ -37,19 +37,29 @@
             <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3">
               +500 sucursales ya operan con Deenex
             </p>
-            <!-- Logos reales de clientes (los mismos que aparecen en la landing).
-                 Filtro grayscale + opacidad para no robar protagonismo a la card
-                 principal, pero suficiente para reconocer las marcas. -->
-            <div class="grid grid-cols-3 gap-x-4 gap-y-3 items-center">
-              <img
+            <!-- Carrusel infinito con vue3-marquee — pasa todos los logos
+                 corriendo lentos sin pausa al hover. Da sensación de
+                 "muchas marcas" en menos espacio vertical que un grid. -->
+            <Vue3Marquee
+              :duration="22"
+              :pause-on-hover="true"
+              :gradient="true"
+              :gradient-color="[248, 250, 252]"
+              :gradient-width="32"
+            >
+              <div
                 v-for="b in brandLogos"
                 :key="b.name"
-                :src="b.src"
-                :alt="b.name"
-                class="h-5 w-auto max-w-[80px] object-contain opacity-70 grayscale hover:grayscale-0 hover:opacity-100 transition-all"
-                loading="lazy"
-              />
-            </div>
+                class="mx-5 flex items-center h-6"
+              >
+                <img
+                  :src="b.src"
+                  :alt="b.name"
+                  class="h-5 w-auto max-w-[90px] object-contain opacity-60 grayscale hover:grayscale-0 hover:opacity-100 transition-all"
+                  loading="lazy"
+                />
+              </div>
+            </Vue3Marquee>
           </div>
         </div>
       </div>
@@ -213,6 +223,8 @@ const props = defineProps({
   hasProgress: { type: Boolean, default: false },
   recommendedPlanCommission: { type: String, default: '1,25%' },
 })
+
+import { Vue3Marquee } from 'vue3-marquee'
 
 // Logos reales de clientes — los mismos `.webp` que usa la landing en el
 // social proof del Hero. Vite resuelve el path al asset hashed en build.
