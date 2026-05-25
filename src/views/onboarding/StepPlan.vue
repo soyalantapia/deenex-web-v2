@@ -177,58 +177,85 @@
       </figcaption>
     </figure>
 
-    <!-- Comparison de TODOS los planes (visible, no escondido) ─────────-->
+    <!-- Escalera de crecimiento — INFORMATIVA, no seleccionable.
+         El plan se ajusta solo según el volumen de pedidos del lead.
+         Esta sección muestra los próximos tiers para que el lead entienda
+         cómo va a crecer su fee a medida que escale. NO es un selector
+         (era el bug anterior — el modelo es Bundle único escalonado, no
+         "elegí cuál plan querés"). -->
     <div v-if="!isEnterprise" class="mb-8">
       <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3">
-        ¿Querés otro plan? Compará al toque
+        Cuando crezcas, tu plan crece con vos
       </p>
-      <div class="grid grid-cols-2 lg:grid-cols-4 gap-2.5">
-        <button
+      <div class="rounded-2xl border border-slate-200 bg-white overflow-hidden">
+        <!-- Header (desktop) -->
+        <div class="hidden sm:grid grid-cols-[1.4fr_1fr_auto_auto] gap-4 px-5 py-2.5 bg-slate-50 border-b border-slate-200 text-[10px] font-black text-slate-400 uppercase tracking-widest">
+          <span>Tier</span>
+          <span class="text-right">Pedidos/mes</span>
+          <span class="text-right whitespace-nowrap">Fee</span>
+          <span class="text-right whitespace-nowrap">Comisión</span>
+        </div>
+        <!-- Filas -->
+        <div
           v-for="tier in selectablePlans"
           :key="tier.key"
-          type="button"
-          @click="form.planKey = tier.key"
-          class="text-left rounded-2xl border-2 p-4 transition-all relative flex flex-col"
-          :class="effectivePlanKey === tier.key
-            ? 'border-primary bg-primary/[0.04]'
-            : 'border-slate-200 hover:border-slate-300 bg-white'"
+          class="grid grid-cols-1 sm:grid-cols-[1.4fr_1fr_auto_auto] gap-2 sm:gap-4 px-5 py-3 transition-colors"
+          :class="[
+            tier.key === recommendedPlan.key ? 'bg-primary/[0.04] sm:bg-primary/[0.05]' : '',
+            'border-b border-slate-100 last:border-b-0',
+          ]"
         >
-          <p class="text-sm font-bold text-slate-900 mb-0.5">{{ tier.name }}</p>
-          <p class="text-[10px] text-slate-400 font-medium mb-3 leading-snug">
-            {{ planVolumeLabel(tier) }}
-          </p>
-          <p class="text-base font-black text-slate-900 tabular-nums leading-none">
-            <template v-if="tier.monthlyFee !== null">USD {{ effectiveFee(tier) }}</template>
-            <template v-else>A medida</template>
-          </p>
-          <p v-if="tier.monthlyFee !== null" class="text-[10px] text-slate-500 mt-1">
-            / mes + {{ tier.commissionPct }}%
-          </p>
-          <!-- Si está en anual, mostramos el precio mensual original tachado para
-               que el "ahorro" sea visible a primera vista. -->
-          <p v-if="tier.monthlyFee !== null && form.billingCycle === 'annual'" class="text-[9px] text-slate-400 tabular-nums line-through mt-0.5">
-            USD {{ tier.monthlyFee }} mensual
-          </p>
-          <!-- Features clave: diferenciador vs el plan anterior. Le permite
-               al lead entender al toque qué gana al pagar más. -->
-          <ul v-if="tier.keyFeatures?.length" class="mt-3 pt-3 border-t border-slate-100 space-y-1.5 flex-1">
-            <li
-              v-for="feat in tier.keyFeatures"
-              :key="feat"
-              class="text-[10px] text-slate-600 leading-tight flex items-start gap-1.5"
-            >
-              <Check class="w-2.5 h-2.5 text-emerald-500 shrink-0 mt-0.5" stroke-width="3" />
-              <span>{{ feat }}</span>
-            </li>
-          </ul>
-          <span
-            v-if="tier.key === recommendedPlan.key"
-            class="absolute -top-2 left-3 bg-emerald-500 text-white text-[9px] font-black px-2 py-0.5 rounded-full uppercase tracking-wider"
-          >
-            Recomendado
-          </span>
-        </button>
+          <div class="flex items-center gap-2.5 min-w-0">
+            <!-- Indicador "estás acá" para el tier recomendado -->
+            <span
+              v-if="tier.key === recommendedPlan.key"
+              class="w-1.5 h-1.5 rounded-full bg-primary shrink-0"
+              aria-hidden="true"
+            ></span>
+            <span v-else class="w-1.5 h-1.5 rounded-full bg-slate-200 shrink-0" aria-hidden="true"></span>
+            <div class="min-w-0">
+              <div class="flex items-center gap-2 flex-wrap">
+                <span class="text-sm font-bold text-slate-900">{{ tier.name }}</span>
+                <span
+                  v-if="tier.key === recommendedPlan.key"
+                  class="text-[9px] font-black text-white bg-primary px-2 py-0.5 rounded-full uppercase tracking-widest"
+                >
+                  Estás acá
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <div class="sm:text-right">
+            <span class="text-xs sm:text-sm font-bold text-slate-700 tabular-nums">
+              {{ planVolumeLabel(tier) }}
+            </span>
+            <p class="sm:hidden text-[10px] text-slate-400 uppercase tracking-widest mt-0.5">Pedidos/mes</p>
+          </div>
+
+          <div class="flex items-baseline gap-1 sm:justify-end sm:text-right">
+            <span class="text-xs sm:text-sm font-bold text-slate-900 tabular-nums whitespace-nowrap">
+              <template v-if="tier.monthlyFee !== null">USD {{ effectiveFee(tier) }}</template>
+              <template v-else>A medida</template>
+            </span>
+            <span v-if="tier.monthlyFee !== null" class="text-[10px] text-slate-400">/ mes</span>
+            <span class="sm:hidden text-[10px] text-slate-400 ml-1 uppercase tracking-widest">Fee</span>
+          </div>
+
+          <div class="flex items-baseline gap-1 sm:justify-end sm:text-right">
+            <span class="text-xs sm:text-sm font-bold tabular-nums whitespace-nowrap" :class="tier.key === recommendedPlan.key ? 'text-primary' : 'text-slate-700'">
+              {{ tier.commissionPct }}%
+            </span>
+            <span class="text-[10px] text-slate-400">por venta</span>
+          </div>
+        </div>
       </div>
+      <p class="text-[11px] text-slate-500 leading-relaxed mt-3 flex items-start gap-1.5">
+        <Check class="w-3 h-3 text-emerald-500 shrink-0 mt-0.5" stroke-width="3" />
+        <span>
+          Pasás al siguiente tier <strong class="text-slate-700">automáticamente</strong> cuando superás el volumen del actual. Sin renegociar nada — el sistema lo hace al cierre del mes y tu data te sigue.
+        </span>
+      </p>
     </div>
 
     <StepActions
@@ -254,10 +281,10 @@ import { useOnboarding } from '@/composables/useOnboarding'
 const router = useRouter()
 const onboarding = useOnboarding()
 
-// Form local sync con state global. billingCycle persiste para que si el lead
-// vuelve al step, mantenga su elección.
+// Form local sync con state global. `planKey` ya no se setea acá — el plan
+// se asigna automáticamente desde recommendedPlan basado en volumen de
+// pedidos. Solo persistimos billingCycle (toggle anual/mensual) y addLoyalty.
 const form = reactive({
-  planKey: onboarding.state.plan.key || '',
   addLoyalty: onboarding.state.plan.addLoyalty,
   billingCycle: onboarding.state.plan.billingCycle || 'monthly',
 })
@@ -285,7 +312,11 @@ const totalMonthlyOrders = computed(() => {
   return locations * onboarding.effectiveOrders.value
 })
 
-const effectivePlanKey = computed(() => form.planKey || recommendedPlan.value.key)
+// Antes el lead podía elegir cualquier tier manualmente. Ahora el modelo
+// es Bundle único escalonado: el tier se calcula automáticamente desde el
+// volumen de pedidos del lead. No hay selección — `effectivePlanKey` siempre
+// apunta al recomendado.
+const effectivePlanKey = computed(() => recommendedPlan.value.key)
 
 const isEnterprise = computed(() => effectivePlanKey.value === 'enterprise')
 
