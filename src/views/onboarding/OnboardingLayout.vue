@@ -110,7 +110,11 @@
 
     <!-- Body -->
     <main class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-16">
-      <div class="grid lg:grid-cols-[1.4fr_1fr] gap-10 lg:gap-16 items-start">
+      <!-- Grid del shell: columna izquierda (form) toma el espacio disponible,
+           columna derecha (side panel) tiene ancho fijo de 320px. Antes era
+           1.4fr_1fr que daba ~42% al panel — demasiado para una columna
+           informativa. Ahora siempre 320px independiente del viewport. -->
+      <div class="grid lg:grid-cols-[minmax(0,1fr)_320px] gap-10 lg:gap-12 items-start">
         <!-- Main column -->
         <div class="max-w-xl">
           <RouterView v-slot="{ Component }">
