@@ -39,14 +39,31 @@
   <link rel="manifest" href="/site.webmanifest">
   <meta name="theme-color" content="#695EDE">
   
-  <!-- Google tag (gtag.js) -->
-  <script async src="https://www.googletagmanager.com/gtag/js?id=G-E7GPE100LK"></script>
+  <!-- Google tag (gtag.js) con Consent Mode v2.
+       Por default analytics está DENIED hasta que el lead acepte el banner.
+       El CookieConsentBanner.vue llama a gtag('consent', 'update', {...})
+       cuando el lead opta-in. Sin esto: multa Ley 25.326 (Arg) o RGPD. -->
   <script>
     window.dataLayer = window.dataLayer || [];
     function gtag(){dataLayer.push(arguments);}
+    window.gtag = gtag;
+    // Consent default: deny everything. La función readConsent() abajo
+    // chequea localStorage por una elección previa para no mostrar el banner
+    // dos veces en la misma máquina.
+    var stored = null;
+    try { stored = localStorage.getItem('deenex_consent_v1'); } catch (e) {}
+    var hasConsent = stored === 'granted';
+    gtag('consent', 'default', {
+      ad_storage: hasConsent ? 'granted' : 'denied',
+      analytics_storage: hasConsent ? 'granted' : 'denied',
+      ad_user_data: hasConsent ? 'granted' : 'denied',
+      ad_personalization: hasConsent ? 'granted' : 'denied',
+      wait_for_update: 500
+    });
     gtag('js', new Date());
-    gtag('config', 'G-E7GPE100LK');
+    gtag('config', 'G-E7GPE100LK', { anonymize_ip: true });
   </script>
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-E7GPE100LK"></script>
   <script src="https://player.vimeo.com/api/player.js"></script>
 </head>
 

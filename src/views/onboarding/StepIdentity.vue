@@ -54,6 +54,7 @@
         :error="errors.whatsapp"
         required
         @blur="validate('whatsapp')"
+        @country-change="validate('whatsapp')"
       />
     </div>
 

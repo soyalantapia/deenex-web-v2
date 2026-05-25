@@ -75,7 +75,21 @@ const onboarding = useOnboarding()
 const DISMISS_KEY = 'deenex_trial_banner_dismissed'
 const dismissed = ref(false)
 
-const dashboardUrl = import.meta.env.VITE_APP_DASHBOARD_URL || 'https://app.deenex.tech'
+// Session handoff: igual que en Welcome, agregamos un token de sesión al
+// link del dashboard para que el lead no tenga que volver a loguearse.
+const DASHBOARD_BASE = import.meta.env.VITE_APP_DASHBOARD_URL || 'https://app.deenex.tech'
+
+const dashboardUrl = computed(() => {
+  const email = onboarding.state.identity.email || ''
+  const activated = onboarding.state.trial.activatedAt || ''
+  if (!email || !activated || typeof window === 'undefined') return DASHBOARD_BASE
+  try {
+    const tok = btoa(`${email}|${activated}|magiclink`).replace(/[^A-Za-z0-9]/g, '').slice(0, 32)
+    return `${DASHBOARD_BASE}?session=${tok}&from=trial_banner`
+  } catch {
+    return DASHBOARD_BASE
+  }
+})
 
 const brand = computed(() => onboarding.state.business.brand)
 const subdomain = computed(() => onboarding.subdomainPreview.value)

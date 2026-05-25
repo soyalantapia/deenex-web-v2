@@ -4,9 +4,14 @@
       Paso 3 de 6
     </p>
     <h1 class="text-[clamp(1.8rem,4vw,2.6rem)] font-extrabold tracking-tighter leading-[1.05] text-slate-900 mb-4">
-      <template v-if="onboarding.greeting.value">{{ onboarding.greeting.value }}, este es<br /></template>
-      <template v-else>Tu plan recomendado.<br /></template>
-      <span class="text-primary italic font-light">tu plan recomendado.</span>
+      <template v-if="onboarding.greeting.value">
+        {{ onboarding.greeting.value }}, este es<br />
+        <span class="text-primary italic font-light">tu plan recomendado.</span>
+      </template>
+      <template v-else>
+        Tu plan<br />
+        <span class="text-primary italic font-light">recomendado.</span>
+      </template>
     </h1>
     <p class="text-base text-slate-500 leading-relaxed mb-6 max-w-md">
       Calculado en base a tus

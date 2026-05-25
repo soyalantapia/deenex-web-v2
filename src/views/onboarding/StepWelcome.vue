@@ -82,7 +82,7 @@
       <a
         v-for="(step, i) in nextSteps"
         :key="step.title"
-        :href="`${dashboardUrl}${step.path}`"
+        :href="buildDashboardLink(step.path)"
         @click="trackNextStepClick(step.key)"
         class="group border border-slate-200 rounded-2xl p-5 flex items-start gap-4 hover:border-primary hover:bg-primary/[0.02] transition-colors"
       >
@@ -366,8 +366,43 @@ const isEnterprise = computed(() => {
 })
 
 // URLs del entorno
-const dashboardUrl = import.meta.env.VITE_APP_DASHBOARD_URL || 'https://app.deenex.tech'
+const DASHBOARD_BASE = import.meta.env.VITE_APP_DASHBOARD_URL || 'https://app.deenex.tech'
 const calendarUrl = import.meta.env.VITE_CALENDAR_URL || '#'
+
+// Session handoff: el dashboard espera un magic-link token en query para
+// loguear al lead automáticamente. En producción este token lo emite el
+// backend en /activate-trial; acá generamos un placeholder con email + nonce
+// que el dashboard usa para hacer el lookup. Sin esto, el lead llega a
+// app.deenex.tech y tiene que volver a poner email / pass (no existe pass).
+const dashboardSessionToken = computed(() => {
+  const email = onboarding.state.identity.email || ''
+  const activatedAt = onboarding.state.trial.activatedAt || new Date().toISOString()
+  // En producción: JWT firmado por el backend con TTL corto (10 min) que el
+  // dashboard intercambia por una session cookie. Acá usamos base64 stub.
+  if (typeof window === 'undefined') return ''
+  try {
+    return btoa(`${email}|${activatedAt}|magiclink`).replace(/[^A-Za-z0-9]/g, '').slice(0, 32)
+  } catch {
+    return ''
+  }
+})
+
+const dashboardUrl = computed(() => {
+  const base = DASHBOARD_BASE
+  const tok = dashboardSessionToken.value
+  if (!tok) return base
+  // El dashboard parsea ?session=token y hace login automático.
+  return `${base}?session=${tok}&from=onboarding`
+})
+
+// Helper para deep-links a settings/branding etc — preserva el token de sesión.
+function buildDashboardLink(path) {
+  const base = `${DASHBOARD_BASE}${path}`
+  const tok = dashboardSessionToken.value
+  if (!tok) return base
+  const sep = path.includes('?') ? '&' : '?'
+  return `${base}${sep}session=${tok}&from=onboarding`
+}
 
 const nextSteps = [
   {
@@ -467,7 +502,13 @@ function toggleReferralPreview() {
 // ── Resumen del plan + monto del próximo cargo ──────────────────────────
 const planSummary = computed(() => {
   const key = onboarding.state.plan.key || onboarding.recommendedPlan.value.key
-  return onboarding.PLAN_TIERS.find((t) => t.key === key) || onboarding.recommendedPlan.value
+  const tier = onboarding.PLAN_TIERS.find((t) => t.key === key) || onboarding.recommendedPlan.value
+  // Aplicamos descuento anual igual que en StepTrial para consistencia
+  // del primer cargo mostrado al lead.
+  if (onboarding.state.plan.billingCycle === 'annual' && tier.monthlyFee !== null) {
+    return { ...tier, monthlyFee: Math.round(tier.monthlyFee * 0.8) }
+  }
+  return tier
 })
 
 const daysUntilFirstCharge = computed(() => {

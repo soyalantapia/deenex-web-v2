@@ -17,6 +17,12 @@
       se muestra (lee state desde useOnboarding).
     -->
     <TrialBanner v-if="showLanding && isReady" />
+    <!--
+      CookieConsentBanner: GDPR + Ley 25.326. Aparece en cualquier ruta si el
+      lead no eligió previamente. Pre-condición regulatoria — sin esto, multas
+      potenciales de USD 100k+. Se muestra una sola vez por máquina.
+    -->
+    <CookieConsentBanner />
   </div>
 </template>
 
@@ -26,6 +32,7 @@ import { RouterView, useRoute } from 'vue-router'
 import LoadingScreen from '@/components/common/LoadingScreen.vue'
 import WhatsAppFloatingButton from '@/components/common/WhatsAppFloatingButton.vue'
 import TrialBanner from '@/components/common/TrialBanner.vue'
+import CookieConsentBanner from '@/components/common/CookieConsentBanner.vue'
 
 const isReady = ref(false)
 const route = useRoute()

@@ -43,17 +43,17 @@
               Escaneá el código y retomás exactamente donde estás ahora — sin
               perder progreso, sin tener que volver a llenar nada.
             </p>
-            <!-- QR generado del lado del cliente con la API de Google Charts
-                 como fallback (no deps). En producción usaríamos un endpoint
-                 propio que firme el token JWT con expiración. -->
+            <!-- QR generado 100% local (sin fetch a 3rd parties).
+                 Antes usábamos api.qrserver.com → leak de datos del lead
+                 (email en el resume token) a un tercero sin DPA, violación
+                 de GDPR / Ley 25.326. Ahora SVG inline. -->
             <div class="flex justify-center mb-4">
-              <img
-                :src="qrUrl"
-                :alt="`Código QR para resume token ${tokenPreview}`"
-                width="192"
-                height="192"
-                class="rounded-2xl border border-slate-200"
-              />
+              <div
+                class="rounded-2xl border border-slate-200 p-2 bg-white"
+                v-html="qrSvg"
+                :aria-label="`Código QR para resume token ${tokenPreview}`"
+                role="img"
+              ></div>
             </div>
             <div class="rounded-xl bg-slate-50 border border-slate-200 px-3 py-2 mb-4">
               <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-0.5">
@@ -93,6 +93,7 @@ import { ref, computed } from 'vue'
 import { Teleport } from 'vue'
 import { Smartphone } from 'lucide-vue-next'
 import { useOnboarding } from '@/composables/useOnboarding'
+import { generateQrSvg } from '@/utils/qrcode'
 
 const onboarding = useOnboarding()
 const open = ref(false)
@@ -115,12 +116,10 @@ const resumeUrl = computed(() => {
   return `${base}/comenzar?resume=${resumeToken.value}`
 })
 
-// QR usando un servicio público sin dependencia. En producción reemplazamos
-// por una lib estilo qrcode-svg para 0 calls externas.
-const qrUrl = computed(() => {
-  const data = encodeURIComponent(resumeUrl.value)
-  return `https://api.qrserver.com/v1/create-qr-code/?size=192x192&data=${data}&margin=10&color=0f172a&bgcolor=ffffff`
-})
+// QR generado 100% local — SVG inline. Sin fetch a 3rd parties, sin leak
+// de datos del lead. Cuando el modal se abre por primera vez se genera al
+// vuelo; si el resumeUrl cambia, el computed reactúa.
+const qrSvg = computed(() => generateQrSvg(resumeUrl.value, { size: 192, margin: 2 }))
 
 async function copyLink() {
   try {

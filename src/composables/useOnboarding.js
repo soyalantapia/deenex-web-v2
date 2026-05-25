@@ -12,7 +12,7 @@
  */
 
 import { reactive, computed, ref, watch } from 'vue'
-import { trackEvent } from '@/utils/analytics'
+import { trackEvent, captureUtmsFromUrl, identify, setUserProperties, getStoredUserId } from '@/utils/analytics'
 
 const STORAGE_KEY = 'deenex_onboarding_v1'
 
@@ -34,6 +34,10 @@ const DEFAULT_STATE = {
     // ROI inputs reales del lead (editados en Step Plan)
     avgTicketUsd: null, // null = usar default por volumen
     ordersPerLocation: null,
+    // Override del subdomain — cuando el slug derivado de brand está tomado
+    // y el lead acepta la sugerencia (ej. "palta-ar"), guardamos ese override
+    // acá. `subdomainPreview` computed lo respeta antes de slugify(brand).
+    subdomainOverride: '',
   },
   // Step 3
   plan: {
@@ -53,13 +57,55 @@ const DEFAULT_STATE = {
     startedAt: null,
     completedSteps: [], // ['identity', 'business', 'plan', 'trial']
     variant: '', // 'cadenas-gastronomicas' | '' (where the flow was triggered)
+    utms: {}, // utm_source/medium/campaign/term/content + gclid/fbclid
   },
+}
+
+// Storage helpers SSR-safe + tolerantes a Safari privado, iOS Webview
+// in-app browser y quota llena. Estrategia 3-tier:
+//   1. localStorage (persiste cross-session)
+//   2. sessionStorage (persiste por pestaña)
+//   3. Map en memoria (lifetime de la app, mejor que nada)
+const memStorage = new Map()
+
+function safeGetItem(key) {
+  if (typeof window === 'undefined') return null
+  try {
+    const v = window.localStorage?.getItem(key)
+    if (v != null) return v
+  } catch { /* private mode / blocked */ }
+  try {
+    const v = window.sessionStorage?.getItem(key)
+    if (v != null) return v
+  } catch { /* sandbox */ }
+  return memStorage.get(key) ?? null
+}
+
+function safeSetItem(key, val) {
+  if (typeof window === 'undefined') return 'memory'
+  try {
+    window.localStorage?.setItem(key, val)
+    return 'local'
+  } catch { /* quota / private / blocked */ }
+  try {
+    window.sessionStorage?.setItem(key, val)
+    return 'session'
+  } catch { /* sandbox */ }
+  memStorage.set(key, val)
+  return 'memory'
+}
+
+function safeRemoveItem(key) {
+  if (typeof window === 'undefined') return
+  try { window.localStorage?.removeItem(key) } catch { /* */ }
+  try { window.sessionStorage?.removeItem(key) } catch { /* */ }
+  memStorage.delete(key)
 }
 
 function loadFromStorage() {
   if (typeof window === 'undefined') return structuredClone(DEFAULT_STATE)
   try {
-    const raw = localStorage.getItem(STORAGE_KEY)
+    const raw = safeGetItem(STORAGE_KEY)
     if (!raw) return structuredClone(DEFAULT_STATE)
     const parsed = JSON.parse(raw)
     // Shallow merge with defaults to handle schema additions
@@ -92,6 +138,9 @@ const lastSavedAt = ref(null)
 let saveStatusTimer = null
 
 // Persist on every mutation with debounce + status update.
+// safeSetItem retorna el tier que persistió ('local'|'session'|'memory'):
+// si cae a memory, el progreso se pierde al cerrar la pestaña — surfaceamos
+// como 'error' visible para que el ConnectivityBanner avise.
 watch(
   state,
   (val) => {
@@ -99,17 +148,17 @@ watch(
     saveStatus.value = 'saving'
     if (saveStatusTimer) clearTimeout(saveStatusTimer)
     saveStatusTimer = setTimeout(() => {
-      try {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(val))
-        saveStatus.value = 'saved'
-        lastSavedAt.value = Date.now()
-        setTimeout(() => {
-          // Volvemos a idle si nadie más empezó a guardar mientras tanto.
-          if (saveStatus.value === 'saved') saveStatus.value = 'idle'
-        }, 1500)
-      } catch {
+      const tier = safeSetItem(STORAGE_KEY, JSON.stringify(val))
+      if (tier === 'memory') {
+        // memoria volátil — alertamos al lead que su data no persistirá.
         saveStatus.value = 'error'
+        return
       }
+      saveStatus.value = 'saved'
+      lastSavedAt.value = Date.now()
+      setTimeout(() => {
+        if (saveStatus.value === 'saved') saveStatus.value = 'idle'
+      }, 1500)
     }, 300)
   },
   { deep: true }
@@ -239,14 +288,49 @@ const breakEvenDays = computed(() => {
 })
 
 // ── Fecha del primer cargo (today + trial length) ────────────────────────
-const TRIAL_DAYS = 15
+// Trial base de 15 días. Si el lead aceptó el bonus del exit intent
+// (DEENEX30), se extiende a 30 días.
+const TRIAL_DAYS_BASE = 15
+const TRIAL_DAYS_WITH_BONUS = 30
+
+// Lee el código de bonus persistido por OnboardingLayout (exit intent flow).
+// El watch sobre state ya re-evalua cuando cambia, pero acá leemos lazy desde
+// localStorage porque el bonus se setea por fuera del state (sessionStorage
+// + localStorage para que sobreviva refresh).
+function readBonusCode() {
+  if (typeof window === 'undefined') return ''
+  try {
+    return localStorage.getItem('deenex_bonus_code') || ''
+  } catch {
+    return ''
+  }
+}
+
+// Reactive ref que apunta al código. Lo refrescamos manualmente cuando
+// OnboardingLayout lo setea via `markBonusApplied`.
+const bonusCode = ref(readBonusCode())
+
+function markBonusApplied(code) {
+  if (typeof window === 'undefined') return
+  try {
+    localStorage.setItem('deenex_bonus_code', code)
+    bonusCode.value = code
+    trackEvent('onboarding_bonus_applied', { code })
+  } catch {
+    /* ignore quota errors */
+  }
+}
+
+const hasBonus = computed(() => bonusCode.value === 'DEENEX30')
+
+const TRIAL_DAYS = computed(() => (hasBonus.value ? TRIAL_DAYS_WITH_BONUS : TRIAL_DAYS_BASE))
 
 const firstChargeDate = computed(() => {
   // Si el trial ya está activado, usamos esa fecha como ancla. Si no, calculamos
   // desde hoy para mostrar al lead una proyección.
   const anchor = state.trial.activatedAt ? new Date(state.trial.activatedAt) : new Date()
   const charge = new Date(anchor)
-  charge.setDate(charge.getDate() + TRIAL_DAYS)
+  charge.setDate(charge.getDate() + TRIAL_DAYS.value)
   return charge
 })
 
@@ -313,6 +397,10 @@ function slugifyBrand(brand) {
 }
 
 const subdomainPreview = computed(() => {
+  // Si el lead aceptó una sugerencia (slug derivado estaba tomado), usamos
+  // ese override en TODO el flow. Si no, slugify del brand.
+  const override = (state.business.subdomainOverride || '').trim()
+  if (override) return override
   const slug = slugifyBrand(state.business.brand)
   return slug || 'tu-marca'
 })
@@ -337,25 +425,46 @@ const currentStep = computed(() => {
 
 // ── Actions ──────────────────────────────────────────────────────────────
 function ensureStarted(variant) {
+  // Captura UTMs en el primer touch — los siguientes events los heredan.
+  const utms = captureUtmsFromUrl()
+  // Rehidrata user_id de localStorage si volvió cross-device.
+  getStoredUserId()
   if (!state.meta.startedAt) {
     state.meta.startedAt = new Date().toISOString()
     state.meta.variant = variant || ''
-    trackEvent('onboarding_start', { variant: state.meta.variant })
+    // Persistimos UTMs en meta para reconstruir attribution después.
+    state.meta.utms = utms
+    trackEvent('onboarding_start', { variant: state.meta.variant, ...utms })
   }
 }
 
 function setIdentity(values) {
   Object.assign(state.identity, values)
+  // Identify a GA4 con user_id estable derivado del email.
+  if (values.email) identify(values.email)
   markStepComplete('identity')
 }
 
 function setBusiness(values) {
   Object.assign(state.business, values)
+  // Propiedades del usuario para segmentación en GA4: tipo de cuenta,
+  // tamaño, canales actuales. Habilita reports por cohort.
+  setUserProperties({
+    business_locations: values.locations || 0,
+    business_pos: values.pos || 'none',
+    business_channels: (values.channels || []).join(',') || 'none',
+    business_brand_slug: slugifyBrand(values.brand || ''),
+  })
   markStepComplete('business')
 }
 
 function setPlan(values) {
   Object.assign(state.plan, values)
+  setUserProperties({
+    plan_key: values.key || '',
+    plan_billing_cycle: values.billingCycle || 'monthly',
+    plan_loyalty: values.addLoyalty ? 'yes' : 'no',
+  })
   markStepComplete('plan')
 }
 
@@ -383,7 +492,7 @@ function markStepComplete(stepKey) {
 function reset() {
   Object.assign(state, structuredClone(DEFAULT_STATE))
   if (typeof window !== 'undefined') {
-    localStorage.removeItem(STORAGE_KEY)
+    safeRemoveItem(STORAGE_KEY)
   }
 }
 
@@ -397,6 +506,9 @@ export function useOnboarding() {
     PLAN_TIERS,
     STEP_ORDER,
     TRIAL_DAYS,
+    bonusCode,
+    hasBonus,
+    markBonusApplied,
     recommendedPlan,
     monthlyEstimateUsd,
     annualSavingsUsd,

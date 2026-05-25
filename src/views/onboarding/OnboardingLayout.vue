@@ -231,7 +231,7 @@
               Antes de irte, una cosa.
             </h3>
             <p class="text-sm text-slate-500 leading-relaxed mb-5">
-              Ya completaste {{ onboarding.state.meta.completedSteps.length }}/5 pasos.
+              Ya completaste {{ onboarding.state.meta.completedSteps.length }}/{{ steps.length - 1 }} pasos.
               Si volvés en las próximas 48 horas y activás tu trial, te regalamos
               <span class="font-bold text-emerald-600">los primeros 30 días gratis</span>
               en vez de 15.
@@ -350,6 +350,9 @@ const currentMode = computed(() => steps[activeStepIndex.value]?.key || 'identit
 // sienta vivo, pero queda estable durante la sesión del lead.
 const liveActivations = ref(0)
 const activationWindow = ref('esta semana')
+// Guardamos el handle para cleanup en onUnmounted — antes era leak: el
+// interval seguía vivo después de salir del onboarding.
+let socialProofTimer = null
 function initSocialProof() {
   // Base: 12 a 47 por día según horario. Determinístico por hora del día
   // para que no parpadee al refrescar.
@@ -362,7 +365,8 @@ function initSocialProof() {
   activationWindow.value = 'esta semana'
 
   // Cada 25-40s sumamos 1 activación para que parezca vivo si la sesión es larga.
-  setInterval(() => {
+  if (socialProofTimer) clearInterval(socialProofTimer)
+  socialProofTimer = setInterval(() => {
     if (Math.random() < 0.55) liveActivations.value += 1
   }, 32_000)
 }
@@ -395,10 +399,9 @@ function dismissExitIntent() {
 function continueWithBonus() {
   showExitIntent.value = false
   onboarding.track('exit_intent_bonus_accepted', { code: 'DEENEX30' })
-  // Persistimos el bonus en localStorage para mostrarlo en el step de Trial.
-  try {
-    localStorage.setItem('deenex_bonus_code', 'DEENEX30')
-  } catch {}
+  // Aplica el bonus REAL — el composable extiende trial a 30 días y todos los
+  // computeds (firstChargeDate, días restantes) reactúan automáticamente.
+  onboarding.markBonusApplied('DEENEX30')
 }
 
 const planCommissionLabel = computed(() => {
@@ -567,6 +570,7 @@ onUnmounted(() => {
   document.removeEventListener('mouseleave', onMouseLeave)
   document.removeEventListener('keydown', onKeyDown)
   if (visibilityTimer) clearTimeout(visibilityTimer)
+  if (socialProofTimer) clearInterval(socialProofTimer)
 })
 </script>
 

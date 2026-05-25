@@ -8,11 +8,32 @@
       <template v-else>Activá </template>tu trial.<br />
       <span class="text-primary italic font-light">No cobramos nada hoy.</span>
     </h1>
-    <p class="text-base text-slate-500 leading-relaxed mb-8 max-w-md">
+    <p class="text-base text-slate-500 leading-relaxed mb-6 max-w-md">
       Necesitamos tu método de pago para reservar tu cuenta. El primer cargo
       es <span class="font-bold text-slate-900">el {{ onboarding.firstChargeDateFormatted.value }}</span>,
       y si cancelás antes no te cobramos nunca.
     </p>
+
+    <!-- Bonus aplicado: cuando el lead vino del exit intent y aceptó el bonus
+         DEENEX30, el trial se extendió a 30 días. Hacemos VISIBLE ese beneficio
+         para que entienda que la promesa se está cumpliendo. -->
+    <div
+      v-if="onboarding.hasBonus.value"
+      class="flex items-center gap-3 rounded-2xl border-2 border-amber-200 bg-amber-50/60 p-4 mb-6"
+    >
+      <div class="w-10 h-10 rounded-xl bg-amber-400 flex items-center justify-center shrink-0 text-xl">
+        🎁
+      </div>
+      <div class="flex-1 min-w-0">
+        <p class="text-sm font-bold text-slate-900 leading-tight">
+          Bonus <code class="font-mono text-amber-700">{{ onboarding.bonusCode.value }}</code> aplicado
+        </p>
+        <p class="text-xs text-slate-600 mt-0.5 leading-snug">
+          Tu trial es de <span class="font-bold text-amber-700">30 días</span> en vez de 15.
+          Primer cargo recién el {{ onboarding.firstChargeDateShort.value }}.
+        </p>
+      </div>
+    </div>
 
     <!-- Resumen del plan -->
     <div class="border border-slate-200 rounded-2xl p-6 mb-6 bg-slate-50/40">
@@ -252,15 +273,28 @@ const mobileTrustBadges = [
   { title: 'Cancelás en 1 click', desc: 'Sin permanencia.', icon: Clock, color: 'text-violet-500' },
 ]
 
+// Si el lead eligió billing anual, aplicamos 20% off sobre TODOS los conceptos
+// (fee mensual + loyalty add-on). Antes el loyalty no descontaba y generaba
+// disputa de facturación.
+const ANNUAL_DISCOUNT_MULT = 0.8
+const isAnnual = computed(() => onboarding.state.plan.billingCycle === 'annual')
+
 const planSummary = computed(() => {
   const key = onboarding.state.plan.key || onboarding.recommendedPlan.value.key
-  return onboarding.PLAN_TIERS.find((t) => t.key === key) || onboarding.recommendedPlan.value
+  const tier = onboarding.PLAN_TIERS.find((t) => t.key === key) || onboarding.recommendedPlan.value
+  // Devolvemos una copia con el monthlyFee ya descontado si corresponde.
+  // El template usa planSummary.monthlyFee directamente, así que mantener
+  // el descuento acá es la single source of truth para la card.
+  if (isAnnual.value && tier.monthlyFee !== null) {
+    return { ...tier, monthlyFee: Math.round(tier.monthlyFee * ANNUAL_DISCOUNT_MULT) }
+  }
+  return tier
 })
 
 const loyaltyCost = computed(() => {
-  return onboarding.state.plan.addLoyalty
-    ? Number(onboarding.state.business.locations) * 15
-    : 0
+  if (!onboarding.state.plan.addLoyalty) return 0
+  const base = Number(onboarding.state.business.locations) * 15
+  return isAnnual.value ? Math.round(base * ANNUAL_DISCOUNT_MULT) : base
 })
 
 const totalMonthly = computed(() => {

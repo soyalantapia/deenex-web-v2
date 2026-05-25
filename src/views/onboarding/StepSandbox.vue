@@ -392,12 +392,31 @@ async function simulateOrder() {
   onboarding.track('sandbox_order_simulated', { total: pick.total, channel: pick.channel })
 }
 
-const salesByChannel = [
-  { name: 'Salón', pct: 85, amount: 1342, color: 'bg-primary' },
-  { name: 'Take Away', pct: 62, amount: 985, color: 'bg-violet-400' },
-  { name: 'Delivery propio', pct: 45, amount: 712, color: 'bg-emerald-500' },
-  { name: 'Mostrador', pct: 8, amount: 126, color: 'bg-amber-400' },
-]
+// Sales by channel filtrado por los canales reales que eligió el lead en
+// Step Business. Antes era una lista hardcoded — una marca delivery-only
+// veía "Salón 85%" sin sentido. Ahora el demo respeta la realidad operativa
+// del lead, lo que aumenta la credibilidad del dashboard.
+const CHANNEL_DEMO_DATA = {
+  salon: { name: 'Salón', pct: 85, amount: 1342, color: 'bg-primary' },
+  takeaway: { name: 'Take Away', pct: 62, amount: 985, color: 'bg-violet-400' },
+  delivery_own: { name: 'Delivery propio', pct: 45, amount: 712, color: 'bg-emerald-500' },
+  delivery_third: { name: 'Apps de terceros', pct: 30, amount: 478, color: 'bg-rose-400' },
+  glovo: { name: 'Glovo', pct: 12, amount: 178, color: 'bg-amber-400' },
+  whatsapp: { name: 'WhatsApp', pct: 18, amount: 268, color: 'bg-sky-400' },
+}
+const salesByChannel = computed(() => {
+  const ch = onboarding.state.business.channels || []
+  if (!ch.length) {
+    // Fallback al set genérico si no hay channels (no debería pasar pero
+    // protege contra estados parciales).
+    return [
+      CHANNEL_DEMO_DATA.salon,
+      CHANNEL_DEMO_DATA.takeaway,
+      CHANNEL_DEMO_DATA.delivery_own,
+    ]
+  }
+  return ch.map((key) => CHANNEL_DEMO_DATA[key]).filter(Boolean)
+})
 
 const topCustomers = [
   { name: 'María González', emoji: '👩‍🦰', orders: 47, last: 'hoy', ltv: 1842, color: 'bg-rose-100' },

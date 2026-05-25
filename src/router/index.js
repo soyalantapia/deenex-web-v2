@@ -84,21 +84,41 @@ const router = createRouter({
   },
 })
 
+// Storage helper SSR-safe + tolerante a Safari privado, iOS WebView in-app
+// browser (donde a veces localStorage tira SecurityError) y quota llena.
+// Estrategia: probamos localStorage primero, fallback a sessionStorage, y
+// si ambos fallan caemos a un Map en memoria (lifetime: la pestaña).
+const memStorage = new Map()
+function safeReadStorage(key) {
+  if (typeof window === 'undefined') return null
+  try {
+    const v = window.localStorage?.getItem(key)
+    if (v != null) return v
+  } catch { /* private mode / blocked */ }
+  try {
+    const v = window.sessionStorage?.getItem(key)
+    if (v != null) return v
+  } catch { /* sandbox */ }
+  return memStorage.get(key) ?? null
+}
+
 // Step gating: si querés saltar a un step sin haber completado el anterior,
 // te redirigimos al primer step pendiente. Excepción: Enterprise puede llegar
 // directo a /comenzar/listo desde plan con ?enterprise=1.
 router.beforeEach((to, _from, next) => {
   const required = to.meta?.requires
+
+  // Magic link resume: ?resume=token preserva la intención del lead — el guard
+  // lo deja pasar a la ruta target aunque no haya state aún (StepIdentity hace
+  // el redirect al pendiente real una vez que hidrata).
+  if (to.query.resume) return next()
+
   if (!required) return next()
 
-  // Acceso al estado sin acoplar al composable (evita import circular).
   let completedSteps = []
   try {
-    const raw =
-      typeof window !== 'undefined' ? window.localStorage.getItem('deenex_onboarding_v1') : null
-    if (raw) {
-      completedSteps = JSON.parse(raw)?.meta?.completedSteps || []
-    }
+    const raw = safeReadStorage('deenex_onboarding_v1')
+    if (raw) completedSteps = JSON.parse(raw)?.meta?.completedSteps || []
   } catch {
     completedSteps = []
   }

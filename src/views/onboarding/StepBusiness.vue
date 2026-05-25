@@ -228,7 +228,9 @@ const form = reactive({
   locations: onboarding.state.business.locations || 1,
   pos: onboarding.state.business.pos,
   channels: [...onboarding.state.business.channels],
-  acceptedSuggestion: '', // override del subdomain si el original estaba tomado
+  // Hidratamos desde state — si el lead aceptó una sugerencia antes y vuelve
+  // al step, mantenemos la elección.
+  acceptedSuggestion: onboarding.state.business.subdomainOverride || '',
 })
 
 // Mantenemos sincronizado el subdomain preview con el state global mientras
@@ -294,11 +296,26 @@ const effectiveSubdomain = computed(() => {
 
 function acceptSuggestion() {
   if (!domainSuggestion.value) return
-  // Persistimos como override del subdomain.
+  // Persistimos como override del subdomain en el STATE GLOBAL — así Welcome,
+  // Trial y todos los preview/email mocks usan el slug correcto. Antes el
+  // override vivía solo en form local y se perdía al salir del step (P0 bug).
   form.acceptedSuggestion = domainSuggestion.value
+  onboarding.state.business.subdomainOverride = domainSuggestion.value
   domainAvailable.value = true
   onboarding.track('subdomain_suggestion_accepted', { slug: domainSuggestion.value })
 }
+
+// Si el lead cambia el brand después de haber aceptado una sugerencia,
+// limpiamos el override (el slugify del nuevo brand vuelve a tener prioridad).
+watch(
+  () => onboarding.state.business.brand,
+  (newBrand, oldBrand) => {
+    if (newBrand !== oldBrand && form.acceptedSuggestion) {
+      form.acceptedSuggestion = ''
+      onboarding.state.business.subdomainOverride = ''
+    }
+  }
+)
 
 onMounted(() => {
   triggerSubdomainCheck()

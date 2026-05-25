@@ -73,7 +73,10 @@ const props = defineProps({
   required: { type: Boolean, default: false },
 })
 
-const emit = defineEmits(['update:modelValue', 'blur'])
+// `country-change` lo emitimos cada vez que el lead cambia de país. El parent
+// (StepIdentity) escucha y re-valida — antes podía cambiar AR→MX con un número
+// AR inválido para MX y el botón Continuar quedaba habilitado (P0 bug).
+const emit = defineEmits(['update:modelValue', 'blur', 'country-change'])
 
 const countries = [
   { code: 'AR', name: 'Argentina', dial: '+54', flag: '🇦🇷', placeholder: '11 5555-5555' },
@@ -113,6 +116,9 @@ function pickCountry(code) {
   selectedCode.value = code
   open.value = false
   emit('update:modelValue', composeValue())
+  // Notificamos al parent para que re-dispare validación del número con
+  // las reglas del nuevo país (mínimo dígitos, prefijo, etc).
+  emit('country-change', code)
 }
 
 function onInput(raw) {
