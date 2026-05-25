@@ -25,9 +25,6 @@ import {
   Repeat,
   Store,
   Bike,
-  Coffee,
-  Utensils,
-  Megaphone,
 } from 'lucide-vue-next'
 
 export const variantId = 'cadenas-gastronomicas'
@@ -391,160 +388,133 @@ export const calendar = {
  *  2. Deenex Comercio (tarifa simple): 1,5% flat sobre 4 canales.
  *  3. Deenex Activa (performance): cobramos solo sobre la venta atribuida.
  */
+/*
+ * Pricing 2026 — Bundle único escalonado por volumen de pedidos.
+ *
+ * Razonamiento del modelo (acordado con founders):
+ *  - Siempre fee mensual + comisión por venta. Eliminamos la opción "sin pago
+ *    mensual" porque generaba confusión: el modelo de negocio NO contempla
+ *    cobrar solo comisión sin fee.
+ *  - Entry-point: USD 69/mes con hasta 300 pedidos/mes. Cualquier marca nueva
+ *    arranca acá independiente de su tamaño actual.
+ *  - A medida que el volumen crece (300 → 1.000 → 3.000 → 7.500 → 25.000+),
+ *    el plan escala automáticamente al siguiente tier. El fee sube pero la
+ *    comisión baja, porque a mayor volumen el costo por orden es menor.
+ *  - Tagline central: "Empezamos juntos, crecemos juntos."
+ */
 export const pricingModel = {
-  eyebrow: 'Pricing · 2026',
-  headlineLine1: 'Crecé con nosotros.',
-  headlineLine2: 'El precio se ajusta solo.',
-  sidequote:
-    '"Los restaurantes saben cocinar. No saben hacer marketing." — Deenex hace que el cliente vuelva.',
-  divider: 'O si preferís una tarifa simple sin fee mensual',
-  dividerActiva: 'Y para activar tu base de clientes, sin compromiso',
+  sectionId: 'pricing-2026',
+  kicker: 'Pricing 2026 · Bundle único',
+  title: 'Empezás simple.',
+  titleAccent: 'Crecemos con vos.',
+  subtitle:
+    'Un solo plan: fee mensual + comisión por venta. El precio se ajusta automáticamente cuando crece tu volumen — no pagás por capacidad que no usás.',
 
-  // ── 1. Planes mensuales ────────────────────────────────────────
-  plans: {
-    eyebrow: 'Planes mensuales',
-    title: 'Fee fijo + comisión que baja con volumen',
-    subtitle:
-      'Premiamos crecimiento: cuanto más vendés, menor la comisión por transacción. Sin tope de locales por marca.',
-    products: [
-      { key: 'comercio', label: 'Comercio', hint: 'Ecommerce omnicanal · 4 canales bajo tu marca.' },
-      { key: 'partners', label: 'Partners', hint: 'Red de riders para cadenas sin flota propia.' },
-      { key: 'bundle', label: 'Bundle', badge: 'AHORRO', hint: 'Comercio + Partners con descuento sobre el fee combinado.' },
-    ],
-    tiers: [
-      {
-        key: 'starter',
-        name: 'Starter',
-        volume: 'Hasta 300 pedidos',
-        comercio: { fee: 29, pct: '1,5' },
-        partners: { fee: 49, pct: '3,0' },
-        bundle: { list: 78, price: 69 },
-      },
-      {
-        key: 'growth',
-        name: 'Growth',
-        volume: '301 – 1.000 pedidos',
-        comercio: { fee: 119, pct: '1,25' },
-        partners: { fee: 169, pct: '2,75' },
-        bundle: { list: 288, price: 239 },
-        featured: true,
-        featuredLabel: 'Más elegido',
-      },
-      {
-        key: 'scale',
-        name: 'Scale',
-        volume: '1.001 – 3.000 pedidos',
-        comercio: { fee: 269, pct: '1,0' },
-        partners: { fee: 389, pct: '2,5' },
-        bundle: { list: 658, price: 549 },
-      },
-      {
-        key: 'pro',
-        name: 'Pro',
-        volume: '3.001+ pedidos',
-        comercio: { fee: 449, pct: '0,75' },
-        partners: { fee: 649, pct: '2,25' },
-        bundle: { list: 1098, price: 899 },
-      },
-    ],
-    footnote:
-      'USD / mes por marca · Sin tope de locales · Implementación: USD 50 por local · USD 75 con integración POS.',
-  },
+  // ── Hero del Bundle inicial ────────────────────────────────────
+  starterEyebrow: 'Punto de entrada',
+  starterTitle: 'Deenex Full Suite.',
+  starterTitleAccent: 'Todo incluido desde el día uno.',
+  starterDescription:
+    'Canal propio (web + app), Loyalty con Wallet, campañas por WhatsApp y Push, multi-canal (Salón, Take Away, Delivery propio) e integración con tu POS. Sin módulos por separado, sin sorpresas.',
+  starterIncludes: [
+    'Ecommerce + app branded con tu marca',
+    'Loyalty dinámico con niveles VIP y cupones',
+    'WhatsApp + Push automatizado por evento',
+    'Dashboard con KPIs en vivo y reportes',
+    'Integración POS + MercadoPago listo del día 1',
+    'Customer Success durante todo el trial',
+  ],
+  starterPrice: 69,
+  starterCommission: '1,5',
+  starterOrders: 300,
+  starterCtaLabel: 'Empezar 15 días gratis',
 
-  // ── 2. Deenex Comercio: 1,5% flat ─────────────────────────────
-  comercio: {
-    eyebrow: 'Deenex Comercio',
-    headlineLine1: 'Una sola tarifa.',
-    headlineLine2: 'Cuatro canales.',
-    rate: '1,5',
-    rateCaption: 'Por venta procesada',
-    rateDesc: 'El alcance cambia según el canal. El número, nunca.',
-    promiseTitle: 'Sin fee fijo. Sin setup. Sin sorpresas.',
-    promiseDesc:
-      'Cobramos cuando el comercio vende — alineados con su crecimiento, no con el calendario.',
-    channels: [
-      {
-        title: 'Mostrador',
-        rate: '1,5%',
-        scope: 'de todo',
-        desc: 'Cliente siempre identificado por QR ID o DNI al pagar.',
-        icon: ShoppingBag,
-      },
-      {
-        title: 'Take Away',
-        rate: '1,5%',
-        scope: 'de todo',
-        desc: 'Pedido nominal por web o app. Cliente registrado de origen.',
-        icon: Coffee,
-      },
-      {
-        title: 'Salón',
-        rate: '1,5%',
-        scope: 'solo registrados',
-        desc: 'Mesas con QR de identificación. El que no escanea, no entra al cobro.',
-        icon: Utensils,
-      },
-      {
-        title: 'Flota Propia',
-        rate: '1,5%',
-        scope: 'de todo',
-        desc: 'El comercio pone los riders. Nosotros la plataforma.',
-        icon: Bike,
-      },
-    ],
-  },
-
-  partners: {
-    eyebrow: 'Plan complementario',
-    title: 'Deenex Partners — red de riders propia',
-    desc: 'Para comercios sin flota. Combinable con Comercio en el Bundle.',
-    rate: '3',
-    icon: Truck,
-  },
-
-  // ── 3. Deenex Activa: performance ─────────────────────────────
-  activa: {
-    eyebrow: 'Deenex Activa · Marketing por performance',
-    headlineLine1: 'Si no vendés,',
-    headlineLine2: 'no pagás.',
-    desc:
-      'Activamos la base de datos del comercio con campañas automáticas — push, WhatsApp, Meta Ads. Cobramos solo sobre la venta atribuida.',
-    tagline: 'Cero fee mensual. Cero compromiso.',
-    organic: {
-      eyebrow: 'Activación orgánica',
-      title: 'Push, email, WhatsApp, SMS',
-      note: 'Sobre venta atribuida a la campaña.',
-      rate: '10 – 12',
-      icon: Sparkles,
+  // ── Escalera de crecimiento ─────────────────────────────────────
+  scaleEyebrow: 'Tu plan crece cuando vos crecés',
+  scaleTitle: 'Una escalera, no un menú.',
+  scaleSubtitle:
+    'Pasás al siguiente tier cuando superás el volumen del actual. Sin renegociar, sin firmar nada, sin perder data. El sistema lo hace automáticamente al cierre del mes.',
+  scaleHighlightLabel: 'Más común',
+  scaleTiers: [
+    {
+      name: 'Inicio',
+      tagline: 'Marca arrancando o pequeña — 1-3 locales típicos.',
+      ordersLabel: 'Hasta 300',
+      fee: 69,
+      commissionLabel: '1,5%',
     },
-    paid: {
-      eyebrow: 'Activación paga',
-      title: 'Meta Ads, Google Ads',
-      note: 'Sobre venta atribuida — sin contar pauta.',
-      rate: '6 – 7',
-      icon: Megaphone,
+    {
+      name: 'Crecimiento',
+      tagline: 'Operación consolidada — 3-10 locales o alto delivery.',
+      ordersLabel: '301 – 1.000',
+      fee: 169,
+      commissionLabel: '1,25%',
+      highlight: true,
     },
-    example: {
-      eyebrow: 'Ejemplo · cliente Growth',
-      rows: [
-        { label: '800 pedidos / mes · ticket USD 15', value: 'USD 12.000 GMV' },
-        { label: 'Recompra atribuida (~15%)', value: 'USD 1.800' },
-        {
-          label: 'Fee Deenex Activa (~7%)',
-          value: '≈ USD 130 / mes',
-          highlight: true,
-        },
-      ],
+    {
+      name: 'Escala',
+      tagline: 'Cadena con operación 24/7 — 10-30 locales activos.',
+      ordersLabel: '1.001 – 3.000',
+      fee: 349,
+      commissionLabel: '1,0%',
     },
-  },
+    {
+      name: 'Performance',
+      tagline: 'Cadena establecida — 30-100 locales con tráfico alto.',
+      ordersLabel: '3.001 – 7.500',
+      fee: 599,
+      commissionLabel: '0,85%',
+    },
+    {
+      name: 'Pro',
+      tagline: 'Líder de categoría — 100+ locales o eventos masivos.',
+      ordersLabel: '7.501 – 25.000',
+      fee: 1199,
+      commissionLabel: '0,75%',
+    },
+    {
+      name: 'Enterprise',
+      tagline: 'Operación nacional o multi-marca — 25k+ pedidos/mes.',
+      ordersLabel: '25.001+',
+      fee: null,
+      commissionLabel: 'Desde 0,5%',
+    },
+  ],
+  scaleFootnote:
+    'Pedidos = transacciones procesadas por Deenex/mes (online + presencial). Setup USD 0 — implementación incluida. Sin permanencia: cancelás en 1 click cuando quieras.',
 
-  cta: {
-    primaryLabel: 'Calcular mi plan',
-    primaryHref: '#agendar',
-    primaryEvent: 'click_pricing_2026_calcular',
-    secondaryLabel: 'Hablar con ventas →',
-    secondaryHref: '#agendar',
-  },
+  // ── Cómo crecemos juntos ────────────────────────────────────────
+  growthPromises: [
+    {
+      title: 'Tu data te sigue.',
+      body:
+        'Cuando subís de tier, mantenés todo: clientes, campañas, configuración, integraciones. Solo cambia el fee del próximo cargo.',
+    },
+    {
+      title: 'No pagás por capacidad que no usás.',
+      body:
+        'Si tenés un mes flojo y bajás de 1.000 pedidos, volvés al tier anterior automáticamente. El sistema reajusta sin que tengas que pedirlo.',
+    },
+    {
+      title: 'Más volumen = menos comisión.',
+      body:
+        'A medida que crecés, tu comisión por venta baja (de 1,5% en Inicio hasta 0,5% en Enterprise). Tu margen mejora con cada tier.',
+    },
+  ],
+
+  // ── Footer CTA ─────────────────────────────────────────────────
+  ctaTitle: 'Probalo 15 días, sin cargo.',
+  ctaSubtitle:
+    'Activás con MercadoPago, no te cobramos nada hasta el día 16 y podés cancelar en 1 click. Sin permanencia, sin setup fee, sin letra chica.',
+  ctaPrimaryLabel: 'Empezar mi trial',
+  ctaSecondaryLabel: 'Hablar con ventas',
+  ctaSecondaryHref: '#agendar',
+  ctaGuarantees: [
+    'Setup en menos de 30 minutos guiado por CSM real',
+    'MercadoPago oficial — partner certificado',
+    'Cobro recién al día 16 — si cancelás antes, USD 0',
+    'Migración asistida desde apps de terceros',
+  ],
 }
 
 export default {
