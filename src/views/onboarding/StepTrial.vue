@@ -126,55 +126,9 @@
           </div>
         </button>
 
-        <!-- Opción 2: Sin tarjeta -->
-        <button
-          type="button"
-          @click="paymentChoice = 'email_only'"
-          class="w-full text-left rounded-2xl border-2 p-5 transition-all"
-          :class="paymentChoice === 'email_only'
-            ? 'border-primary bg-primary/[0.04]'
-            : 'border-slate-200 hover:border-slate-300'"
-        >
-          <div class="flex items-start gap-4">
-            <div class="w-12 h-12 rounded-xl bg-amber-50 border border-amber-100 flex items-center justify-center shrink-0">
-              <Sparkles class="w-5 h-5 text-amber-500" />
-            </div>
-            <div class="flex-1 min-w-0">
-              <p class="text-sm font-bold text-slate-900">Activar sin tarjeta</p>
-              <p class="text-xs text-slate-500 mt-1 leading-snug">
-                Validamos tu cuenta por email. Probás 15 días; al día 16 te pedimos
-                el método de pago si querés seguir.
-              </p>
-              <!-- Qué cambia con esta opción: bullets explícitos -->
-              <ul class="mt-3 space-y-1.5 text-[11px] text-slate-600">
-                <li class="flex items-start gap-1.5">
-                  <Check class="w-3 h-3 text-emerald-500 shrink-0 mt-0.5" />
-                  Salón, Take Away y Delivery Propio funcionando al 100%
-                </li>
-                <li class="flex items-start gap-1.5">
-                  <Check class="w-3 h-3 text-emerald-500 shrink-0 mt-0.5" />
-                  Hasta {{ trialOrderCap }} pedidos / mes
-                </li>
-                <li class="flex items-start gap-1.5">
-                  <Lock class="w-3 h-3 text-amber-500 shrink-0 mt-0.5" />
-                  Sin campañas pagadas (Meta Ads / Google Ads)
-                </li>
-                <li class="flex items-start gap-1.5">
-                  <Lock class="w-3 h-3 text-amber-500 shrink-0 mt-0.5" />
-                  Onboarding self-serve · sin CSM dedicado las primeras 48h
-                </li>
-              </ul>
-            </div>
-            <div
-              class="w-5 h-5 rounded-full flex items-center justify-center shrink-0 mt-1 border-2"
-              :class="paymentChoice === 'email_only'
-                ? 'bg-primary border-primary'
-                : 'bg-white border-slate-300'"
-            >
-              <Check v-if="paymentChoice === 'email_only'" class="w-3 h-3 text-white" />
-            </div>
-          </div>
-        </button>
+        <!-- Opción "Activar sin tarjeta" removida: forzamos MercadoPago como
+             único método para tener cobranza garantizada al día 16 sin
+             fricción adicional. -->
       </div>
     </div>
 
@@ -242,27 +196,18 @@
 <script setup>
 import { ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
-import { Check, Shield, Clock, FileText, ArrowRight, Sparkles, Lock } from 'lucide-vue-next'
+import { Check, Shield, Clock, FileText, ArrowRight, Lock } from 'lucide-vue-next'
 import { useOnboarding } from '@/composables/useOnboarding'
 
 const router = useRouter()
 const onboarding = useOnboarding()
 const loading = ref(false)
 
-// 'mercadopago' (default · recommended) | 'email_only' (no card, limited features)
+// MercadoPago como único método. El "email_only" fue removido — necesitamos
+// método de pago al activar para garantizar cobranza al día 16 sin fricción.
 const paymentChoice = ref('mercadopago')
 
-const activateButtonLabel = computed(() =>
-  paymentChoice.value === 'mercadopago'
-    ? 'Activar mi cuenta con MercadoPago'
-    : 'Activar mi trial sin tarjeta'
-)
-
-// Cap de pedidos del trial sin tarjeta — para que sea generoso pero acotado.
-const trialOrderCap = computed(() => {
-  const l = Math.max(1, Number(onboarding.state.business.locations) || 1)
-  return l <= 5 ? '500' : l <= 25 ? '1.500' : l <= 70 ? '3.500' : '8.000'
-})
+const activateButtonLabel = computed(() => 'Activar mi cuenta con MercadoPago')
 
 // Trust badges mobile — la versión inline que llena el gap del sidebar
 // desktop-only. Versión compacta para 390px.

@@ -140,13 +140,12 @@ onMounted(() => {
       token: String(resumeToken).slice(0, 8) + '…',
       completed_count: completed.length,
     })
-    const pending = ['business', 'plan', 'preview', 'trial'].find(
+    const pending = ['business', 'plan', 'trial'].find(
       (s) => !completed.includes(s)
     )
     const map = {
       business: '/comenzar/negocio',
       plan: '/comenzar/plan',
-      preview: '/comenzar/preview',
       trial: '/comenzar/activar',
     }
     if (pending && map[pending]) {
@@ -166,13 +165,12 @@ function onResume() {
   showResumeModal.value = false
   onboarding.track('resume_accepted', { completed_count: onboarding.state.meta.completedSteps.length })
   // Saltar al primer step incompleto
-  const pending = ['business', 'plan', 'preview', 'trial'].find(
+  const pending = ['business', 'plan', 'trial'].find(
     (s) => !onboarding.state.meta.completedSteps.includes(s)
   )
   const map = {
     business: '/comenzar/negocio',
     plan: '/comenzar/plan',
-    preview: '/comenzar/preview',
     trial: '/comenzar/activar',
   }
   if (pending) router.push(map[pending])
@@ -249,12 +247,17 @@ function validateAll() {
   ;['fullName', 'email', 'whatsapp'].forEach(validate)
 }
 
+// El cómputo lee directamente los VALORES del form, no `errors`. Los errores
+// se muestran on blur (mejor UX, no spamea al lead mientras tipea) pero el
+// botón "Continuar" reactúa al instante al tipear cada caracter — antes había
+// un bug de doble-click: click #1 disparaba blur del input, validate limpiaba
+// el error, isFormValid pasaba a true, pero el evento click ya había pegado
+// en el botón disabled. Click #2 ya enabled → submit. Ahora no hay race.
 const isFormValid = computed(() => {
   return (
     form.fullName.trim().length >= 2 &&
     /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email.trim()) &&
-    form.whatsapp.replace(/\D/g, '').length >= 8 &&
-    Object.values(errors).every((e) => !e)
+    form.whatsapp.replace(/\D/g, '').length >= 8
   )
 })
 

@@ -37,8 +37,18 @@
             <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3">
               +500 sucursales ya operan con Deenex
             </p>
-            <div class="flex items-center gap-3 flex-wrap">
-              <span v-for="b in brands" :key="b" class="text-xs font-semibold text-slate-500">{{ b }}</span>
+            <!-- Logos reales de clientes (los mismos que aparecen en la landing).
+                 Filtro grayscale + opacidad para no robar protagonismo a la card
+                 principal, pero suficiente para reconocer las marcas. -->
+            <div class="grid grid-cols-3 gap-x-4 gap-y-3 items-center">
+              <img
+                v-for="b in brandLogos"
+                :key="b.name"
+                :src="b.src"
+                :alt="b.name"
+                class="h-5 w-auto max-w-[80px] object-contain opacity-70 grayscale hover:grayscale-0 hover:opacity-100 transition-all"
+                loading="lazy"
+              />
             </div>
           </div>
         </div>
@@ -204,7 +214,23 @@ const props = defineProps({
   recommendedPlanCommission: { type: String, default: '1,25%' },
 })
 
-const brands = ['Palta', 'Hatsu', 'Coquitos', 'Monti', 'Glorias', 'Quem']
+// Logos reales de clientes — los mismos `.webp` que usa la landing en el
+// social proof del Hero. Vite resuelve el path al asset hashed en build.
+import paltaLogo from '@/assets/images/clients/palta.webp'
+import hatsuLogo from '@/assets/images/clients/hatsu.webp'
+import coquitosLogo from '@/assets/images/clients/coquitos.webp'
+import montiLogo from '@/assets/images/clients/monti.webp'
+import gloriasLogo from '@/assets/images/clients/glorias.webp'
+import quemLogo from '@/assets/images/clients/quem.webp'
+
+const brandLogos = [
+  { name: 'Palta', src: paltaLogo },
+  { name: 'Hatsu', src: hatsuLogo },
+  { name: 'Coquitos', src: coquitosLogo },
+  { name: 'Monti', src: montiLogo },
+  { name: 'Glorias', src: gloriasLogo },
+  { name: 'Qüem', src: quemLogo },
+]
 
 const deenexFeeLabel = computed(() => `+${props.recommendedPlanCommission}`)
 

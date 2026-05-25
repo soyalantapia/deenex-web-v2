@@ -30,6 +30,9 @@ const DEFAULT_STATE = {
     brand: '',
     locations: 1,
     pos: '', // 'maxirest' | 'odoo' | 'other' | 'none'
+    // Si pos === 'other', acá guardamos el nombre que escriba el lead
+    // (lo necesita el CSM para preparar la integración antes del setup).
+    posOther: '',
     channels: [], // ['salon', 'takeaway', 'delivery_own', 'delivery_third']
     // ROI inputs reales del lead (editados en Step Plan)
     avgTicketUsd: null, // null = usar default por volumen
@@ -406,7 +409,7 @@ const subdomainPreview = computed(() => {
 })
 
 // ── Step gating ──────────────────────────────────────────────────────────
-const STEP_ORDER = ['identity', 'business', 'plan', 'preview', 'trial', 'welcome']
+const STEP_ORDER = ['identity', 'business', 'plan', 'trial', 'welcome']
 
 function isStepUnlocked(stepKey) {
   if (stepKey === 'identity') return true

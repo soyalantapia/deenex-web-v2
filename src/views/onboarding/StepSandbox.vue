@@ -401,7 +401,7 @@ const CHANNEL_DEMO_DATA = {
   takeaway: { name: 'Take Away', pct: 62, amount: 985, color: 'bg-violet-400' },
   delivery_own: { name: 'Delivery propio', pct: 45, amount: 712, color: 'bg-emerald-500' },
   delivery_third: { name: 'Apps de terceros', pct: 30, amount: 478, color: 'bg-rose-400' },
-  glovo: { name: 'Glovo', pct: 12, amount: 178, color: 'bg-amber-400' },
+  app_own: { name: 'App propia', pct: 38, amount: 568, color: 'bg-amber-400' },
   whatsapp: { name: 'WhatsApp', pct: 18, amount: 268, color: 'bg-sky-400' },
 }
 const salesByChannel = computed(() => {

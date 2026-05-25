@@ -1,7 +1,7 @@
 <template>
   <form @submit.prevent="onSubmit" novalidate>
     <p class="text-[11px] font-black text-primary uppercase tracking-[0.2em] mb-3">
-      Paso 3 de 6
+      Paso 4 de 5
     </p>
     <h1 class="text-[clamp(1.8rem,4vw,2.6rem)] font-extrabold tracking-tighter leading-[1.05] text-slate-900 mb-4">
       <template v-if="onboarding.greeting.value">
@@ -14,110 +14,10 @@
       </template>
     </h1>
     <p class="text-base text-slate-500 leading-relaxed mb-6 max-w-md">
-      Calculado en base a tus
+      Para tus
       <span class="font-bold text-slate-900">{{ onboarding.state.business.locations }} {{ onboarding.state.business.locations === 1 ? 'local' : 'locales' }}</span>.
       Activás gratis hoy y pagás solo si te convence al día 16.
     </p>
-
-    <!-- Personalización por canal: si trabaja con apps de terceros, mensaje especial -->
-    <div
-      v-if="usesThirdPartyApps && !isEnterprise"
-      class="rounded-2xl border-2 border-amber-200 bg-amber-50/50 p-4 mb-4 flex items-start gap-3"
-    >
-      <div class="w-9 h-9 rounded-lg bg-amber-500 flex items-center justify-center shrink-0">
-        <Zap class="w-5 h-5 text-white" />
-      </div>
-      <div class="min-w-0">
-        <p class="text-sm font-bold text-slate-900 leading-tight mb-1">
-          Te ayudamos a migrar de apps de terceros.
-        </p>
-        <p class="text-xs text-slate-600 leading-snug">
-          Nuestro Customer Success te guía para recuperar el margen del 25% que
-          hoy le pagás a Rappi, PedidosYa o Uber Eats. La migración promedio
-          de las marcas en Deenex demora 14 días.
-        </p>
-      </div>
-    </div>
-
-    <!-- 1️⃣ PRIMERO: calculadora ROI editable. Le pedimos los números reales -->
-    <RoiCalculator v-if="!isEnterprise" />
-
-    <!-- 2️⃣ DESPUÉS: savings hero proyectado con sus números ──────────── -->
-    <div
-      v-if="onboarding.savingsVsThirdParty.value > 0 && !isEnterprise"
-      class="relative bg-emerald-500 text-white rounded-3xl p-6 mb-4 overflow-hidden"
-    >
-      <div class="absolute inset-0 bg-gradient-to-br from-white/10 via-transparent to-emerald-700/40 pointer-events-none"></div>
-      <div class="relative flex items-start gap-4">
-        <div class="w-12 h-12 rounded-2xl bg-white/15 backdrop-blur-sm flex items-center justify-center shrink-0">
-          <TrendingDown class="w-6 h-6 text-white" />
-        </div>
-        <div class="min-w-0 flex-1">
-          <p class="text-[10px] font-black uppercase tracking-widest text-white/70 mb-1">
-            Tu ahorro proyectado
-            <span v-if="onboarding.hasCustomRoiInputs.value" class="text-emerald-100 ml-1">· con tus números</span>
-          </p>
-          <p class="text-3xl sm:text-4xl font-black tabular-nums tracking-tighter leading-none">
-            USD <AnimatedNumber :value="onboarding.savingsVsThirdParty.value" :duration="1100" />
-            <span class="text-base font-bold text-white/80">/ mes</span>
-          </p>
-          <p class="text-sm text-white/90 mt-2 leading-snug">
-            vs lo que te cobrarían PedidosYa, Rappi o Uber Eats por el mismo volumen
-            ({{ totalOrdersLabel }} pedidos · ticket USD {{ onboarding.effectiveTicket.value }} · 25% de comisión).
-          </p>
-
-          <!-- Break-even visual -->
-          <div v-if="onboarding.breakEvenDays.value !== null" class="mt-4 pt-4 border-t border-white/20">
-            <div class="flex items-center justify-between mb-2">
-              <span class="text-[10px] font-black uppercase tracking-widest text-white/70">Break-even del fee</span>
-              <span class="text-xs font-bold text-white">
-                Día {{ onboarding.breakEvenDays.value }} del mes
-              </span>
-            </div>
-            <div class="h-2 bg-white/20 rounded-full overflow-hidden relative">
-              <div
-                class="h-full bg-white rounded-full"
-                :style="{ width: ((onboarding.breakEvenDays.value / 30) * 100) + '%' }"
-              ></div>
-              <div class="absolute inset-y-0 right-0 w-px bg-white/50"></div>
-            </div>
-            <p class="text-[11px] text-white/80 leading-snug mt-2">
-              Tu ahorro vs apps cubre el costo de Deenex en {{ onboarding.breakEvenDays.value }} días.
-              Los {{ 30 - onboarding.breakEvenDays.value }} restantes del mes son ganancia neta.
-            </p>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Comparison Sin Deenex vs Con Deenex ──────────────────────────── -->
-    <div
-      v-if="!isEnterprise"
-      class="grid grid-cols-2 gap-3 mb-8"
-    >
-      <div class="rounded-2xl border border-slate-200 p-4 bg-slate-50/40">
-        <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">
-          Sin Deenex
-        </p>
-        <p class="text-2xl font-black text-slate-400 line-through tabular-nums tracking-tighter mb-1">
-          USD <AnimatedNumber :value="thirdPartyMonthly" :duration="1400" />
-        </p>
-        <p class="text-[11px] text-slate-400 leading-snug">
-          Comisión típica de apps de terceros (25% sobre GMV).
-        </p>
-      </div>
-      <div class="rounded-2xl border-2 border-primary bg-primary/[0.04] p-4">
-        <p class="text-[10px] font-black text-primary uppercase tracking-widest mb-2">
-          Con Deenex
-        </p>
-        <p class="text-2xl font-black text-primary tabular-nums tracking-tighter mb-1">
-          USD <AnimatedNumber :value="deenexMonthly" :duration="1400" />
-        </p>
-        <p class="text-[11px] text-slate-600 leading-snug">
-          Fee fijo + {{ recommendedPlan.commissionPct }}% por venta procesada.
-        </p>
-      </div>
-    </div>
 
     <!-- Toggle mensual/anual — anual 20% off. Cobranza estándar SaaS para
          mejorar cash flow + reducir churn. -->
@@ -333,7 +233,7 @@
     <StepActions
       :next-label="isEnterprise ? 'Hablar con ventas' : 'Activar trial gratis'"
       :disabled="false"
-      @back="$router.push('/comenzar/negocio')"
+      @back="$router.push('/comenzar/ahorro')"
     />
 
     <p class="mt-6 text-[11px] text-slate-400 leading-relaxed">
@@ -345,9 +245,7 @@
 <script setup>
 import { reactive, computed, watch } from 'vue'
 import { useRouter } from 'vue-router'
-import { TrendingDown, Zap, Check } from 'lucide-vue-next'
-import AnimatedNumber from '@/components/onboarding/AnimatedNumber.vue'
-import RoiCalculator from '@/components/onboarding/RoiCalculator.vue'
+import { Check } from 'lucide-vue-next'
 import StepActions from '@/components/onboarding/StepActions.vue'
 import Tooltip from '@/components/onboarding/Tooltip.vue'
 import { useOnboarding } from '@/composables/useOnboarding'
@@ -385,25 +283,6 @@ const isEnterprise = computed(() => effectivePlanKey.value === 'enterprise')
 
 const selectablePlans = computed(() => onboarding.PLAN_TIERS)
 
-const formattedSavings = computed(() => onboarding.savingsVsThirdParty.value.toLocaleString('es-AR'))
-
-// Reutilizamos los computeds del composable, que ya respetan los inputs
-// editados por el lead en la calculadora (single source of truth).
-const totalOrdersLabel = computed(() => {
-  const locations = Math.max(1, Number(onboarding.state.business.locations) || 1)
-  return (locations * onboarding.effectiveOrders.value).toLocaleString('es-AR')
-})
-
-const thirdPartyMonthly = computed(() => onboarding.thirdPartyMonthlyFee.value)
-const deenexMonthly = computed(() => onboarding.deenexMonthlyCost.value)
-
-// Si el lead seleccionó apps de terceros como canal actual, ofrecemos un
-// mensaje de migración asistida que aumenta la conversión en ese segmento.
-const usesThirdPartyApps = computed(() => {
-  const channels = onboarding.state.business.channels || []
-  return channels.includes('delivery_third') || channels.includes('glovo')
-})
-
 function planVolumeLabel(tier) {
   if (tier.key === 'enterprise') return '200+ locales'
   if (tier.minLocations === tier.maxLocations) return `${tier.minLocations} local`
@@ -420,7 +299,7 @@ function onSubmit() {
   if (isEnterprise.value) {
     router.push('/comenzar/listo?enterprise=1')
   } else {
-    router.push('/comenzar/preview')
+    router.push('/comenzar/activar')
   }
 }
 </script>

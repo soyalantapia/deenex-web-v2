@@ -322,11 +322,14 @@ import { useOnboarding } from '@/composables/useOnboarding'
 const route = useRoute()
 const onboarding = useOnboarding()
 
+// Flow: identity → business → savings → plan → trial → welcome (6 steps).
+// El step 'preview' (sandbox) fue removido para reducir fricción. El step
+// 'savings' separa la presentación del ahorro de la elección del plan.
 const steps = [
   { key: 'identity', label: 'Vos', path: '/comenzar' },
   { key: 'business', label: 'Tu marca', path: '/comenzar/negocio' },
+  { key: 'savings', label: 'Tu ahorro', path: '/comenzar/ahorro' },
   { key: 'plan', label: 'Plan', path: '/comenzar/plan' },
-  { key: 'preview', label: 'Vista previa', path: '/comenzar/preview' },
   { key: 'trial', label: 'Activar', path: '/comenzar/activar' },
   { key: 'welcome', label: 'Listo', path: '/comenzar/listo' },
 ]
@@ -471,8 +474,8 @@ function applyStepHead() {
   const stepInfo = steps[activeStepIndex.value]
   const stepName = stepInfo?.key === 'identity' ? 'Tus datos'
     : stepInfo?.key === 'business' ? 'Tu marca'
+    : stepInfo?.key === 'savings' ? 'Tu ahorro'
     : stepInfo?.key === 'plan' ? 'Elegir plan'
-    : stepInfo?.key === 'preview' ? 'Vista previa'
     : stepInfo?.key === 'trial' ? 'Activar trial'
     : 'Listo'
   document.title = `Paso ${activeStepIndex.value + 1}/${steps.length} · ${stepName} · Deenex`
@@ -518,7 +521,7 @@ function onKeyDown(e) {
 
 function onBeforeUnload(e) {
   const completed = onboarding.state.meta.completedSteps.length
-  if (completed > 0 && completed < 4 && route.path !== '/comenzar/listo') {
+  if (completed > 0 && completed < 3 && route.path !== '/comenzar/listo') {
     e.preventDefault()
     // Chrome ignora el mensaje custom pero el dialog igual aparece.
     e.returnValue = 'Tu progreso queda guardado pero estás por salir del onboarding.'

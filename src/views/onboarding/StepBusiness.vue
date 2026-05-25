@@ -154,6 +154,23 @@
             </span>
           </button>
         </div>
+        <!-- Input adicional para "Otro POS": cuando el lead selecciona "Otro"
+             le preguntamos cuál usa. Le entra al CSM como contexto para el
+             setup de la integración. -->
+        <Transition name="other-pos">
+          <div v-if="form.pos === 'other'" class="mt-3">
+            <input
+              v-model="form.posOther"
+              type="text"
+              placeholder="¿Cuál? Ej: Bistrosoft, Restaurant.com, Square…"
+              maxlength="60"
+              class="w-full px-4 py-3 rounded-xl bg-white border-2 border-slate-200 focus:border-primary text-sm text-slate-900 placeholder-slate-400 focus:outline-none transition-colors"
+            />
+            <p class="text-[11px] text-slate-400 mt-1.5 leading-snug">
+              Lo usamos para preparar la integración antes de tu setup.
+            </p>
+          </div>
+        </Transition>
       </div>
 
       <!-- Canales actuales -->
@@ -227,6 +244,7 @@ const form = reactive({
   brand: onboarding.state.business.brand || inferredBrand,
   locations: onboarding.state.business.locations || 1,
   pos: onboarding.state.business.pos,
+  posOther: onboarding.state.business.posOther || '',
   channels: [...onboarding.state.business.channels],
   // Hidratamos desde state — si el lead aceptó una sugerencia antes y vuelve
   // al step, mantenemos la elección.
@@ -338,7 +356,7 @@ const channelOptions = [
   { value: 'takeaway', label: 'Take Away', desc: 'Pedido al mostrador o por QR.' },
   { value: 'delivery_own', label: 'Delivery propio', desc: 'Tenés flota o repartidores.' },
   { value: 'delivery_third', label: 'PedidosYa / Rappi / Uber Eats', desc: 'Apps de terceros con comisión.' },
-  { value: 'glovo', label: 'Glovo', desc: 'Si operás en LATAM con Glovo activo.' },
+  { value: 'app_own', label: 'App propia', desc: 'Ya tenés app o web propia con pedidos online.' },
   { value: 'whatsapp', label: 'WhatsApp', desc: 'Pedidos por mensaje sin sistema.' },
 ]
 
@@ -385,9 +403,12 @@ function onSubmit() {
     brand: form.brand.trim(),
     locations: Number(form.locations),
     pos: form.pos,
+    // Solo enviamos posOther si seleccionaron "Otro", para no contaminar
+    // el state con valores stale al cambiar de POS.
+    posOther: form.pos === 'other' ? form.posOther.trim() : '',
     channels: [...form.channels],
   })
-  router.push('/comenzar/plan')
+  router.push('/comenzar/ahorro')
 }
 </script>
 
@@ -420,5 +441,22 @@ function onSubmit() {
 }
 input[type='range'] {
   touch-action: none;
+}
+/* Animación del input "Otro POS" — slide+fade al aparecer. */
+.other-pos-enter-active,
+.other-pos-leave-active {
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  overflow: hidden;
+}
+.other-pos-enter-from,
+.other-pos-leave-to {
+  opacity: 0;
+  max-height: 0;
+  transform: translateY(-4px);
+}
+.other-pos-enter-to,
+.other-pos-leave-from {
+  opacity: 1;
+  max-height: 100px;
 }
 </style>
