@@ -1,5 +1,7 @@
 <template>
-  <form @submit.prevent="onSubmit" novalidate v-autofocus>
+  <!-- Step Business: form con inputs cortos + grids 2-col. max-w-2xl da
+       buen respiro para los grids de POS/canales sin que queden anchísimos. -->
+  <form @submit.prevent="onSubmit" novalidate v-autofocus class="max-w-2xl">
     <p class="text-[11px] font-black text-primary uppercase tracking-[0.2em] mb-3">
       Paso 2 de 6
     </p>

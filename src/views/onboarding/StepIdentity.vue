@@ -1,5 +1,7 @@
 <template>
-  <div>
+  <!-- Step Identity: inputs cortos (nombre, email, whatsapp), un max-w-xl
+       local mantiene el form compacto aunque el layout permita full-width. -->
+  <div class="max-w-xl">
     <ResumeModal
       :show="showResumeModal"
       :progress-summary="progressSummary"

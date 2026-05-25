@@ -115,13 +115,12 @@
            1.4fr_1fr que daba ~42% al panel — demasiado para una columna
            informativa. Ahora siempre 320px independiente del viewport. -->
       <div class="grid lg:grid-cols-[minmax(0,1fr)_320px] gap-10 lg:gap-12 items-start">
-        <!-- Main column -->
-        <div class="max-w-xl">
-          <!-- Antes usábamos Transition mode="out-in" entre steps, pero
-               provocaba pantalla blanca al navegar /ahorro → /plan en SPA
-               mode (componente quedaba atascado en la transición). Removida
-               la transition por estabilidad; el step changes feel instantáneo
-               pero no rompe el render. -->
+        <!-- Main column — sin max-width hard cap. Antes era max-w-xl (576px)
+             y eso limitaba al form del Plan que tiene cards anchas (tabla de
+             tiers). Ahora ocupa la totalidad del espacio asignado por el grid.
+             Cada Step puede agregar su propio max-w-* a los párrafos largos
+             para no quedar wall-of-text. -->
+        <div class="min-w-0">
           <RouterView />
         </div>
 
