@@ -118,15 +118,17 @@ function safeReadStorage(key) {
 // Step gating: si querés saltar a un step sin haber completado el anterior,
 // te redirigimos al primer step pendiente. Excepción: Enterprise puede llegar
 // directo a /comenzar/listo desde plan con ?enterprise=1.
-router.beforeEach((to, _from, next) => {
+// Guards en Vue Router 4 — return value en lugar de next(value). Antes
+// usábamos `next(map[pending])` que estaba deprecated y rompía la navegación
+// en algunos casos (síntoma: pantalla blanca al pasar de /ahorro → /plan en
+// SPA mode, ok al recargar).
+router.beforeEach((to) => {
   const required = to.meta?.requires
 
-  // Magic link resume: ?resume=token preserva la intención del lead — el guard
-  // lo deja pasar a la ruta target aunque no haya state aún (StepIdentity hace
-  // el redirect al pendiente real una vez que hidrata).
-  if (to.query.resume) return next()
+  // Magic link resume: ?resume=token preserva la intención del lead.
+  if (to.query.resume) return true
 
-  if (!required) return next()
+  if (!required) return true
 
   let completedSteps = []
   try {
@@ -136,14 +138,13 @@ router.beforeEach((to, _from, next) => {
     completedSteps = []
   }
 
-  // Welcome con flag enterprise está permitido aunque "trial" no esté completo,
-  // porque Enterprise saltea el step de checkout.
+  // Welcome con flag enterprise está permitido aunque "trial" no esté completo.
   if (to.name === 'onboarding-welcome' && to.query.enterprise === '1') {
-    return next()
+    return true
   }
 
   if (completedSteps.includes(required)) {
-    return next()
+    return true
   }
 
   // Redirige al primer step pendiente.
@@ -155,7 +156,7 @@ router.beforeEach((to, _from, next) => {
     plan: '/comenzar/plan',
     trial: '/comenzar/activar',
   }
-  return next(map[pending])
+  return map[pending]
 })
 
 export default router

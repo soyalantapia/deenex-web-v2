@@ -2,7 +2,10 @@
   <aside class="hidden lg:block sticky top-32">
     <Transition name="panel" mode="out-in">
       <!-- IDENTITY · MARCA — social proof + guarantee ─────────────────── -->
-      <div v-if="mode === 'identity' || mode === 'business'" key="trust" class="bg-slate-50/60 border border-slate-200 rounded-3xl p-7 relative overflow-hidden">
+      <!-- Identity, Business y Savings comparten el mismo card "Trial 15 días"
+           (sin cargo hoy + garantías + logos clientes). Estos 3 steps son
+           pre-conversión, sin contexto de plan elegido. -->
+      <div v-if="mode === 'identity' || mode === 'business' || mode === 'savings'" key="trust" class="bg-slate-50/60 border border-slate-200 rounded-3xl p-7 relative overflow-hidden">
         <div class="absolute inset-0 bg-gradient-to-br from-primary/[0.05] to-transparent pointer-events-none"></div>
         <div class="relative">
           <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 text-primary text-[10px] font-bold uppercase tracking-wider mb-5">

@@ -117,11 +117,12 @@
       <div class="grid lg:grid-cols-[minmax(0,1fr)_320px] gap-10 lg:gap-12 items-start">
         <!-- Main column -->
         <div class="max-w-xl">
-          <RouterView v-slot="{ Component }">
-            <Transition name="step" mode="out-in">
-              <component :is="Component" />
-            </Transition>
-          </RouterView>
+          <!-- Antes usábamos Transition mode="out-in" entre steps, pero
+               provocaba pantalla blanca al navegar /ahorro → /plan en SPA
+               mode (componente quedaba atascado en la transición). Removida
+               la transition por estabilidad; el step changes feel instantáneo
+               pero no rompe el render. -->
+          <RouterView />
         </div>
 
         <!-- Side panel: contenido cambia según el step activo -->

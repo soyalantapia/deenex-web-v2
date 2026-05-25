@@ -341,14 +341,17 @@ onMounted(() => {
 
 const errors = reactive({ brand: '', channels: '' })
 
+// Lista completa de POS gastronómicos populares en LATAM. Orden alfabético
+// (menos "No tengo POS" y "Otro" que van al final como casos especiales).
 const posOptions = [
-  { value: 'maxirest', label: 'Maxirest' },
+  { value: 'ayresit', label: 'Ayresit' },
   { value: 'fudo', label: 'Fudo' },
+  { value: 'bistrosoft', label: 'Bistrosoft' },
+  { value: 'maxirest', label: 'Maxirest' },
   { value: 'odoo', label: 'Odoo' },
-  { value: 'bsale', label: 'Bsale' },
   { value: 'tango', label: 'Tango' },
-  { value: 'other', label: 'Otro POS' },
   { value: 'none', label: 'No tengo POS' },
+  { value: 'other', label: 'Otro' },
 ]
 
 const channelOptions = [

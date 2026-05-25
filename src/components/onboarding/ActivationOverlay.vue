@@ -15,52 +15,53 @@
     <Transition name="activation-overlay">
       <div
         v-if="show"
-        class="fixed inset-0 z-[10000] bg-gradient-to-br from-primary via-[#3c1fc9] to-slate-900 flex items-center justify-center p-4"
+        class="fixed inset-0 z-[10000] bg-white flex items-center justify-center p-4 overflow-y-auto"
       >
-        <!-- Glow effects de fondo -->
-        <div class="absolute top-20 left-20 w-96 h-96 rounded-full bg-emerald-400/20 blur-[120px] pointer-events-none"></div>
-        <div class="absolute bottom-20 right-20 w-96 h-96 rounded-full bg-primary/30 blur-[120px] pointer-events-none animate-pulse"></div>
+        <!-- Glow sutil de marca: pequeños halos primary + emerald en las
+             esquinas para que no sea un blanco plano puro, pero el fondo
+             principal se mantiene blanco como el resto del onboarding. -->
+        <div class="absolute top-0 left-0 w-[480px] h-[480px] rounded-full bg-primary/[0.06] blur-[140px] pointer-events-none"></div>
+        <div class="absolute bottom-0 right-0 w-[420px] h-[420px] rounded-full bg-emerald-400/10 blur-[140px] pointer-events-none"></div>
 
         <div class="relative max-w-lg w-full">
           <!-- Header -->
           <div class="text-center mb-8">
-            <div class="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-white/10 backdrop-blur-sm border border-white/15 mb-5">
-              <!-- Spinner pulsante -->
-              <div class="w-8 h-8 rounded-full border-[3px] border-white/30 border-t-white animate-spin"></div>
+            <div class="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-primary/10 border border-primary/15 mb-5">
+              <div class="w-8 h-8 rounded-full border-[3px] border-primary/20 border-t-primary animate-spin"></div>
             </div>
-            <p class="text-[10px] font-black text-white/60 uppercase tracking-[0.25em] mb-2">
+            <p class="text-[10px] font-black text-primary uppercase tracking-[0.25em] mb-2">
               Activando tu cuenta
             </p>
-            <h2 class="text-2xl sm:text-3xl font-extrabold text-white tracking-tighter leading-tight">
+            <h2 class="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tighter leading-tight">
               {{ activeStep ? activeStep.title : 'Conectando…' }}
             </h2>
-            <p class="text-sm text-white/70 mt-2 leading-relaxed">
+            <p class="text-sm text-slate-500 mt-2 leading-relaxed">
               {{ activeStep?.description || '' }}
             </p>
           </div>
 
-          <!-- Lista de pasos con animación -->
-          <div class="rounded-2xl bg-white/[0.08] backdrop-blur-md border border-white/10 p-5">
+          <!-- Lista de pasos -->
+          <div class="rounded-2xl bg-slate-50/60 border border-slate-200 p-5">
             <ul class="space-y-3">
               <li
                 v-for="(step, i) in steps"
                 :key="step.key"
                 class="flex items-start gap-3 transition-all"
-                :class="{ 'opacity-50': step.status === 'pending' }"
+                :class="{ 'opacity-60': step.status === 'pending' }"
               >
                 <!-- Status icon -->
                 <span
                   class="w-7 h-7 rounded-full flex items-center justify-center shrink-0 transition-all"
                   :class="{
-                    'bg-emerald-400 text-emerald-950 scale-100': step.status === 'done',
-                    'bg-white/15 text-white': step.status === 'doing',
-                    'bg-white/5 text-white/40': step.status === 'pending',
+                    'bg-emerald-500 text-white': step.status === 'done',
+                    'bg-primary/10 text-primary': step.status === 'doing',
+                    'bg-slate-100 text-slate-400': step.status === 'pending',
                   }"
                 >
                   <Check v-if="step.status === 'done'" class="w-3.5 h-3.5" stroke-width="3" />
                   <span
                     v-else-if="step.status === 'doing'"
-                    class="w-3 h-3 rounded-full border-2 border-white/40 border-t-white animate-spin"
+                    class="w-3 h-3 rounded-full border-2 border-primary/30 border-t-primary animate-spin"
                   ></span>
                   <span v-else class="text-[10px] font-black tabular-nums">{{ i + 1 }}</span>
                 </span>
@@ -68,16 +69,16 @@
                 <div class="flex-1 min-w-0 pt-0.5">
                   <p
                     class="text-sm font-bold leading-tight transition-colors"
-                    :class="step.status === 'done' ? 'text-white' : step.status === 'doing' ? 'text-white' : 'text-white/50'"
+                    :class="step.status === 'done' || step.status === 'doing' ? 'text-slate-900' : 'text-slate-400'"
                   >
                     {{ step.title }}
                   </p>
                   <p
                     v-if="step.status === 'doing' || step.status === 'done'"
-                    class="text-[11px] text-white/60 mt-0.5 leading-snug"
+                    class="text-[11px] text-slate-500 mt-0.5 leading-snug"
                   >
                     <template v-if="step.status === 'done' && step.doneText">
-                      <Check class="w-2.5 h-2.5 inline -mt-0.5 mr-0.5 text-emerald-400" stroke-width="3" />
+                      <Check class="w-2.5 h-2.5 inline -mt-0.5 mr-0.5 text-emerald-500" stroke-width="3" />
                       {{ step.doneText }}
                     </template>
                     <template v-else-if="step.status === 'doing'">
@@ -86,16 +87,15 @@
                   </p>
                 </div>
 
-                <!-- Time indicator -->
                 <span
                   v-if="step.status === 'doing'"
-                  class="text-[10px] font-bold text-white/40 tabular-nums uppercase tracking-widest mt-1.5 whitespace-nowrap"
+                  class="text-[10px] font-bold text-slate-400 tabular-nums uppercase tracking-widest mt-1.5 whitespace-nowrap"
                 >
                   ~{{ step.estimatedSec }}s
                 </span>
                 <span
                   v-else-if="step.status === 'done'"
-                  class="text-[10px] font-bold text-emerald-400 uppercase tracking-widest mt-1.5 whitespace-nowrap"
+                  class="text-[10px] font-bold text-emerald-600 uppercase tracking-widest mt-1.5 whitespace-nowrap"
                 >
                   Listo
                 </span>
@@ -103,24 +103,23 @@
             </ul>
 
             <!-- Progress bar -->
-            <div class="mt-5 h-1 rounded-full bg-white/10 overflow-hidden">
+            <div class="mt-5 h-1.5 rounded-full bg-slate-200 overflow-hidden">
               <div
-                class="h-full rounded-full bg-emerald-400 transition-all duration-500"
+                class="h-full rounded-full bg-primary transition-all duration-500"
                 :style="{ width: progressPct + '%' }"
               ></div>
             </div>
-            <div class="mt-2 flex items-center justify-between gap-3">
-              <p class="text-[10px] font-bold text-white/60 uppercase tracking-widest tabular-nums">
+            <div class="mt-2.5 flex items-center justify-between gap-3">
+              <p class="text-[10px] font-bold text-slate-500 uppercase tracking-widest tabular-nums">
                 {{ doneCount }}/{{ steps.length }} pasos
               </p>
-              <p class="text-[10px] font-bold text-white/60 uppercase tracking-widest tabular-nums">
+              <p class="text-[10px] font-bold text-slate-500 uppercase tracking-widest tabular-nums">
                 {{ remainingSec }}s restantes
               </p>
             </div>
           </div>
 
-          <!-- Footer info -->
-          <p class="mt-5 text-center text-[11px] text-white/50 leading-relaxed">
+          <p class="mt-5 text-center text-[11px] text-slate-400 leading-relaxed">
             No cierres la pestaña. En {{ remainingSec || '~5' }} segundos
             estás operando.
           </p>

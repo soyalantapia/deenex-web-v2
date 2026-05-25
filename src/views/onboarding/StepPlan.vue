@@ -174,85 +174,83 @@
     </figure>
 
     <!-- Escalera de crecimiento — INFORMATIVA, no seleccionable.
-         "Estás acá" siempre marca Inicio (USD 69) — ahí arranca todo el mundo.
-         Si el lead declaró un volumen alto (projectedTier > Inicio), también
-         marcamos ese tier con "Acá vas a llegar" como roadmap motivacional. -->
+         "Estás acá" siempre marca Inicio (USD 69). Si declaró volumen alto,
+         "Próxima parada" señala el projectedTier como roadmap. Layout más
+         respirado que la versión anterior (grid colapsado): cards stacked
+         con padding generoso. -->
     <div v-if="!isEnterprise" class="mb-8">
-      <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3">
+      <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-4">
         Cuando crezcas, tu plan crece con vos
       </p>
-      <div class="rounded-2xl border border-slate-200 bg-white overflow-hidden">
-        <!-- Header (desktop) -->
-        <div class="hidden sm:grid grid-cols-[1.4fr_1fr_auto_auto] gap-4 px-5 py-2.5 bg-slate-50 border-b border-slate-200 text-[10px] font-black text-slate-400 uppercase tracking-widest">
-          <span>Tier</span>
-          <span class="text-right">Pedidos/mes</span>
-          <span class="text-right whitespace-nowrap">Fee</span>
-          <span class="text-right whitespace-nowrap">Comisión</span>
-        </div>
-        <!-- Filas -->
+      <div class="space-y-2.5">
         <div
           v-for="tier in selectablePlans"
           :key="tier.key"
-          class="grid grid-cols-1 sm:grid-cols-[1.4fr_1fr_auto_auto] gap-2 sm:gap-4 px-5 py-3 transition-colors"
+          class="rounded-2xl border-2 px-5 py-4 transition-colors"
           :class="[
-            tier.key === recommendedPlan.key ? 'bg-primary/[0.04] sm:bg-primary/[0.05]' : '',
-            tier.key === projectedTier.key && projectedTier.key !== recommendedPlan.key ? 'bg-emerald-50/40' : '',
-            'border-b border-slate-100 last:border-b-0',
+            tier.key === recommendedPlan.key
+              ? 'border-primary bg-primary/[0.04]'
+              : tier.key === projectedTier.key && projectedTier.key !== recommendedPlan.key
+                ? 'border-emerald-200 bg-emerald-50/40'
+                : 'border-slate-200 bg-white',
           ]"
         >
-          <div class="flex items-center gap-2.5 min-w-0">
-            <!-- Indicador: primary = Estás acá, emerald = Acá vas a llegar -->
+          <!-- Línea 1: nombre del tier + badges -->
+          <div class="flex items-center gap-2 flex-wrap mb-2">
+            <span
+              class="w-2 h-2 rounded-full shrink-0"
+              :class="tier.key === recommendedPlan.key
+                ? 'bg-primary'
+                : tier.key === projectedTier.key
+                  ? 'bg-emerald-500'
+                  : 'bg-slate-300'"
+              aria-hidden="true"
+            ></span>
+            <span class="text-base font-bold text-slate-900">{{ tier.name }}</span>
             <span
               v-if="tier.key === recommendedPlan.key"
-              class="w-1.5 h-1.5 rounded-full bg-primary shrink-0"
-              aria-hidden="true"
-            ></span>
+              class="text-[10px] font-black text-white bg-primary px-2.5 py-0.5 rounded-full uppercase tracking-widest"
+            >
+              Estás acá
+            </span>
             <span
               v-else-if="tier.key === projectedTier.key"
-              class="w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0"
-              aria-hidden="true"
-            ></span>
-            <span v-else class="w-1.5 h-1.5 rounded-full bg-slate-200 shrink-0" aria-hidden="true"></span>
+              class="text-[10px] font-black text-white bg-emerald-500 px-2.5 py-0.5 rounded-full uppercase tracking-widest"
+            >
+              Próxima parada
+            </span>
+          </div>
+
+          <!-- Línea 2: stats con mucho aire -->
+          <div class="flex items-baseline gap-x-6 gap-y-2 flex-wrap pl-4">
+            <!-- Pedidos -->
             <div class="min-w-0">
-              <div class="flex items-center gap-2 flex-wrap">
-                <span class="text-sm font-bold text-slate-900">{{ tier.name }}</span>
-                <span
-                  v-if="tier.key === recommendedPlan.key"
-                  class="text-[9px] font-black text-white bg-primary px-2 py-0.5 rounded-full uppercase tracking-widest"
-                >
-                  Estás acá
-                </span>
-                <span
-                  v-else-if="tier.key === projectedTier.key"
-                  class="text-[9px] font-black text-white bg-emerald-500 px-2 py-0.5 rounded-full uppercase tracking-widest"
-                >
-                  Próxima parada
-                </span>
-              </div>
+              <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-0.5">
+                Pedidos/mes
+              </p>
+              <p class="text-sm font-bold text-slate-700 tabular-nums">
+                {{ planVolumeLabel(tier) }}
+              </p>
             </div>
-          </div>
-
-          <div class="sm:text-right">
-            <span class="text-xs sm:text-sm font-bold text-slate-700 tabular-nums">
-              {{ planVolumeLabel(tier) }}
-            </span>
-            <p class="sm:hidden text-[10px] text-slate-400 uppercase tracking-widest mt-0.5">Pedidos/mes</p>
-          </div>
-
-          <div class="flex items-baseline gap-1 sm:justify-end sm:text-right">
-            <span class="text-xs sm:text-sm font-bold text-slate-900 tabular-nums whitespace-nowrap">
-              <template v-if="tier.monthlyFee !== null">USD {{ effectiveFee(tier) }}</template>
-              <template v-else>A medida</template>
-            </span>
-            <span v-if="tier.monthlyFee !== null" class="text-[10px] text-slate-400">/ mes</span>
-            <span class="sm:hidden text-[10px] text-slate-400 ml-1 uppercase tracking-widest">Fee</span>
-          </div>
-
-          <div class="flex items-baseline gap-1 sm:justify-end sm:text-right">
-            <span class="text-xs sm:text-sm font-bold tabular-nums whitespace-nowrap" :class="tier.key === recommendedPlan.key ? 'text-primary' : 'text-slate-700'">
-              {{ tier.commissionPct }}%
-            </span>
-            <span class="text-[10px] text-slate-400">por venta</span>
+            <!-- Fee -->
+            <div class="min-w-0">
+              <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-0.5">
+                Fee mensual
+              </p>
+              <p class="text-sm font-bold text-slate-900 tabular-nums whitespace-nowrap">
+                <template v-if="tier.monthlyFee !== null">USD {{ effectiveFee(tier) }}</template>
+                <template v-else>A medida</template>
+              </p>
+            </div>
+            <!-- Comisión -->
+            <div class="min-w-0">
+              <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-0.5">
+                Comisión
+              </p>
+              <p class="text-sm font-bold tabular-nums" :class="tier.key === recommendedPlan.key ? 'text-primary' : 'text-slate-700'">
+                {{ tier.commissionPct }}% por venta
+              </p>
+            </div>
           </div>
         </div>
       </div>
