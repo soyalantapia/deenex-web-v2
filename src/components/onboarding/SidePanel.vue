@@ -37,25 +37,33 @@
             <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3">
               +500 sucursales ya operan con Deenex
             </p>
-            <!-- Carrusel infinito con vue3-marquee — pasa todos los logos
-                 corriendo lentos sin pausa al hover. Da sensación de
-                 "muchas marcas" en menos espacio vertical que un grid. -->
+            <!-- Carrusel infinito con vue3-marquee.
+                 Notas técnicas:
+                 - `:duration="18"` — más lento que 22s daba feel "muerto".
+                 - `:clone="true"` clave: duplica la lista internamente para
+                   que el loop sea sin gap visible (era el bug: la screenshot
+                   capturaba el gap entre ciclos).
+                 - Gap entre logos con `mr-8` (no mx-5 que daba doble margin).
+                 - Items todos con `h-8 w-[88px]` para tamaño uniforme — el
+                   max-width estaba dejando logos chicos como "Monti" muy
+                   apretados y logos anchos como "Coquito's" cortados. -->
             <Vue3Marquee
-              :duration="22"
+              :duration="18"
               :pause-on-hover="true"
+              :clone="true"
               :gradient="true"
               :gradient-color="[248, 250, 252]"
-              :gradient-width="32"
+              :gradient-width="24"
             >
               <div
                 v-for="b in brandLogos"
                 :key="b.name"
-                class="mx-5 flex items-center h-6"
+                class="mr-8 flex items-center justify-center h-8 w-[88px] shrink-0"
               >
                 <img
                   :src="b.src"
                   :alt="b.name"
-                  class="h-5 w-auto max-w-[90px] object-contain opacity-60 grayscale hover:grayscale-0 hover:opacity-100 transition-all"
+                  class="max-h-7 max-w-full w-auto object-contain opacity-60 grayscale hover:grayscale-0 hover:opacity-100 transition-all"
                   loading="lazy"
                 />
               </div>
