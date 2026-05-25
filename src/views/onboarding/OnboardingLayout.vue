@@ -282,28 +282,40 @@
           v-if="showExitModal"
           class="fixed inset-0 z-[9999] flex items-center justify-center p-4 pointer-events-none"
         >
+          <!-- Copy persuasivo + botones invertidos: izquierda apagado ("No quiero")
+               para no fomentar la salida, derecha verde primary ("Aprovechar")
+               como CTA principal para seguir en el flow. -->
           <div class="bg-white rounded-3xl shadow-2xl max-w-md w-full p-7 pointer-events-auto">
-            <h3 class="text-xl font-extrabold tracking-tight text-slate-900 mb-2">
-              ¿Salir del trial?
+            <div class="w-12 h-12 rounded-2xl bg-amber-100 flex items-center justify-center text-2xl mb-5">
+              ⏳
+            </div>
+            <h3 class="text-xl sm:text-2xl font-extrabold tracking-tight text-slate-900 mb-2 leading-tight">
+              ¿Seguro que querés perderte los <span class="text-emerald-600">15 días gratis</span>?
             </h3>
-            <p class="text-sm text-slate-500 leading-relaxed mb-6">
-              Tu progreso queda guardado. Cuando vuelvas, retomás donde lo dejaste.
+            <p class="text-sm text-slate-600 leading-relaxed mb-6">
+              Es una oportunidad <span class="font-bold text-slate-900">de una sola vez</span> para
+              probar Deenex con los datos reales de tu cadena, sin pagar nada hasta el día 16.
+              <br /><br />
+              Si te vas ahora, perdés el setup que ya hiciste — y mañana podemos no tener cupo
+              de Customer Success para activarte.
             </p>
-            <div class="flex flex-col-reverse sm:flex-row sm:justify-end gap-2">
-              <button
-                type="button"
-                @click="showExitModal = false"
-                class="px-5 py-2.5 rounded-xl text-sm font-semibold text-slate-600 hover:bg-slate-50 transition-colors"
-              >
-                Quedarme acá
-              </button>
+            <div class="flex flex-col-reverse sm:flex-row sm:items-center sm:justify-end gap-2">
+              <!-- Izquierda: apagado / sin color fuerte -->
               <RouterLink
                 to="/"
                 @click="onConfirmExit"
-                class="px-5 py-2.5 rounded-xl text-sm font-bold bg-slate-900 text-white hover:bg-slate-800 transition-colors text-center"
+                class="px-5 py-2.5 rounded-xl text-sm font-semibold text-slate-400 hover:text-slate-600 hover:bg-slate-50 transition-colors text-center"
               >
-                Salir al inicio
+                No quiero
               </RouterLink>
+              <!-- Derecha: verde primary, CTA principal -->
+              <button
+                type="button"
+                @click="showExitModal = false"
+                class="px-6 py-3 rounded-xl text-sm font-bold bg-emerald-500 text-white hover:bg-emerald-600 transition-all shadow-md shadow-emerald-500/25 hover:shadow-emerald-500/40 hover:-translate-y-0.5"
+              >
+                Aprovechar
+              </button>
             </div>
           </div>
         </div>
