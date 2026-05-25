@@ -28,9 +28,14 @@
         </div>
       </div>
 
-      <!-- CTA — texto solamente, en sintonía con el patrón del resto del sitio -->
+      <!-- CTA — trial self-serve. RouterLink para evitar full reload al navegar
+           al onboarding (era #agendar anchor hardcoded). -->
       <div class="mt-12 flex flex-col sm:flex-row items-start sm:items-center gap-5">
-        <a href="#agendar" @click="trackEvent('click_agendar_demo')" class="demo-link-primary">Agendar una demo en vivo</a>
+        <RouterLink :to="{ path: '/comenzar', query: { from: 'demo_video' } }"
+          @click="trackEvent('click_trial_start', { source: 'demo_video' })"
+          class="demo-link-primary">
+          Empezar 15 días gratis
+        </RouterLink>
         <a href="#infraestructura" class="demo-link-ghost">Ver toda la infraestructura</a>
       </div>
 
@@ -40,6 +45,7 @@
 
 <script setup>
 import { ref, onMounted, onUnmounted } from 'vue'
+import { RouterLink } from 'vue-router'
 import { trackEvent } from '@/utils/analytics'
 
 // ← reemplazá con tu ID de Vimeo real

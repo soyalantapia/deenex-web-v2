@@ -49,7 +49,9 @@ export const hero = {
     highlight: 'WhatsApp y Push Notifications',
     suffix: '.',
   },
-  ctaPrimary: { label: 'Comenzar Ahora', href: '#agendar', event: 'click_comenzar_ahora' },
+  // CTA primario apunta al onboarding self-serve. Antes era "Agendar demo"
+  // sales-led; ahora invitamos al lead a probar el producto solo durante 15 días.
+  ctaPrimary: { label: 'Empezar 15 días gratis', href: '/comenzar?from=cadenas_hero', event: 'click_trial_start' },
   ctaSecondary: { label: 'Ver cómo funciona', href: '#infraestructura' },
   socialProof: {
     badges: [
@@ -212,7 +214,7 @@ export const demoVideo = {
   sidequote:
     '"Así se ve la experiencia para tu cliente y el control que tenés desde el dashboard."',
   vimeoId: '1183253994',
-  ctaPrimary: { label: 'Agendar una demo en vivo', href: '#agendar' },
+  ctaPrimary: { label: 'Empezar 15 días gratis', href: '/comenzar?from=cadenas_demo' },
   ctaSecondary: { label: 'Ver toda la infraestructura', href: '#infraestructura' },
 }
 
