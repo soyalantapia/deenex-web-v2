@@ -9,6 +9,14 @@ const router = createRouter({
       component: () => import('../views/HomeView.vue'), // Lazy loading
     },
     {
+      // Variante A/B "Cadenas Gastronómicas" — landing dedicada con copy
+      // y pricing focalizados en chains (vs la home genérica). Recuperado
+      // del branch original feat/landing-cadenas-gastronomicas-abtest.
+      path: '/cadenas-gastronomicas',
+      name: 'cadenas-gastronomicas',
+      component: () => import('../views/CadenasGastronomicasView.vue'),
+    },
+    {
       // Auto-onboarding self-serve flow — 5 pasos con persistencia en localStorage.
       // El layout vive en views/onboarding/OnboardingLayout.vue y los steps son
       // children que rotan dentro de un <RouterView> con transition.
