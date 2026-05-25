@@ -125,33 +125,8 @@
           Antes no te cobramos nada.
         </p>
 
-        <!-- Toggle add-on Loyalty -->
-        <label
-          class="mt-5 flex items-start gap-3 p-4 rounded-2xl bg-white/10 cursor-pointer hover:bg-white/[0.15] transition-colors"
-        >
-          <input type="checkbox" v-model="form.addLoyalty" class="sr-only" />
-          <div
-            class="w-10 h-6 rounded-full p-0.5 shrink-0 transition-colors mt-0.5"
-            :class="form.addLoyalty ? 'bg-emerald-400' : 'bg-white/20'"
-          >
-            <div
-              class="w-5 h-5 bg-white rounded-full shadow-sm transition-transform"
-              :class="form.addLoyalty ? 'translate-x-4' : 'translate-x-0'"
-            ></div>
-          </div>
-          <div class="flex-1 min-w-0">
-            <p class="text-sm font-bold leading-tight flex items-center gap-1.5">
-              Sumar Fidelización Dinámica
-              <Tooltip variant="light" placement="bottom" align="left" label="Qué incluye Fidelización Dinámica">
-                <strong class="block mb-1">¿Qué incluye?</strong>
-                Sistema de puntos por pedido, 3 niveles VIP automáticos (Bronce/Plata/Oro), cupones de cumpleaños, wallet branded de tu marca y campañas de reactivación segmentadas.
-              </Tooltip>
-            </p>
-            <p class="text-xs text-white/70 mt-1 leading-snug">
-              Puntos, niveles VIP, cupones. +USD 15 / local — incluido en el trial.
-            </p>
-          </div>
-        </label>
+        <!-- Toggle de Fidelización Dinámica removido — ya viene incluida en
+             el Bundle de entrada (USD 69), no es add-on opcional. -->
       </div>
     </div>
 
@@ -327,10 +302,10 @@ const router = useRouter()
 const onboarding = useOnboarding()
 
 // Form local sync con state global. `planKey` ya no se setea acá — el plan
-// se asigna automáticamente desde recommendedPlan basado en volumen de
-// pedidos. Solo persistimos billingCycle (toggle anual/mensual) y addLoyalty.
+// se asigna automáticamente desde recommendedPlan. `addLoyalty` se removió
+// porque ahora Fidelización Dinámica viene incluida en el Bundle de entrada,
+// no es add-on opcional. Solo queda billingCycle.
 const form = reactive({
-  addLoyalty: onboarding.state.plan.addLoyalty,
   billingCycle: onboarding.state.plan.billingCycle || 'monthly',
 })
 
@@ -385,7 +360,8 @@ function onSubmit() {
   onboarding.setPlan({
     key: effectivePlanKey.value,
     product: 'comercio',
-    addLoyalty: form.addLoyalty,
+    // Loyalty viene incluida en el Bundle de entrada — no es add-on opcional.
+    addLoyalty: true,
     billingCycle: form.billingCycle,
   })
   if (isEnterprise.value) {

@@ -267,9 +267,8 @@ const monthlyEstimateUsd = computed(() => {
   // Si el usuario manualmente eligió otro plan, usamos ese
   const chosenTier = state.plan.key ? PLAN_TIERS.find((t) => t.key === state.plan.key) || tier : tier
   const base = chosenTier.monthlyFee || 0
-  // Loyalty add-on: USD 15 / local. Modelo conservador.
-  const loyalty = state.plan.addLoyalty ? 15 * (Number(state.business.locations) || 1) : 0
-  const subtotal = base + loyalty
+  // Loyalty viene incluida en el Bundle — sin add-on extra.
+  const subtotal = base
   // Si anual, descuento 20% sobre el subtotal mensual equivalente.
   return state.plan.billingCycle === 'annual'
     ? Math.round(subtotal * (1 - ANNUAL_DISCOUNT))
@@ -282,8 +281,7 @@ const annualSavingsUsd = computed(() => {
     ? PLAN_TIERS.find((t) => t.key === state.plan.key) || recommendedPlan.value
     : recommendedPlan.value
   const base = tier.monthlyFee || 0
-  const loyalty = state.plan.addLoyalty ? 15 * (Number(state.business.locations) || 1) : 0
-  return Math.round((base + loyalty) * 12 * ANNUAL_DISCOUNT)
+  return Math.round(base * 12 * ANNUAL_DISCOUNT)
 })
 
 /**

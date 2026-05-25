@@ -51,16 +51,8 @@
           </span>
         </div>
 
-        <div v-if="onboarding.state.plan.addLoyalty" class="flex justify-between items-baseline">
-          <span class="text-sm text-slate-600">
-            Fidelización Dinámica
-            <span class="text-xs text-slate-400">· {{ onboarding.state.business.locations }} × USD 15</span>
-          </span>
-          <span class="text-sm font-bold text-slate-900 tabular-nums">
-            USD {{ loyaltyCost }}
-            <span class="text-xs font-normal text-slate-400">/ mes</span>
-          </span>
-        </div>
+        <!-- Fidelización Dinámica removida como línea separada — ahora viene
+             incluida en el Bundle de entrada (no es add-on opcional). -->
 
         <div class="flex justify-between items-baseline">
           <span class="text-sm text-slate-600">Comisión por venta</span>
@@ -236,15 +228,8 @@ const planSummary = computed(() => {
   return tier
 })
 
-const loyaltyCost = computed(() => {
-  if (!onboarding.state.plan.addLoyalty) return 0
-  const base = Number(onboarding.state.business.locations) * 15
-  return isAnnual.value ? Math.round(base * ANNUAL_DISCOUNT_MULT) : base
-})
-
-const totalMonthly = computed(() => {
-  return (planSummary.value.monthlyFee || 0) + loyaltyCost.value
-})
+// Loyalty viene incluida en el Bundle de entrada — sin costo extra.
+const totalMonthly = computed(() => planSummary.value.monthlyFee || 0)
 
 async function onActivate() {
   loading.value = true
