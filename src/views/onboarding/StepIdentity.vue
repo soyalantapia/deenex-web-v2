@@ -14,11 +14,11 @@
     </p>
     <h1 class="text-[clamp(1.8rem,4vw,2.6rem)] font-extrabold tracking-tighter leading-[1.05] text-slate-900 mb-4">
       Decinos quién sos.<br />
-      <span class="text-primary italic font-light">Sin tarjeta, sin compromiso.</span>
+      <span class="text-primary italic font-light">Te lleva menos de un minuto.</span>
     </h1>
     <p class="text-base text-slate-500 leading-relaxed mb-10 max-w-md">
       Lo usamos para crear tu cuenta y mandarte los datos de acceso por
-      WhatsApp y email. Toma menos de un minuto.
+      email y WhatsApp.
     </p>
 
     <div class="space-y-5">
@@ -27,7 +27,7 @@
         label="Tu nombre"
         name="fullName"
         autocomplete="name"
-        placeholder="Marcos Aldazábal"
+        placeholder="Tu nombre completo"
         :error="errors.fullName"
         required
         @blur="validate('fullName')"

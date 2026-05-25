@@ -9,7 +9,7 @@
       <span class="text-primary italic font-light">Te recomendamos el plan en base a eso.</span>
     </h1>
     <p class="text-base text-slate-500 leading-relaxed mb-10 max-w-md">
-      Nada de esto es definitivo — podés cambiarlo después dentro de la plataforma.
+      Lo cambiás después si hace falta.
     </p>
 
     <div class="space-y-8">
@@ -23,35 +23,53 @@
           required
           @blur="validate('brand')"
         />
-        <!-- Subdomain preview live + availability check -->
+        <!-- Subdomain preview live + availability check.
+             Tres estados visuales claros:
+             1. checking → spinner azul
+             2. available → verde + "Disponible"
+             3. taken → amber con razón explícita + botón "Usar {sugerencia}" -->
         <div
           v-if="onboarding.subdomainPreview.value && onboarding.subdomainPreview.value !== 'tu-marca'"
-          class="mt-2 flex items-center gap-2 px-3 py-2 rounded-lg border transition-colors"
+          class="mt-2 rounded-lg border transition-colors overflow-hidden"
           :class="domainAvailable === false
             ? 'bg-amber-50 border-amber-200'
             : 'bg-primary/[0.04] border-primary/10'"
         >
-          <span class="text-[10px] font-bold uppercase tracking-widest"
-            :class="domainAvailable === false ? 'text-amber-700' : 'text-primary'"
-          >
-            Tu app
-          </span>
-          <code class="text-xs font-mono flex-1 min-w-0 truncate"
-            :class="domainAvailable === false ? 'text-amber-800' : 'text-slate-700'"
-          >
-            {{ effectiveSubdomain }}<span class="text-slate-400">.deenex.app</span>
-          </code>
-          <span v-if="domainChecking" class="w-3 h-3 border-2 border-primary/30 border-t-primary rounded-full animate-spin shrink-0"></span>
-          <span v-else-if="domainAvailable === true" class="inline-flex items-center gap-1 text-[10px] font-bold text-emerald-600 shrink-0">
-            <Check class="w-3 h-3" />Disponible
-          </span>
+          <div class="flex items-center gap-2 px-3 py-2">
+            <span class="text-[10px] font-bold uppercase tracking-widest"
+              :class="domainAvailable === false ? 'text-amber-700' : 'text-primary'"
+            >
+              <template v-if="domainAvailable === false">Ocupado</template>
+              <template v-else>Tu app</template>
+            </span>
+            <code class="text-xs font-mono flex-1 min-w-0 truncate"
+              :class="domainAvailable === false ? 'text-amber-800 line-through opacity-70' : 'text-slate-700'"
+            >
+              {{ effectiveSubdomain }}<span class="text-slate-400">.deenex.app</span>
+            </code>
+            <span v-if="domainChecking" class="w-3 h-3 border-2 border-primary/30 border-t-primary rounded-full animate-spin shrink-0"></span>
+            <span v-else-if="domainAvailable === true" class="inline-flex items-center gap-1 text-[10px] font-bold text-emerald-600 shrink-0">
+              <Check class="w-3 h-3" />Disponible
+            </span>
+          </div>
+          <!-- Sugerencia explícita cuando está tomado — el lead ve qué va a quedar. -->
           <button
-            v-else-if="domainAvailable === false"
+            v-if="domainAvailable === false && domainSuggestion"
             type="button"
             @click="acceptSuggestion"
-            class="text-[10px] font-bold text-amber-700 hover:text-amber-900 underline shrink-0"
+            class="w-full flex items-center justify-between gap-2 px-3 py-2 border-t border-amber-200/70 bg-white hover:bg-amber-50/40 transition-colors text-left"
           >
-            Usar sugerencia
+            <div class="flex items-center gap-2 min-w-0 flex-1">
+              <span class="text-[10px] font-bold text-emerald-600 uppercase tracking-widest shrink-0">
+                Libre →
+              </span>
+              <code class="text-xs font-mono text-slate-800 truncate">
+                {{ domainSuggestion }}<span class="text-slate-400">.deenex.app</span>
+              </code>
+            </div>
+            <span class="text-[10px] font-bold text-primary hover:underline shrink-0">
+              Usar este
+            </span>
           </button>
         </div>
       </div>
@@ -121,13 +139,13 @@
             :key="opt.value"
             type="button"
             @click="form.pos = opt.value"
-            class="relative px-4 py-3 rounded-xl border-2 text-sm font-semibold transition-all text-left"
+            class="relative pl-4 pr-9 py-3 rounded-xl border-2 text-sm font-semibold transition-all text-left"
             :class="form.pos === opt.value
               ? 'border-primary bg-primary/[0.04] text-primary'
               : 'border-slate-200 text-slate-600 hover:border-slate-300'"
           >
             {{ opt.label }}
-            <span v-if="form.pos === opt.value" class="absolute top-3 right-3 w-4 h-4 rounded-full bg-primary flex items-center justify-center">
+            <span v-if="form.pos === opt.value" class="absolute top-1/2 -translate-y-1/2 right-3 w-4 h-4 rounded-full bg-primary flex items-center justify-center">
               <Check class="w-2.5 h-2.5 text-white" />
             </span>
           </button>

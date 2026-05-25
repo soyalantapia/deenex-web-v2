@@ -226,7 +226,7 @@
           :key="tier.key"
           type="button"
           @click="form.planKey = tier.key"
-          class="text-left rounded-2xl border-2 p-4 transition-all relative"
+          class="text-left rounded-2xl border-2 p-4 transition-all relative flex flex-col"
           :class="effectivePlanKey === tier.key
             ? 'border-primary bg-primary/[0.04]'
             : 'border-slate-200 hover:border-slate-300 bg-white'"
@@ -242,6 +242,18 @@
           <p v-if="tier.monthlyFee !== null" class="text-[10px] text-slate-500 mt-1">
             / mes + {{ tier.commissionPct }}%
           </p>
+          <!-- Features clave: diferenciador vs el plan anterior. Le permite
+               al lead entender al toque qué gana al pagar más. -->
+          <ul v-if="tier.keyFeatures?.length" class="mt-3 pt-3 border-t border-slate-100 space-y-1.5 flex-1">
+            <li
+              v-for="feat in tier.keyFeatures"
+              :key="feat"
+              class="text-[10px] text-slate-600 leading-tight flex items-start gap-1.5"
+            >
+              <Check class="w-2.5 h-2.5 text-emerald-500 shrink-0 mt-0.5" stroke-width="3" />
+              <span>{{ feat }}</span>
+            </li>
+          </ul>
           <span
             v-if="tier.key === recommendedPlan.key"
             class="absolute -top-2 left-3 bg-emerald-500 text-white text-[9px] font-black px-2 py-0.5 rounded-full uppercase tracking-wider"
@@ -267,7 +279,7 @@
 <script setup>
 import { reactive, computed } from 'vue'
 import { useRouter } from 'vue-router'
-import { TrendingDown, Zap } from 'lucide-vue-next'
+import { TrendingDown, Zap, Check } from 'lucide-vue-next'
 import AnimatedNumber from '@/components/onboarding/AnimatedNumber.vue'
 import RoiCalculator from '@/components/onboarding/RoiCalculator.vue'
 import StepActions from '@/components/onboarding/StepActions.vue'

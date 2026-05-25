@@ -92,12 +92,35 @@ watch(
 )
 
 // ── Plan recommendation engine — matches the Pricing 2026 table ─────────
+// keyFeatures: 2 features clave que diferencian un plan del anterior. No
+// es la lista completa (esa vive en /pricing) — solo el "upgrade" visible
+// para que el lead entienda al toque qué le da pagar más.
 const PLAN_TIERS = [
-  { key: 'starter', name: 'Starter', minLocations: 1, maxLocations: 5, monthlyFee: 29, commissionPct: 1.5 },
-  { key: 'growth', name: 'Growth', minLocations: 6, maxLocations: 25, monthlyFee: 119, commissionPct: 1.25 },
-  { key: 'scale', name: 'Scale', minLocations: 26, maxLocations: 70, monthlyFee: 269, commissionPct: 1.0 },
-  { key: 'pro', name: 'Pro', minLocations: 71, maxLocations: 200, monthlyFee: 449, commissionPct: 0.75 },
-  { key: 'enterprise', name: 'Enterprise', minLocations: 201, maxLocations: Infinity, monthlyFee: null, commissionPct: 0.5 },
+  {
+    key: 'starter', name: 'Starter', minLocations: 1, maxLocations: 5,
+    monthlyFee: 29, commissionPct: 1.5,
+    keyFeatures: ['Self-service · 1 admin', 'Soporte por email'],
+  },
+  {
+    key: 'growth', name: 'Growth', minLocations: 6, maxLocations: 25,
+    monthlyFee: 119, commissionPct: 1.25,
+    keyFeatures: ['CSM compartido · 3 admins', 'Branding propio + dominio'],
+  },
+  {
+    key: 'scale', name: 'Scale', minLocations: 26, maxLocations: 70,
+    monthlyFee: 269, commissionPct: 1.0,
+    keyFeatures: ['CSM dedicado 4h/mes · 10 admins', 'API pública + webhooks'],
+  },
+  {
+    key: 'pro', name: 'Pro', minLocations: 71, maxLocations: 200,
+    monthlyFee: 449, commissionPct: 0.75,
+    keyFeatures: ['CSM 24/7 · admins ilimitados', 'Multi-región + SSO'],
+  },
+  {
+    key: 'enterprise', name: 'Enterprise', minLocations: 201, maxLocations: Infinity,
+    monthlyFee: null, commissionPct: 0.5,
+    keyFeatures: ['SLA 99,9% + soporte L3', 'Integraciones custom + on-prem'],
+  },
 ]
 
 const recommendedPlan = computed(() => {

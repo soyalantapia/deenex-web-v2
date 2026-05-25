@@ -25,14 +25,13 @@
         </div>
         <div class="flex-1 min-w-0">
           <p class="text-sm font-bold text-slate-900 leading-tight mb-1">
-            Tour de 10 segundos
+            Tocá los 4 tabs
           </p>
           <p class="text-xs text-slate-600 leading-snug">
-            Cambiá entre los 4 tabs de abajo para ver las distintas vistas de Deenex:
-            <span class="font-semibold">Ventas</span> en tiempo real,
-            <span class="font-semibold">Clientes</span> con su LTV,
-            <span class="font-semibold">Campañas</span> automatizadas y
-            <span class="font-semibold">Fidelización</span> por niveles.
+            <span class="font-semibold">Ventas</span>,
+            <span class="font-semibold">Clientes</span>,
+            <span class="font-semibold">Campañas</span> y
+            <span class="font-semibold">Fidelización</span> — recorrelos en 30 seg.
           </p>
         </div>
         <button
@@ -262,18 +261,23 @@
       </div>
     </div>
 
-    <!-- Persuasion CTA -->
-    <div class="border border-slate-200 rounded-2xl p-5 bg-white flex flex-col sm:flex-row items-start sm:items-center gap-4 mb-8">
-      <div class="w-12 h-12 rounded-xl bg-emerald-100 flex items-center justify-center shrink-0">
-        <Zap class="w-6 h-6 text-emerald-600" />
+    <!-- Persuasion CTA — más prominente (bg gradient + size mayor) que el
+         versionado anterior, que se confundía con un disclaimer. -->
+    <div class="rounded-2xl p-5 sm:p-6 mb-8 relative overflow-hidden border-2 border-emerald-200 bg-gradient-to-br from-emerald-50 to-white">
+      <div class="absolute right-4 top-4 w-12 h-12 rounded-xl bg-emerald-500 flex items-center justify-center text-white">
+        <Zap class="w-6 h-6" />
       </div>
-      <div class="flex-1 min-w-0">
-        <p class="text-sm font-bold text-slate-900 leading-tight mb-1">
-          ¿Te gusta lo que ves?
+      <div class="max-w-sm pr-16">
+        <p class="text-[10px] font-black text-emerald-700 uppercase tracking-widest mb-1.5">
+          ¿Te enganchó?
         </p>
-        <p class="text-xs text-slate-500 leading-snug">
-          Activá tu trial y empezás con tus datos reales en menos de 5 minutos.
-          Los datos de esta demo se quedan acá.
+        <p class="text-base sm:text-lg font-extrabold tracking-tight text-slate-900 leading-tight mb-2">
+          Tus datos reales acá en menos de 5 min.
+        </p>
+        <p class="text-xs text-slate-600 leading-relaxed">
+          Esta demo desaparece cuando activás tu cuenta. Vas a ver
+          <span class="font-semibold text-slate-900">tus pedidos, tus clientes, tu marca</span>
+          aplicada.
         </p>
       </div>
     </div>

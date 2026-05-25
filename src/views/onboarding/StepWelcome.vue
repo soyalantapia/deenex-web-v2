@@ -64,7 +64,7 @@
             <span class="font-bold tabular-nums">USD {{ planSummary.monthlyFee }}</span>
             <span class="text-slate-400">/ mes</span>
             <span class="text-slate-300 mx-1">·</span>
-            <span class="font-semibold tabular-nums">+{{ planSummary.commissionPct }}%</span>
+            <span class="font-semibold tabular-nums">{{ planSummary.commissionPct }}%</span>
             <span class="text-slate-400"> por venta</span>
           </p>
         </div>
@@ -102,11 +102,28 @@
       </a>
     </div>
 
-    <!-- Provisioning checklist — qué pasa después que el lead activó -->
+    <!-- Provisioning checklist — qué pasa después que el lead activó.
+         Mostramos un counter "N/4" + barra de progreso para que el lead
+         entienda al toque que es un proceso de ~4 pasos finitos, no un
+         "loading infinito" ansiogénico. -->
     <div v-if="!isEnterprise" class="rounded-2xl border border-slate-200 bg-slate-50/40 p-5 mb-6">
-      <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3">
-        Estado de tu cuenta
-      </p>
+      <div class="flex items-center justify-between mb-3 gap-3">
+        <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest">
+          Estado de tu cuenta
+        </p>
+        <p class="text-[10px] font-black uppercase tracking-widest tabular-nums shrink-0"
+          :class="provisioningComplete ? 'text-emerald-600' : 'text-primary'">
+          {{ provisioningProgress.done }}/{{ provisioningProgress.total }} listos
+        </p>
+      </div>
+      <!-- Progress bar -->
+      <div class="h-1 rounded-full bg-slate-200 overflow-hidden mb-4">
+        <div
+          class="h-full rounded-full transition-all duration-500"
+          :class="provisioningComplete ? 'bg-emerald-500' : 'bg-primary'"
+          :style="{ width: provisioningProgress.pct + '%' }"
+        ></div>
+      </div>
       <ul class="space-y-2.5">
         <li
           v-for="task in provisioningTasks"
@@ -146,7 +163,7 @@
         class="group flex-1 inline-flex items-center justify-center gap-2 bg-slate-200 text-slate-500 font-bold rounded-xl px-6 py-4 text-sm cursor-not-allowed"
       >
         <span class="w-4 h-4 border-2 border-slate-400 border-t-transparent rounded-full animate-spin"></span>
-        Preparando tu dashboard…
+        <span>Preparando tu dashboard… <span class="tabular-nums opacity-70">{{ provisioningProgress.done }}/{{ provisioningProgress.total }}</span></span>
       </button>
       <a
         v-else
@@ -477,6 +494,14 @@ const provisioningTasks = ref([
 const provisioningComplete = computed(() =>
   provisioningTasks.value.every((t) => t.status === 'done')
 )
+
+// Progress visible — el lead ve "2/4 listos" + barra avanzando, mucho menos
+// ansiógeno que un spinner indefinido.
+const provisioningProgress = computed(() => {
+  const total = provisioningTasks.value.length
+  const done = provisioningTasks.value.filter((t) => t.status === 'done').length
+  return { total, done, pct: Math.round((done / total) * 100) }
+})
 
 function startProvisioning() {
   // Avanza los pasos de a uno cada ~700ms. En producción cada paso es un
