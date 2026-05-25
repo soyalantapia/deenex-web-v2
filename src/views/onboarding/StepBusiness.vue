@@ -130,8 +130,12 @@
 
       <!-- POS -->
       <div>
-        <span class="block text-[11px] font-bold text-slate-700 uppercase tracking-widest mb-3">
+        <span class="flex items-center gap-1.5 text-[11px] font-bold text-slate-700 uppercase tracking-widest mb-3">
           ¿Qué POS usás hoy?
+          <Tooltip placement="top" align="left">
+            <strong class="block mb-1">¿Para qué lo preguntamos?</strong>
+            Conectamos automáticamente Deenex con tu sistema de cobro para que los pedidos del canal propio entren a tu caja del salón. Si no tenés POS, igual funciona.
+          </Tooltip>
         </span>
         <div class="grid grid-cols-2 gap-2.5">
           <button
@@ -154,9 +158,13 @@
 
       <!-- Canales actuales -->
       <div>
-        <span class="block text-[11px] font-bold text-slate-700 uppercase tracking-widest mb-3">
+        <span class="flex items-center gap-1.5 flex-wrap text-[11px] font-bold text-slate-700 uppercase tracking-widest mb-3">
           ¿Con qué canales vendés hoy?
-          <span class="ml-1 text-[10px] font-medium text-slate-400 normal-case tracking-normal">Podés elegir varios</span>
+          <span class="text-[10px] font-medium text-slate-400 normal-case tracking-normal">Podés elegir varios</span>
+          <Tooltip placement="top" align="left">
+            <strong class="block mb-1">¿Por qué importa?</strong>
+            Calculamos cuánto estás dejando en comisiones de apps de terceros y proyectamos cuánto te ahorrás migrando ese tráfico al canal propio.
+          </Tooltip>
         </span>
         <div class="grid sm:grid-cols-2 gap-2.5">
           <label
@@ -205,6 +213,7 @@ import { useRouter } from 'vue-router'
 import { Check } from 'lucide-vue-next'
 import Field from '@/components/onboarding/Field.vue'
 import StepActions from '@/components/onboarding/StepActions.vue'
+import Tooltip from '@/components/onboarding/Tooltip.vue'
 import { useOnboarding } from '@/composables/useOnboarding'
 
 const router = useRouter()
@@ -318,7 +327,16 @@ const channelOptions = [
 
 function validate(field) {
   if (field === 'brand') {
-    errors.brand = form.brand.trim().length < 2 ? 'Necesitamos al menos 2 caracteres.' : ''
+    const v = form.brand.trim()
+    if (v.length < 2) {
+      errors.brand = 'Necesitamos al menos 2 caracteres.'
+    } else if (v.length > 60) {
+      errors.brand = 'Demasiado largo (máx 60).'
+    } else if (!/[\p{L}\p{N}]/u.test(v)) {
+      errors.brand = 'El nombre tiene que tener letras o números.'
+    } else {
+      errors.brand = ''
+    }
   }
 }
 

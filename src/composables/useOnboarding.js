@@ -11,7 +11,7 @@
  *     GA4 del flow con prefijo `onboarding_`.
  */
 
-import { reactive, computed, watch } from 'vue'
+import { reactive, computed, ref, watch } from 'vue'
 import { trackEvent } from '@/utils/analytics'
 
 const STORAGE_KEY = 'deenex_onboarding_v1'
@@ -40,6 +40,7 @@ const DEFAULT_STATE = {
     key: '', // 'starter' | 'growth' | 'scale' | 'pro' | 'enterprise'
     product: 'comercio', // 'comercio' | 'partners' | 'bundle'
     addLoyalty: false,
+    billingCycle: 'monthly', // 'monthly' | 'annual' (annual = -20%)
   },
   // Step 4
   trial: {
@@ -77,16 +78,39 @@ function loadFromStorage() {
 // Singleton: una sola instancia compartida entre todos los steps.
 const state = reactive(loadFromStorage())
 
-// Persist on every mutation.
+// ── Auto-save indicator ────────────────────────────────────────────────
+// Estados:
+//   'idle'   → nada que mostrar (default + 2s después del último guardado)
+//   'saving' → mostrando "Guardando…" (durante el debounce)
+//   'saved'  → mostrando "Guardado ✓" (1.5s después de persistir)
+//   'error'  → falló localStorage (cuota llena, modo privado de Safari)
+//
+// Le permite al lead VER que su progreso queda guardado — crítico para
+// dar tranquilidad en flows largos.
+const saveStatus = ref('idle')
+const lastSavedAt = ref(null)
+let saveStatusTimer = null
+
+// Persist on every mutation with debounce + status update.
 watch(
   state,
   (val) => {
     if (typeof window === 'undefined') return
-    try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(val))
-    } catch {
-      // Silent fail — quota issues are not blocking.
-    }
+    saveStatus.value = 'saving'
+    if (saveStatusTimer) clearTimeout(saveStatusTimer)
+    saveStatusTimer = setTimeout(() => {
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(val))
+        saveStatus.value = 'saved'
+        lastSavedAt.value = Date.now()
+        setTimeout(() => {
+          // Volvemos a idle si nadie más empezó a guardar mientras tanto.
+          if (saveStatus.value === 'saved') saveStatus.value = 'idle'
+        }, 1500)
+      } catch {
+        saveStatus.value = 'error'
+      }
+    }, 300)
   },
   { deep: true }
 )
@@ -128,6 +152,10 @@ const recommendedPlan = computed(() => {
   return PLAN_TIERS.find((t) => n >= t.minLocations && n <= t.maxLocations) || PLAN_TIERS[0]
 })
 
+// Descuento por billing anual. Estándar SaaS: 20% off para incentivar
+// cobro upfront (mejora cash flow y reduce churn).
+const ANNUAL_DISCOUNT = 0.20
+
 const monthlyEstimateUsd = computed(() => {
   const tier = recommendedPlan.value
   // Si el usuario manualmente eligió otro plan, usamos ese
@@ -135,7 +163,21 @@ const monthlyEstimateUsd = computed(() => {
   const base = chosenTier.monthlyFee || 0
   // Loyalty add-on: USD 15 / local. Modelo conservador.
   const loyalty = state.plan.addLoyalty ? 15 * (Number(state.business.locations) || 1) : 0
-  return base + loyalty
+  const subtotal = base + loyalty
+  // Si anual, descuento 20% sobre el subtotal mensual equivalente.
+  return state.plan.billingCycle === 'annual'
+    ? Math.round(subtotal * (1 - ANNUAL_DISCOUNT))
+    : subtotal
+})
+
+// Ahorro anual al pagar anual (en USD) — para mostrar en el toggle.
+const annualSavingsUsd = computed(() => {
+  const tier = state.plan.key
+    ? PLAN_TIERS.find((t) => t.key === state.plan.key) || recommendedPlan.value
+    : recommendedPlan.value
+  const base = tier.monthlyFee || 0
+  const loyalty = state.plan.addLoyalty ? 15 * (Number(state.business.locations) || 1) : 0
+  return Math.round((base + loyalty) * 12 * ANNUAL_DISCOUNT)
 })
 
 /**
@@ -357,6 +399,8 @@ export function useOnboarding() {
     TRIAL_DAYS,
     recommendedPlan,
     monthlyEstimateUsd,
+    annualSavingsUsd,
+    ANNUAL_DISCOUNT,
     savingsVsThirdParty,
     breakEvenDays,
     defaultAvgTicketUsd,
@@ -383,5 +427,8 @@ export function useOnboarding() {
     markTrialActivated,
     reset,
     track,
+    // Auto-save UI signals
+    saveStatus,
+    lastSavedAt,
   }
 }

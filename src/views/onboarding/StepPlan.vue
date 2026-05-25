@@ -114,6 +114,43 @@
       </div>
     </div>
 
+    <!-- Toggle mensual/anual — anual 20% off. Cobranza estándar SaaS para
+         mejorar cash flow + reducir churn. -->
+    <div v-if="!isEnterprise" class="mb-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+      <div class="inline-flex items-center bg-slate-100 rounded-full p-1 relative">
+        <button
+          type="button"
+          @click="form.billingCycle = 'monthly'"
+          class="relative px-4 py-1.5 rounded-full text-[11px] font-bold uppercase tracking-wider transition-colors z-10"
+          :class="form.billingCycle === 'monthly' ? 'text-slate-900' : 'text-slate-500 hover:text-slate-700'"
+        >
+          Mensual
+        </button>
+        <button
+          type="button"
+          @click="form.billingCycle = 'annual'"
+          class="relative px-4 py-1.5 rounded-full text-[11px] font-bold uppercase tracking-wider transition-colors z-10 flex items-center gap-1.5"
+          :class="form.billingCycle === 'annual' ? 'text-slate-900' : 'text-slate-500 hover:text-slate-700'"
+        >
+          Anual
+          <span class="text-[9px] font-black text-emerald-600 bg-emerald-100 px-1.5 py-0.5 rounded-full">−20%</span>
+        </button>
+        <!-- Indicador animado del toggle activo -->
+        <span
+          class="absolute top-1 bottom-1 rounded-full bg-white shadow-sm transition-all"
+          :style="form.billingCycle === 'monthly'
+            ? { left: '4px', width: 'calc(50% - 8px)' }
+            : { left: 'calc(50% + 4px)', width: 'calc(50% - 8px)' }"
+        ></span>
+      </div>
+      <p v-if="form.billingCycle === 'annual'" class="text-xs text-emerald-700 font-semibold leading-snug">
+        💰 Ahorrás <span class="tabular-nums">USD {{ onboarding.annualSavingsUsd.value.toLocaleString('es-AR') }}</span> al año vs mensual.
+      </p>
+      <p v-else class="text-xs text-slate-400 leading-snug">
+        Cambiá a anual y ahorrás <span class="tabular-nums font-bold text-emerald-600">20%</span> sobre el fee.
+      </p>
+    </div>
+
     <!-- Plan recomendado: card grande con hero claro ─────────────────── -->
     <div
       v-if="!isEnterprise"
@@ -135,13 +172,26 @@
           </span>
         </div>
 
-        <div class="flex items-baseline gap-2 mb-3">
-          <span class="text-5xl font-black tabular-nums tracking-tighter">USD {{ recommendedPlan.monthlyFee }}</span>
+        <div class="flex items-baseline gap-2 mb-3 flex-wrap">
+          <span class="text-5xl font-black tabular-nums tracking-tighter">USD {{ effectiveFee(recommendedPlan) }}</span>
           <span class="text-sm text-white/70">/ mes</span>
+          <span v-if="form.billingCycle === 'annual'" class="text-sm text-white/50 line-through tabular-nums">
+            USD {{ recommendedPlan.monthlyFee }}
+          </span>
+          <span v-if="form.billingCycle === 'annual'" class="text-[10px] font-black bg-emerald-400 text-emerald-950 px-2 py-0.5 rounded-full uppercase tracking-wider">
+            −20%
+          </span>
         </div>
-        <p class="text-white/80 text-sm leading-relaxed mb-1">
+        <p v-if="form.billingCycle === 'annual'" class="text-[11px] text-white/70 leading-snug mb-2">
+          Cobrado anualmente: USD {{ (effectiveFee(recommendedPlan) * 12).toLocaleString('es-AR') }} / año.
+        </p>
+        <p class="text-white/80 text-sm leading-relaxed mb-1 flex items-center gap-1.5 flex-wrap">
           + <span class="font-bold">{{ recommendedPlan.commissionPct }}%</span>
           por venta procesada.
+          <Tooltip variant="light" placement="top" align="left" label="Sobre qué se aplica la comisión">
+            <strong class="block mb-1">¿Sobre qué se aplica?</strong>
+            Sobre el GMV (Gross Merchandise Value) — es decir, el monto total de ventas que pasen por Deenex. No se aplica sobre propinas ni impuestos.
+          </Tooltip>
         </p>
         <p class="text-white/60 text-xs leading-relaxed">
           Primer cargo el <span class="font-bold text-white">{{ onboarding.firstChargeDateShort.value }}</span>.
@@ -163,7 +213,13 @@
             ></div>
           </div>
           <div class="flex-1 min-w-0">
-            <p class="text-sm font-bold leading-tight">Sumar Fidelización Dinámica</p>
+            <p class="text-sm font-bold leading-tight flex items-center gap-1.5">
+              Sumar Fidelización Dinámica
+              <Tooltip variant="light" placement="bottom" align="left" label="Qué incluye Fidelización Dinámica">
+                <strong class="block mb-1">¿Qué incluye?</strong>
+                Sistema de puntos por pedido, 3 niveles VIP automáticos (Bronce/Plata/Oro), cupones de cumpleaños, wallet branded de tu marca y campañas de reactivación segmentadas.
+              </Tooltip>
+            </p>
             <p class="text-xs text-white/70 mt-1 leading-snug">
               Puntos, niveles VIP, cupones. +USD 15 / local — incluido en el trial.
             </p>
@@ -236,11 +292,16 @@
             {{ planVolumeLabel(tier) }}
           </p>
           <p class="text-base font-black text-slate-900 tabular-nums leading-none">
-            <template v-if="tier.monthlyFee !== null">USD {{ tier.monthlyFee }}</template>
+            <template v-if="tier.monthlyFee !== null">USD {{ effectiveFee(tier) }}</template>
             <template v-else>A medida</template>
           </p>
           <p v-if="tier.monthlyFee !== null" class="text-[10px] text-slate-500 mt-1">
             / mes + {{ tier.commissionPct }}%
+          </p>
+          <!-- Si está en anual, mostramos el precio mensual original tachado para
+               que el "ahorro" sea visible a primera vista. -->
+          <p v-if="tier.monthlyFee !== null && form.billingCycle === 'annual'" class="text-[9px] text-slate-400 tabular-nums line-through mt-0.5">
+            USD {{ tier.monthlyFee }} mensual
           </p>
           <!-- Features clave: diferenciador vs el plan anterior. Le permite
                al lead entender al toque qué gana al pagar más. -->
@@ -277,21 +338,39 @@
 </template>
 
 <script setup>
-import { reactive, computed } from 'vue'
+import { reactive, computed, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { TrendingDown, Zap, Check } from 'lucide-vue-next'
 import AnimatedNumber from '@/components/onboarding/AnimatedNumber.vue'
 import RoiCalculator from '@/components/onboarding/RoiCalculator.vue'
 import StepActions from '@/components/onboarding/StepActions.vue'
+import Tooltip from '@/components/onboarding/Tooltip.vue'
 import { useOnboarding } from '@/composables/useOnboarding'
 
 const router = useRouter()
 const onboarding = useOnboarding()
 
+// Form local sync con state global. billingCycle persiste para que si el lead
+// vuelve al step, mantenga su elección.
 const form = reactive({
   planKey: onboarding.state.plan.key || '',
   addLoyalty: onboarding.state.plan.addLoyalty,
+  billingCycle: onboarding.state.plan.billingCycle || 'monthly',
 })
+
+// Sync billing cycle al state cuando cambia.
+watch(() => form.billingCycle, (v) => {
+  onboarding.state.plan.billingCycle = v
+  onboarding.track('plan_billing_cycle_changed', { cycle: v })
+})
+
+// Precio efectivo: aplica descuento anual si corresponde.
+function effectiveFee(tier) {
+  if (tier.monthlyFee === null) return null
+  return form.billingCycle === 'annual'
+    ? Math.round(tier.monthlyFee * 0.8)
+    : tier.monthlyFee
+}
 
 const recommendedPlan = computed(() => onboarding.recommendedPlan.value)
 
@@ -331,6 +410,7 @@ function onSubmit() {
     key: effectivePlanKey.value,
     product: 'comercio',
     addLoyalty: form.addLoyalty,
+    billingCycle: form.billingCycle,
   })
   if (isEnterprise.value) {
     router.push('/comenzar/listo?enterprise=1')

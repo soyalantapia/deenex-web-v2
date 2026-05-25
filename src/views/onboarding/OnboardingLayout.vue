@@ -1,5 +1,7 @@
 <template>
   <div class="onboarding-shell min-h-screen bg-white">
+    <!-- Connectivity banner: offline + save errors -->
+    <ConnectivityBanner />
     <!-- Social proof live counter (top of page) -->
     <div class="bg-slate-900 text-white py-1.5 px-4 text-center">
       <p class="text-[11px] font-medium leading-snug">
@@ -45,6 +47,36 @@
         </div>
 
         <div class="flex items-center gap-3 shrink-0">
+          <!-- Auto-save indicator: aparece sólo cuando "saving" o "saved", evita
+               ruido visual cuando no pasó nada. Le da al lead la tranquilidad
+               de que su progreso no se pierde. -->
+          <Transition name="save-status">
+            <span
+              v-if="onboarding.saveStatus.value === 'saving'"
+              class="inline-flex items-center gap-1.5 text-[10px] font-bold text-slate-400 uppercase tracking-widest"
+            >
+              <span class="w-2.5 h-2.5 border-2 border-slate-300 border-t-slate-500 rounded-full animate-spin"></span>
+              Guardando
+            </span>
+            <span
+              v-else-if="onboarding.saveStatus.value === 'saved'"
+              class="inline-flex items-center gap-1.5 text-[10px] font-bold text-emerald-600 uppercase tracking-widest"
+            >
+              <Check class="w-3 h-3" stroke-width="3" />
+              Guardado
+            </span>
+            <span
+              v-else-if="onboarding.saveStatus.value === 'error'"
+              class="inline-flex items-center gap-1.5 text-[10px] font-bold text-amber-600 uppercase tracking-widest"
+              :title="'Hubo un problema guardando. Si tu navegador está en modo privado, los datos podrían no persistir.'"
+            >
+              ⚠ Sin guardar
+            </span>
+          </Transition>
+
+          <!-- Cross-device QR: solo aparece en desktop, permite escanear y
+               retomar en celular. Solo cuando el lead tiene progreso real. -->
+          <CrossDeviceQR v-if="canSaveAndExit" />
           <button
             v-if="canSaveAndExit"
             type="button"
@@ -280,7 +312,11 @@
 import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
 import { useRoute, RouterLink, RouterView } from 'vue-router'
 import { Gift, Save, Check } from 'lucide-vue-next'
+// `Check` ya está importado — se usa en el modal Save & exit Y ahora también
+// en el auto-save indicator (success state).
 import SidePanel from '@/components/onboarding/SidePanel.vue'
+import ConnectivityBanner from '@/components/onboarding/ConnectivityBanner.vue'
+import CrossDeviceQR from '@/components/onboarding/CrossDeviceQR.vue'
 import { useOnboarding } from '@/composables/useOnboarding'
 
 const route = useRoute()
@@ -458,7 +494,24 @@ onMounted(() => {
   window.addEventListener('pagehide', onPageHide)
   document.addEventListener('visibilitychange', onVisibilityChange)
   document.addEventListener('mouseleave', onMouseLeave)
+  // ESC cierra cualquier modal abierto. Es accesibilidad básica que faltaba.
+  document.addEventListener('keydown', onKeyDown)
 })
+
+// ESC handler global — cierra modals con jerarquía: el más arriba primero.
+function onKeyDown(e) {
+  if (e.key !== 'Escape') return
+  if (showSaveModal.value) {
+    showSaveModal.value = false
+    saveSent.value = false
+    onboarding.track('save_modal_dismissed', { via: 'esc' })
+  } else if (showExitIntent.value) {
+    dismissExitIntent()
+  } else if (showExitModal.value) {
+    showExitModal.value = false
+    onboarding.track('exit_modal_dismissed', { via: 'esc' })
+  }
+}
 
 function onBeforeUnload(e) {
   const completed = onboarding.state.meta.completedSteps.length
@@ -512,6 +565,7 @@ onUnmounted(() => {
   window.removeEventListener('pagehide', onPageHide)
   document.removeEventListener('visibilitychange', onVisibilityChange)
   document.removeEventListener('mouseleave', onMouseLeave)
+  document.removeEventListener('keydown', onKeyDown)
   if (visibilityTimer) clearTimeout(visibilityTimer)
 })
 </script>
@@ -552,5 +606,15 @@ onUnmounted(() => {
 .exit-modal-leave-to {
   opacity: 0;
   transform: translateY(12px) scale(0.97);
+}
+
+/* Save status pill: fade rápido para que no sea distractor */
+.save-status-enter-active,
+.save-status-leave-active {
+  transition: opacity 0.2s ease;
+}
+.save-status-enter-from,
+.save-status-leave-to {
+  opacity: 0;
 }
 </style>

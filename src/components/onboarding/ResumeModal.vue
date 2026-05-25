@@ -60,10 +60,10 @@
 </template>
 
 <script setup>
-import { Teleport } from 'vue'
+import { Teleport, watch, onMounted, onUnmounted } from 'vue'
 import { Sparkles } from 'lucide-vue-next'
 
-defineProps({
+const props = defineProps({
   show: { type: Boolean, default: false },
   progressSummary: {
     type: Object,
@@ -89,6 +89,13 @@ function onStartOver() {
 function onDecline() {
   emit('decline')
 }
+
+// ESC cierra el modal — accesibilidad básica.
+function onKeyDown(e) {
+  if (e.key === 'Escape' && props.show) onDecline()
+}
+onMounted(() => document.addEventListener('keydown', onKeyDown))
+onUnmounted(() => document.removeEventListener('keydown', onKeyDown))
 </script>
 
 <style scoped>

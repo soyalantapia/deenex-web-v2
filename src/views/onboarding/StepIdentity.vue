@@ -184,18 +184,61 @@ function onStartOver() {
   Object.assign(form, { fullName: '', email: '', whatsapp: '' })
 }
 
+// ── Validación robusta ───────────────────────────────────────────────────
+// Emails desechables — bloqueamos los más comunes. En producción esto sería
+// una lookup table del backend que se actualiza periódicamente. Por ahora
+// frontend-only, suficiente para filtrar el 90% de los abusos.
+const DISPOSABLE_EMAIL_DOMAINS = new Set([
+  'mailinator.com', 'guerrillamail.com', 'tempmail.com', '10minutemail.com',
+  'trashmail.com', 'yopmail.com', 'sharklasers.com', 'dispostable.com',
+  'maildrop.cc', 'temp-mail.org', 'fakeinbox.com', 'getnada.com',
+])
+
+// Detecta strings que son SOLO emojis/whitespace (sin caracteres alfanuméricos
+// reales). Las marcas con sólo emojis son spam casi siempre.
+function isOnlyEmoji(s) {
+  return s.length > 0 && !/[\p{L}\p{N}]/u.test(s)
+}
+
 function validate(field) {
   const value = (form[field] || '').trim()
   switch (field) {
     case 'fullName':
-      errors.fullName = value.length < 2 ? 'Mínimo 2 caracteres.' : ''
+      if (value.length < 2) {
+        errors.fullName = 'Mínimo 2 caracteres.'
+      } else if (isOnlyEmoji(value)) {
+        errors.fullName = 'Tu nombre real, por favor.'
+      } else if (value.length > 80) {
+        errors.fullName = 'Demasiado largo (máx 80).'
+      } else {
+        errors.fullName = ''
+      }
       break
-    case 'email':
-      errors.email = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value) ? '' : 'Necesitamos un email válido.'
+    case 'email': {
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) {
+        errors.email = 'Necesitamos un email válido.'
+      } else {
+        const domain = value.split('@')[1]?.toLowerCase() || ''
+        if (DISPOSABLE_EMAIL_DOMAINS.has(domain)) {
+          errors.email = 'Usá un email permanente — te mandamos cosas importantes acá.'
+        } else {
+          errors.email = ''
+        }
+      }
       break
+    }
     case 'whatsapp': {
       const digits = value.replace(/\D/g, '')
-      errors.whatsapp = digits.length >= 8 ? '' : 'Ingresá un número con código de área.'
+      if (digits.length < 8) {
+        errors.whatsapp = 'Ingresá un número con código de área.'
+      } else if (digits.length > 15) {
+        errors.whatsapp = 'Número demasiado largo.'
+      } else if (/^(\d)\1+$/.test(digits)) {
+        // 11111111, 00000000, etc — son números fake típicos.
+        errors.whatsapp = 'Ese número no parece real.'
+      } else {
+        errors.whatsapp = ''
+      }
       break
     }
   }

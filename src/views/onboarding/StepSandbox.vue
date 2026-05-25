@@ -161,6 +161,27 @@
                 </div>
               </div>
             </div>
+
+            <!-- KPIs extras: hora pico + NPS proxy + ticket por canal.
+                 Le dan al lead razones nuevas para enganchar con el dashboard. -->
+            <div class="grid grid-cols-2 gap-3">
+              <div class="rounded-xl border border-slate-200 bg-white p-3">
+                <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5 flex items-center gap-1">
+                  <Clock class="w-3 h-3" />
+                  Hora pico
+                </p>
+                <p class="text-base font-black text-slate-900 tabular-nums leading-none">21:30</p>
+                <p class="text-[10px] text-slate-500 mt-1">35% de los pedidos · vie/sáb</p>
+              </div>
+              <div class="rounded-xl border border-emerald-200 bg-emerald-50/40 p-3">
+                <p class="text-[10px] font-bold text-emerald-700 uppercase tracking-widest mb-1.5 flex items-center gap-1">
+                  <Smile class="w-3 h-3" />
+                  Satisfacción (NPS)
+                </p>
+                <p class="text-base font-black text-emerald-700 tabular-nums leading-none">+62</p>
+                <p class="text-[10px] text-emerald-600 mt-1">+8 vs mes anterior</p>
+              </div>
+            </div>
           </div>
 
           <!-- CLIENTES -->
@@ -295,7 +316,7 @@ import { ref, computed, onMounted, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import {
   Lock, BarChart3, Users, Megaphone, Crown, Star, Award, Zap,
-  Send, MessageCircle, Sparkles, ShoppingBag,
+  Send, MessageCircle, Sparkles, ShoppingBag, Clock, Smile,
 } from 'lucide-vue-next'
 import StepActions from '@/components/onboarding/StepActions.vue'
 import { useOnboarding } from '@/composables/useOnboarding'
