@@ -5,19 +5,22 @@
     </p>
     <h1 class="text-[clamp(1.8rem,4vw,2.6rem)] font-extrabold tracking-tighter leading-[1.05] text-slate-900 mb-4">
       <template v-if="onboarding.greeting.value">
-        {{ onboarding.greeting.value }}, este es<br />
-        <span class="text-primary italic font-light">tu plan recomendado.</span>
+        {{ onboarding.greeting.value }}, arrancás<br />
+        <span class="text-primary italic font-light">en USD 69 / mes.</span>
       </template>
       <template v-else>
-        Tu plan<br />
-        <span class="text-primary italic font-light">recomendado.</span>
+        Arrancás en<br />
+        <span class="text-primary italic font-light">USD 69 / mes.</span>
       </template>
     </h1>
+    <!-- Mensaje clave: TODOS arrancan acá independiente del tamaño actual.
+         No hay decisión de "qué plan" — es un único bundle de entrada que
+         crece automáticamente cuando el VOLUMEN REAL lo justifica. -->
     <p class="text-base text-slate-500 leading-relaxed mb-6 max-w-md">
-      Pricing por volumen de pedidos. Estimás
-      <span class="font-bold text-slate-900 tabular-nums">{{ totalMonthlyOrders.toLocaleString('es-AR') }} pedidos/mes</span>
-      ({{ onboarding.state.business.locations }} {{ onboarding.state.business.locations === 1 ? 'local' : 'locales' }} × {{ onboarding.effectiveOrders.value }} pedidos).
-      Activás gratis hoy y pagás solo si te convence al día 16.
+      Todas las marcas arrancan con el mismo plan de entrada — pagás solo
+      <span class="font-bold text-slate-900">USD 69 hasta 300 pedidos/mes</span>.
+      Cuando tu volumen real supere ese límite, escalás automáticamente al
+      siguiente tier. Sin renegociar nada.
     </p>
 
     <!-- Toggle mensual/anual — anual 20% off. Cobranza estándar SaaS para
@@ -66,8 +69,9 @@
       <div class="relative">
         <div class="flex items-start justify-between gap-4 mb-5">
           <div>
-            <p class="text-[10px] font-black text-white/60 uppercase tracking-widest mb-1">
-              Plan recomendado
+            <p class="text-[10px] font-black text-white/60 uppercase tracking-widest mb-1 flex items-center gap-2">
+              <Sparkles class="w-3 h-3" />
+              Tu punto de partida
             </p>
             <h2 class="text-2xl sm:text-3xl font-black tracking-tighter">
               {{ recommendedPlan.name }}
@@ -88,6 +92,23 @@
             −20%
           </span>
         </div>
+
+        <!-- "Incluye hasta X pedidos/mes" — el corazón del mensaje:
+             todos arrancan acá, el escalado lo dispara el VOLUMEN REAL. -->
+        <div class="rounded-xl bg-white/10 border border-white/15 p-3 mb-4 flex items-center gap-3">
+          <div class="w-10 h-10 rounded-lg bg-emerald-400 flex items-center justify-center shrink-0 text-emerald-950">
+            <Check class="w-5 h-5" stroke-width="3" />
+          </div>
+          <div class="min-w-0">
+            <p class="text-xs text-white/60 uppercase tracking-widest font-black mb-0.5">
+              Incluye hasta
+            </p>
+            <p class="text-lg font-extrabold tabular-nums text-white leading-tight">
+              {{ recommendedPlan.maxOrders.toLocaleString('es-AR') }} pedidos/mes
+            </p>
+          </div>
+        </div>
+
         <p v-if="form.billingCycle === 'annual'" class="text-[11px] text-white/70 leading-snug mb-2">
           Cobrado anualmente: USD {{ (effectiveFee(recommendedPlan) * 12).toLocaleString('es-AR') }} / año.
         </p>
@@ -178,11 +199,9 @@
     </figure>
 
     <!-- Escalera de crecimiento — INFORMATIVA, no seleccionable.
-         El plan se ajusta solo según el volumen de pedidos del lead.
-         Esta sección muestra los próximos tiers para que el lead entienda
-         cómo va a crecer su fee a medida que escale. NO es un selector
-         (era el bug anterior — el modelo es Bundle único escalonado, no
-         "elegí cuál plan querés"). -->
+         "Estás acá" siempre marca Inicio (USD 69) — ahí arranca todo el mundo.
+         Si el lead declaró un volumen alto (projectedTier > Inicio), también
+         marcamos ese tier con "Acá vas a llegar" como roadmap motivacional. -->
     <div v-if="!isEnterprise" class="mb-8">
       <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3">
         Cuando crezcas, tu plan crece con vos
@@ -202,14 +221,20 @@
           class="grid grid-cols-1 sm:grid-cols-[1.4fr_1fr_auto_auto] gap-2 sm:gap-4 px-5 py-3 transition-colors"
           :class="[
             tier.key === recommendedPlan.key ? 'bg-primary/[0.04] sm:bg-primary/[0.05]' : '',
+            tier.key === projectedTier.key && projectedTier.key !== recommendedPlan.key ? 'bg-emerald-50/40' : '',
             'border-b border-slate-100 last:border-b-0',
           ]"
         >
           <div class="flex items-center gap-2.5 min-w-0">
-            <!-- Indicador "estás acá" para el tier recomendado -->
+            <!-- Indicador: primary = Estás acá, emerald = Acá vas a llegar -->
             <span
               v-if="tier.key === recommendedPlan.key"
               class="w-1.5 h-1.5 rounded-full bg-primary shrink-0"
+              aria-hidden="true"
+            ></span>
+            <span
+              v-else-if="tier.key === projectedTier.key"
+              class="w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0"
               aria-hidden="true"
             ></span>
             <span v-else class="w-1.5 h-1.5 rounded-full bg-slate-200 shrink-0" aria-hidden="true"></span>
@@ -221,6 +246,12 @@
                   class="text-[9px] font-black text-white bg-primary px-2 py-0.5 rounded-full uppercase tracking-widest"
                 >
                   Estás acá
+                </span>
+                <span
+                  v-else-if="tier.key === projectedTier.key"
+                  class="text-[9px] font-black text-white bg-emerald-500 px-2 py-0.5 rounded-full uppercase tracking-widest"
+                >
+                  Próxima parada
                 </span>
               </div>
             </div>
@@ -250,7 +281,21 @@
           </div>
         </div>
       </div>
-      <p class="text-[11px] text-slate-500 leading-relaxed mt-3 flex items-start gap-1.5">
+
+      <!-- Footer con narrativa según volumen declarado -->
+      <p
+        v-if="projectedTier.key !== recommendedPlan.key"
+        class="text-[12px] text-slate-600 leading-relaxed mt-3 flex items-start gap-1.5 bg-emerald-50/60 border border-emerald-100 rounded-xl p-3"
+      >
+        <Sparkles class="w-3.5 h-3.5 text-emerald-600 shrink-0 mt-0.5" />
+        <span>
+          Declaraste <strong>{{ totalMonthlyOrders.toLocaleString('es-AR') }} pedidos/mes</strong>.
+          Cuando tu volumen real lo confirme, escalamos automáticamente al tier
+          <strong class="text-emerald-700">{{ projectedTier.name }}</strong>.
+          Mientras tanto pagás solo USD {{ effectiveFee(recommendedPlan) }} de entrada.
+        </span>
+      </p>
+      <p v-else class="text-[11px] text-slate-500 leading-relaxed mt-3 flex items-start gap-1.5">
         <Check class="w-3 h-3 text-emerald-500 shrink-0 mt-0.5" stroke-width="3" />
         <span>
           Pasás al siguiente tier <strong class="text-slate-700">automáticamente</strong> cuando superás el volumen del actual. Sin renegociar nada — el sistema lo hace al cierre del mes y tu data te sigue.
@@ -273,7 +318,7 @@
 <script setup>
 import { reactive, computed, watch } from 'vue'
 import { useRouter } from 'vue-router'
-import { Check } from 'lucide-vue-next'
+import { Check, Sparkles } from 'lucide-vue-next'
 import StepActions from '@/components/onboarding/StepActions.vue'
 import Tooltip from '@/components/onboarding/Tooltip.vue'
 import { useOnboarding } from '@/composables/useOnboarding'
@@ -304,6 +349,11 @@ function effectiveFee(tier) {
 }
 
 const recommendedPlan = computed(() => onboarding.recommendedPlan.value)
+// projectedTier = tier teórico según volumen declarado. Usado en la escalera
+// para mostrar "Acá vas a llegar" cuando el lead declaró un volumen mayor
+// al cap del tier Inicio. Si declaró ≤300 pedidos, projectedTier === Inicio
+// y no mostramos roadmap (solo el copy default).
+const projectedTier = computed(() => onboarding.projectedTier.value)
 
 // Total estimado de pedidos/mes = locales × pedidos por local. Usado para
 // mostrar en el subtítulo y para que el lead entienda por qué le tocó X plan.

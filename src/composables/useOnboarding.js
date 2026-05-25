@@ -167,63 +167,85 @@ watch(
   { deep: true }
 )
 
-// ── Plan recommendation engine — Pricing 2026 por VOLUMEN DE PEDIDOS ────
-// El lead paga según pedidos totales/mes (más cercano a su ingreso real)
-// no según locales. Una marca con 3 locales facturando alto puede estar en
-// Growth; una con 12 locales pequeños puede estar en Starter.
+// ── Plan recommendation engine — Bundle único escalonado 2026 ──────────
+// Decisión de pricing: TODOS los leads arrancan en el tier "Inicio" (USD 69
+// con hasta 300 pedidos/mes), independiente de cuántos locales tengan o
+// cuánto volumen DECLAREN inicialmente. Solo escalan al siguiente tier cuando
+// el VOLUMEN REAL (medido por nuestro sistema en producción) supera el límite.
 //
-// Cálculo: pedidos totales = locations × ordersPerLocation (effectiveOrders).
-// Default: 300 pedidos/local para marcas nuevas — el slider en Step Savings
-// permite ajustarlo. Mantenemos `minLocations/maxLocations` solo para mostrar
-// "para X-Y locales" como referencia visual, pero el engine usa orders.
+// Por qué: protege al lead de pagar caro de entrada, baja la fricción de
+// activación, y el upgrade automático mantiene cash flow saludable cuando
+// el volumen real lo justifica.
 //
-// keyFeatures: 2 features clave que diferencian un plan del anterior. No
-// es la lista completa (esa vive en /pricing) — solo el "upgrade" visible.
+// La escalera de tiers se muestra como roadmap a futuro, no como selector.
 const PLAN_TIERS = [
   {
-    key: 'starter', name: 'Starter',
-    minOrders: 0, maxOrders: 1500,
-    minLocations: 1, maxLocations: 5,
-    monthlyFee: 29, commissionPct: 1.5,
-    keyFeatures: ['Self-service · 1 admin', 'Soporte por email'],
+    key: 'inicio', name: 'Inicio',
+    minOrders: 0, maxOrders: 300,
+    minLocations: 1, maxLocations: 3,
+    monthlyFee: 69, commissionPct: 1.5,
+    keyFeatures: ['Self-service · 1 admin', 'Soporte por email + WhatsApp CSM'],
+    tagline: 'Tu punto de partida — sin importar tu tamaño actual',
   },
   {
-    key: 'growth', name: 'Growth',
-    minOrders: 1501, maxOrders: 7500,
-    minLocations: 4, maxLocations: 25,
-    monthlyFee: 119, commissionPct: 1.25,
+    key: 'crecimiento', name: 'Crecimiento',
+    minOrders: 301, maxOrders: 1000,
+    minLocations: 3, maxLocations: 10,
+    monthlyFee: 169, commissionPct: 1.25,
     keyFeatures: ['CSM compartido · 3 admins', 'Branding propio + dominio'],
+    tagline: 'Operación consolidada, alto delivery',
   },
   {
-    key: 'scale', name: 'Scale',
-    minOrders: 7501, maxOrders: 25000,
-    minLocations: 12, maxLocations: 70,
-    monthlyFee: 269, commissionPct: 1.0,
+    key: 'escala', name: 'Escala',
+    minOrders: 1001, maxOrders: 3000,
+    minLocations: 10, maxLocations: 30,
+    monthlyFee: 349, commissionPct: 1.0,
     keyFeatures: ['CSM dedicado 4h/mes · 10 admins', 'API pública + webhooks'],
+    tagline: 'Cadena con operación 24/7',
+  },
+  {
+    key: 'performance', name: 'Performance',
+    minOrders: 3001, maxOrders: 7500,
+    minLocations: 30, maxLocations: 100,
+    monthlyFee: 599, commissionPct: 0.85,
+    keyFeatures: ['CSM dedicado full-time', 'SSO + multi-región'],
+    tagline: 'Cadena establecida con tráfico alto',
   },
   {
     key: 'pro', name: 'Pro',
-    minOrders: 25001, maxOrders: 75000,
-    minLocations: 30, maxLocations: 200,
-    monthlyFee: 449, commissionPct: 0.75,
-    keyFeatures: ['CSM 24/7 · admins ilimitados', 'Multi-región + SSO'],
+    minOrders: 7501, maxOrders: 25000,
+    minLocations: 100, maxLocations: 500,
+    monthlyFee: 1199, commissionPct: 0.75,
+    keyFeatures: ['CSM 24/7 · admins ilimitados', 'SLA 99,5% + audit logs'],
+    tagline: 'Líder de categoría o eventos masivos',
   },
   {
     key: 'enterprise', name: 'Enterprise',
-    minOrders: 75001, maxOrders: Infinity,
-    minLocations: 100, maxLocations: Infinity,
+    minOrders: 25001, maxOrders: Infinity,
+    minLocations: 200, maxLocations: Infinity,
     monthlyFee: null, commissionPct: 0.5,
     keyFeatures: ['SLA 99,9% + soporte L3', 'Integraciones custom + on-prem'],
+    tagline: 'Operación nacional o multi-marca',
   },
 ]
 
-// Default 300 pedidos/local cuando el lead todavía no editó. Single source
-// para que Step Savings y la recomendación se vean consistentes.
+// Default declarado de pedidos/local cuando el lead todavía no editó.
+// Coincide con el cap del tier de entrada — todos los leads arrancan en
+// "Inicio" con USD 69 / hasta 300 pedidos.
 const DEFAULT_ORDERS_PER_LOCATION = 300
 
-const recommendedPlan = computed(() => {
-  // Volumen total = locales × pedidos/local efectivos (lo que el lead editó
-  // en RoiCalculator, o el default 300). Esto es la métrica clave.
+// El plan RECOMENDADO al activar el trial siempre es el primer tier (Inicio).
+// La razón: el upgrade es por VOLUMEN REAL medido en producción, no por
+// proyección declarada en el form. El lead arranca pagando USD 69 y solo
+// sube de tier si su volumen real lo dispara.
+//
+// `projectedTier` (computed más abajo) sí proyecta el tier teórico basado
+// en lo que declaró — útil para mostrar en la "escalera" como roadmap.
+const recommendedPlan = computed(() => PLAN_TIERS[0])
+
+// Tier teórico basado en volumen declarado por el lead. Lo usamos sólo para
+// mostrar "cuando tu volumen real supere X, pasás a este tier".
+const projectedTier = computed(() => {
   const locations = Math.max(1, Number(state.business.locations) || 1)
   const perLocation =
     Number(state.business.ordersPerLocation) > 0
@@ -547,6 +569,7 @@ export function useOnboarding() {
     hasBonus,
     markBonusApplied,
     recommendedPlan,
+    projectedTier,
     monthlyEstimateUsd,
     annualSavingsUsd,
     ANNUAL_DISCOUNT,
