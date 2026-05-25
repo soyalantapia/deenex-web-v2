@@ -170,13 +170,8 @@
       </template>
     </button>
 
-    <button
-      type="button"
-      @click="$router.push('/comenzar/plan')"
-      class="mt-4 w-full text-sm font-semibold text-slate-500 hover:text-slate-900 transition-colors text-center"
-    >
-      ← Cambiar de plan
-    </button>
+    <!-- "Cambiar de plan" removido — el plan se asigna automáticamente
+         según volumen (no hay opción de elegir). -->
 
     <p class="mt-6 text-[11px] text-slate-400 leading-relaxed text-center">
       Al activar tu cuenta aceptás el cobro recurrente desde el día 16.
