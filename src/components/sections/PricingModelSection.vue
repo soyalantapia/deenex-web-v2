@@ -73,8 +73,9 @@
               </span>
               <span class="text-sm text-slate-500">/ mes</span>
             </div>
-            <p class="text-sm font-bold text-primary mb-4 flex items-center gap-1">
-              <span>+ {{ content.starterCommission }}% por venta procesada</span>
+            <p class="text-sm font-bold text-primary mb-4 flex items-center gap-1 flex-wrap">
+              <span>+ {{ content.starterCommission }}% comisión</span>
+              <span class="text-[10px] font-black text-slate-400 uppercase tracking-wider">{{ content.starterCommissionScope }}</span>
             </p>
 
             <div class="rounded-xl bg-emerald-50 border border-emerald-100 p-3 mb-4">
@@ -241,40 +242,111 @@
                   </div>
                 </div>
 
-                <!-- % via apps de terceros -->
-                <div>
-                  <div class="flex items-center justify-between mb-2 gap-3">
-                    <label for="calc-pct-apps" class="text-sm font-bold text-slate-700 leading-tight">
-                      % que hoy hacés por Rappi / PedidosYa
-                    </label>
-                    <div class="flex items-center gap-1.5">
-                      <input
-                        id="calc-pct-apps"
-                        v-model.number="calc.pctViaApps"
-                        type="number"
-                        min="0"
-                        max="100"
-                        step="5"
-                        class="w-14 px-2 py-1 border border-slate-300 rounded-lg text-sm font-bold tabular-nums text-right focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary"
-                      />
-                      <span class="text-[11px] text-slate-500">%</span>
+                <!-- Mix de canales — agrupador visual con 2 sliders separados.
+                     Modelo nuevo: comisión Deenex aplica SOLO a delivery propio,
+                     y el lead controla el % de Rappi por separado (con su % de
+                     comisión editable, porque varía 25-40% según país/segmento).
+                     El % que no es ni delivery propio ni apps queda implícito
+                     como mesa/takeaway presencial (sin comisión). -->
+                <div class="rounded-xl bg-slate-50/50 border border-slate-200 p-3.5 space-y-4">
+                  <p class="text-[10px] font-black text-slate-500 uppercase tracking-widest flex items-center gap-1.5">
+                    <Repeat class="w-3 h-3" />
+                    Mix de canales (% del GMV total)
+                  </p>
+
+                  <!-- % delivery propio -->
+                  <div>
+                    <div class="flex items-center justify-between mb-2 gap-3">
+                      <label for="calc-pct-delivery" class="text-sm font-bold text-slate-700 leading-tight">
+                        % delivery propio (canal Deenex)
+                      </label>
+                      <div class="flex items-center gap-1.5">
+                        <input
+                          id="calc-pct-delivery"
+                          v-model.number="calc.pctDeliveryPropio"
+                          type="number"
+                          min="0"
+                          max="100"
+                          step="5"
+                          class="w-14 px-2 py-1 border border-slate-300 rounded-lg text-sm font-bold tabular-nums text-right focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary"
+                        />
+                        <span class="text-[11px] text-slate-500">%</span>
+                      </div>
+                    </div>
+                    <input
+                      v-model.number="calc.pctDeliveryPropio"
+                      type="range"
+                      min="0"
+                      max="100"
+                      step="5"
+                      class="w-full h-2 bg-slate-200 rounded-full appearance-none cursor-pointer accent-primary"
+                      aria-label="% delivery propio slider"
+                    />
+                    <p class="text-[10px] text-slate-400 mt-1 font-medium">
+                      La comisión Deenex (<span class="font-bold">{{ calcTier.commissionLabel }}</span>) aplica solo sobre este %.
+                    </p>
+                  </div>
+
+                  <!-- % via apps -->
+                  <div>
+                    <div class="flex items-center justify-between mb-2 gap-3">
+                      <label for="calc-pct-apps" class="text-sm font-bold text-slate-700 leading-tight">
+                        % via Rappi / PedidosYa
+                      </label>
+                      <div class="flex items-center gap-1.5">
+                        <input
+                          id="calc-pct-apps"
+                          v-model.number="calc.pctViaApps"
+                          type="number"
+                          min="0"
+                          max="100"
+                          step="5"
+                          class="w-14 px-2 py-1 border border-slate-300 rounded-lg text-sm font-bold tabular-nums text-right focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary"
+                        />
+                        <span class="text-[11px] text-slate-500">%</span>
+                      </div>
+                    </div>
+                    <input
+                      v-model.number="calc.pctViaApps"
+                      type="range"
+                      min="0"
+                      max="100"
+                      step="5"
+                      class="w-full h-2 bg-slate-200 rounded-full appearance-none cursor-pointer accent-primary"
+                      aria-label="% apps slider"
+                    />
+                    <!-- Sub-input: % comisión que cobran las apps (editable) -->
+                    <div class="mt-2 flex items-center gap-2 flex-wrap text-[11px] text-slate-500">
+                      <span>Comisión que te cobran:</span>
+                      <div class="flex items-center gap-1">
+                        <input
+                          v-model.number="calc.pctCommissionApps"
+                          type="number"
+                          min="0"
+                          max="60"
+                          step="1"
+                          class="w-12 px-1.5 py-0.5 border border-slate-300 rounded text-[11px] font-bold tabular-nums text-right focus:outline-none focus:ring-1 focus:ring-primary/30 focus:border-primary"
+                          aria-label="% comisión apps"
+                        />
+                        <span class="font-bold">%</span>
+                      </div>
+                      <span class="text-slate-400">(default 30% típico AR)</span>
                     </div>
                   </div>
-                  <input
-                    v-model.number="calc.pctViaApps"
-                    type="range"
-                    min="0"
-                    max="100"
-                    step="5"
-                    class="w-full h-2 bg-slate-200 rounded-full appearance-none cursor-pointer accent-primary"
-                    aria-label="% apps slider"
-                  />
-                  <div class="flex justify-between text-[10px] text-slate-400 mt-1 font-semibold tabular-nums">
-                    <span>0%</span>
-                    <span>25%</span>
-                    <span>50%</span>
-                    <span>100%</span>
-                  </div>
+
+                  <!-- Validación visual: muestra % presencial implícito -->
+                  <p
+                    v-if="pctPresencial > 0"
+                    class="text-[10px] text-slate-400 leading-snug pt-2 border-t border-slate-200"
+                  >
+                    <span class="font-bold tabular-nums">{{ pctPresencial }}%</span> implícito en mesa/takeaway presencial (sin comisión).
+                  </p>
+                  <p
+                    v-else-if="pctPresencial < 0"
+                    class="text-[10px] text-rose-600 leading-snug pt-2 border-t border-rose-100 font-medium"
+                  >
+                    ⚠️ La suma supera el 100%. Ajustá los sliders para que delivery + apps ≤ 100%.
+                  </p>
                 </div>
 
                 <!-- Toggle: ¿Tenés POS hoy? Compact UI, marcado por default
@@ -353,7 +425,15 @@
                     </span>
                   </div>
                   <p class="text-[12px] text-white/80 mt-1">
-                    + {{ calcTier.commissionLabel }} de comisión por venta procesada
+                    + <span class="font-bold tabular-nums">{{ calcTier.commissionLabel }}</span> de comisión <span class="text-white/60">solo en delivery propio</span>
+                  </p>
+                  <!-- Marketing AI: add-on opcional (% sobre venta atribuida) -->
+                  <p
+                    v-if="calcTier.marketingAiPct !== undefined && calcTier.marketingAiPct !== null"
+                    class="text-[12px] text-white/80 mt-1 flex items-center gap-1.5"
+                  >
+                    <Sparkles class="w-3 h-3" />
+                    Marketing AI opcional: <span class="font-bold tabular-nums">{{ calcTier.marketingAiPct }}%</span> sobre venta atribuida
                   </p>
                   <!-- POS / local en este tier (si aplica) -->
                   <p
@@ -380,7 +460,7 @@
                   <div class="min-w-0">
                     <p class="text-sm font-semibold text-slate-700">Tu costo con Deenex</p>
                     <p v-if="calcTier.fee !== null" class="text-[11px] text-slate-400 leading-snug">
-                      USD {{ calcTier.fee }} fee + {{ fmtUsd(commissionCost) }} de comisión
+                      USD {{ calcTier.fee }} bundle + {{ fmtUsd(commissionCost) }} comisión <span class="font-medium">({{ calcTier.commissionLabel }} sobre {{ calc.pctDeliveryPropio }}% delivery propio)</span>
                     </p>
                     <p v-else class="text-[11px] text-slate-400 leading-snug">
                       Volumen Enterprise — acuerdo dedicado
@@ -395,9 +475,9 @@
                   class="flex items-baseline justify-between gap-3 pb-2.5 border-b border-slate-200"
                 >
                   <div class="min-w-0">
-                    <p class="text-sm font-semibold text-slate-700">Tu costo actual en apps</p>
+                    <p class="text-sm font-semibold text-slate-700">Comisión que pagás en apps de delivery</p>
                     <p class="text-[11px] text-slate-400 leading-snug">
-                      {{ calc.pctViaApps }}% del GMV × {{ content.calculatorAppsCommissionPct }}%
+                      {{ calc.pctViaApps }}% del GMV × {{ calc.pctCommissionApps }}% (Rappi/PedidosYa)
                     </p>
                   </div>
                   <span class="text-xl font-extrabold text-slate-400 line-through tabular-nums whitespace-nowrap">
@@ -767,14 +847,23 @@ const calc = reactive({
   locations: props.content.calculatorDefaults?.locations ?? 5,
   ordersPerLocation: props.content.calculatorDefaults?.ordersPerLocation ?? 300,
   avgTicket: props.content.calculatorDefaults?.avgTicket ?? 15,
-  pctViaApps: props.content.calculatorDefaults?.pctViaApps ?? 50,
+  // Modelo 2026 v2: separamos canal en 2 inputs.
+  // pctDeliveryPropio: % del GMV que es delivery propio (canal Deenex)
+  //   → SOBRE este % aplica la comisión Deenex (3% solo en delivery).
+  // pctViaApps: % del GMV que va por Rappi/PedidosYa
+  //   → SOBRE este % aplica el costo de comisión de apps de terceros.
+  // El resto (100 - delivery - apps) es mesa/takeaway presencial → sin comisión.
+  pctDeliveryPropio: props.content.calculatorDefaults?.pctDeliveryPropio ?? 30,
+  pctViaApps: props.content.calculatorDefaults?.pctViaApps ?? 30,
+  // pctCommissionApps: % de comisión que el lead paga a Rappi/PedidosYa.
+  // Editable porque varía 25-40% según país/segmento. Default 30 (típico AR).
+  pctCommissionApps: props.content.calculatorDefaults?.pctCommissionApps ?? 30,
   // hasPos: si el lead ya tiene un sistema POS hoy (Fudo, Maxirest, etc.).
   // Default true porque la inmensa mayoría de cadenas gastronómicas SÍ tienen.
   // Toggleable para que el lead que no tiene POS no vea el ahorro irrelevante.
   hasPos: props.content.calculatorDefaults?.hasPos ?? true,
 })
 
-const APPS_COMMISSION_PCT = props.content.calculatorAppsCommissionPct ?? 30
 const POS_INDUSTRY_COST = props.content.posIndustryCostPerLocation ?? 20
 
 // ── Métricas de volumen ─────────────────────────────────────────────
@@ -796,13 +885,23 @@ const calcTier = computed(() => {
   return tiers.find((t) => t.maxOrders === null || n <= t.maxOrders) || tiers[0]
 })
 
+// % presencial implícito = 100 - delivery propio - apps. Si negativo,
+// significa que el lead puso una suma >100 entre los 2 sliders (error UX).
+const pctPresencial = computed(() => {
+  const del = Math.max(0, Number(calc.pctDeliveryPropio) || 0)
+  const apps = Math.max(0, Number(calc.pctViaApps) || 0)
+  return 100 - del - apps
+})
+
 // ── Costos mensuales ────────────────────────────────────────────────
-// Sólo la parte de comisión del costo Deenex (sin el fee). Útil para
-// mostrarlo desglosado en el output ("USD 169 fee + USD 937 comisión").
+// Comisión Deenex aplica SOLO al delivery propio (no al GMV total).
+// Por eso multiplica por pctDeliveryPropio antes del % del tier.
+// Útil para el desglose ("USD 119 fee + USD X comisión delivery").
 const commissionCost = computed(() => {
   const tier = calcTier.value
   if (tier.fee === null || tier.commissionPct === undefined) return 0
-  return gmvUsd.value * (tier.commissionPct / 100)
+  const pctDel = Math.max(0, Math.min(100, Number(calc.pctDeliveryPropio) || 0))
+  return gmvUsd.value * (pctDel / 100) * (tier.commissionPct / 100)
 })
 
 const deenexMonthlyCost = computed(() => {
@@ -812,9 +911,12 @@ const deenexMonthlyCost = computed(() => {
   return tier.fee + commissionCost.value
 })
 
+// Costo de comisión de Rappi/PedidosYa. Aplica al % via apps del GMV
+// usando el `pctCommissionApps` editable (default 30%, range 20-40).
 const appsMonthlyCost = computed(() => {
   const pct = Math.max(0, Math.min(100, Number(calc.pctViaApps) || 0))
-  return gmvUsd.value * (pct / 100) * (APPS_COMMISSION_PCT / 100)
+  const commPct = Math.max(0, Math.min(100, Number(calc.pctCommissionApps) || 0))
+  return gmvUsd.value * (pct / 100) * (commPct / 100)
 })
 
 // ── Ahorro de comisión vs apps ──────────────────────────────────────

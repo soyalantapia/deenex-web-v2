@@ -426,8 +426,9 @@ export const pricingModel = {
     'Integración POS + MercadoPago listo del día 1',
     'Customer Success durante todo el trial',
   ],
-  starterPrice: 69,
-  starterCommission: '1,5',
+  starterPrice: 29,
+  starterCommission: '3',
+  starterCommissionScope: 'solo en delivery propio',
   starterOrders: 300,
   starterCtaLabel: 'Empezar 15 días gratis',
 
@@ -436,22 +437,24 @@ export const pricingModel = {
   scaleTitle: 'Una escalera, no un menú.',
   scaleSubtitle:
     'Pasás al siguiente tier cuando superás el volumen del actual. Sin renegociar, sin firmar nada, sin perder data. El sistema lo hace automáticamente al cierre del mes.',
-  scaleHighlightLabel: 'Más común',
-  // maxOrders = límite superior del tier (null = enterprise sin techo).
-  // commissionPct = % numérico para los cálculos (commissionLabel es el string display).
-  // posPerLocation = precio del POS integrado por local en este tier (USD/mes).
-  //   Cae progresivamente con cada tier mayor — descuento por volumen.
-  //   USD 20 = paridad con mercado AR (Fudo/Maxirest típico). null = enterprise.
-  // Lo usa la calculadora detallada para mapear input → tier en vivo y computar costos.
+  scaleHighlightLabel: 'Siguiente paso',
+  // Modelo pricing 2026 v2 (actualizado):
+  //   - fee = Bundle "Ventas + Loyalty" (precio mensual fijo).
+  //   - commissionPct = % de comisión SOLO en delivery propio (no aplica a salón ni Rappi).
+  //   - marketingAiPct = % opcional cobrado sobre ventas atribuidas a Marketing AI.
+  //   - posPerLocation = USD/local del POS integrado (cae progresivo por tier).
+  //   - maxOrders = límite superior de pedidos/mes del tier.
+  // Todos los % bajan progresivamente con tier para premiar volumen.
   scaleTiers: [
     {
       name: 'Inicio',
       tagline: 'Marca arrancando o pequeña — 1-3 locales típicos.',
       ordersLabel: 'Hasta 300',
       maxOrders: 300,
-      fee: 69,
-      commissionPct: 1.5,
-      commissionLabel: '1,5%',
+      fee: 29,
+      commissionPct: 3.0,
+      commissionLabel: '3%',
+      marketingAiPct: 12,
       posPerLocation: 20,
     },
     {
@@ -459,9 +462,10 @@ export const pricingModel = {
       tagline: 'Operación consolidada — 3-10 locales o alto delivery.',
       ordersLabel: '301 – 1.000',
       maxOrders: 1000,
-      fee: 169,
-      commissionPct: 1.25,
-      commissionLabel: '1,25%',
+      fee: 119,
+      commissionPct: 2.75,
+      commissionLabel: '2,75%',
+      marketingAiPct: 11,
       posPerLocation: 17,
       highlight: true,
     },
@@ -471,8 +475,9 @@ export const pricingModel = {
       ordersLabel: '1.001 – 3.000',
       maxOrders: 3000,
       fee: 349,
-      commissionPct: 1.0,
-      commissionLabel: '1,0%',
+      commissionPct: 2.5,
+      commissionLabel: '2,5%',
+      marketingAiPct: 10,
       posPerLocation: 13,
     },
     {
@@ -481,8 +486,9 @@ export const pricingModel = {
       ordersLabel: '3.001 – 7.500',
       maxOrders: 7500,
       fee: 599,
-      commissionPct: 0.85,
-      commissionLabel: '0,85%',
+      commissionPct: 2.25,
+      commissionLabel: '2,25%',
+      marketingAiPct: 9,
       posPerLocation: 10,
     },
     {
@@ -491,8 +497,9 @@ export const pricingModel = {
       ordersLabel: '7.501 – 25.000',
       maxOrders: 25000,
       fee: 1199,
-      commissionPct: 0.75,
-      commissionLabel: '0,75%',
+      commissionPct: 2.0,
+      commissionLabel: '2%',
+      marketingAiPct: 8,
       posPerLocation: 7,
     },
     {
@@ -501,8 +508,9 @@ export const pricingModel = {
       ordersLabel: '25.001+',
       maxOrders: null,
       fee: null,
-      commissionPct: 0.5,
-      commissionLabel: 'Desde 0,5%',
+      commissionPct: 1.75,
+      commissionLabel: 'Desde 1,75%',
+      marketingAiPct: 7,
       posPerLocation: null,
     },
   ],
@@ -521,12 +529,15 @@ export const pricingModel = {
   calculatorSubtitle:
     'Movés los sliders con tus datos reales. La columna de la derecha te dice EN VIVO en qué tier caés, cuánto pagás y cuánto te ahorrás vs Rappi/PedidosYa. Sin trucos, sin "consultá a ventas".',
   // Defaults pensados para un caso típico: 5 locales × 300 pedidos = 1.500 pedidos
-  // → cae en tier Crecimiento (el "más común"). 50% via apps terceros = ahorro visible.
+  // → cae en tier Crecimiento. 30% delivery propio + 30% via Rappi/PedidosYa
+  // (suma 60% delivery total) deja 40% en mesa/takeaway.
   calculatorDefaults: {
     locations: 5,
     ordersPerLocation: 300,
     avgTicket: 15,
-    pctViaApps: 50,
+    pctDeliveryPropio: 30,
+    pctViaApps: 30,
+    pctCommissionApps: 30,
   },
   // % típico de comisión que cobran Rappi/PedidosYa. Lo exponemos en
   // el footnote para que el lead pueda auditar el cálculo si quiere.
@@ -543,7 +554,7 @@ export const pricingModel = {
     ticketUpliftPct: 15,
   },
   calculatorFootnote:
-    'Asumimos 30% de comisión en apps (Rappi/PedidosYa típico AR/LATAM) y USD 20/local de POS de mercado (Fudo/Maxirest típico). Uplifts +20% recurrencia y +15% ticket son promedios conservadores de clientes Deenex con 6+ meses. Tu resultado real depende de cuánto actives Loyalty, campañas por WhatsApp y promociones — clientes top promedian +35% / +25%.',
+    'Comisión Deenex aplica solo a delivery propio (no en mesa/takeaway/Rappi). % comisión apps editable (default 30%, típico AR). USD 20/local de POS mercado (Fudo/Maxirest típico). Uplifts +20% recurrencia y +15% ticket son promedios conservadores de clientes Deenex con 6+ meses — clientes top promedian +35% / +25%.',
 
   // ── Cómo empezar (al cierre de la calculadora) ─────────────────
   calculatorHowToStartEyebrow: 'Cómo empezar',
