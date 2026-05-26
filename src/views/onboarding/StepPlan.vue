@@ -281,10 +281,6 @@
       :disabled="false"
       @back="$router.push('/comenzar/ahorro')"
     />
-
-    <p class="mt-6 text-[11px] text-slate-400 leading-relaxed">
-      Sin cargo durante 15 días. Cancelás en 1 click. Si no convence, te exportamos los datos y bajamos la cuenta sin preguntas.
-    </p>
   </form>
 </template>
 

@@ -437,51 +437,141 @@ export const pricingModel = {
   scaleSubtitle:
     'Pasás al siguiente tier cuando superás el volumen del actual. Sin renegociar, sin firmar nada, sin perder data. El sistema lo hace automáticamente al cierre del mes.',
   scaleHighlightLabel: 'Más común',
+  // maxOrders = límite superior del tier (null = enterprise sin techo).
+  // commissionPct = % numérico para los cálculos (commissionLabel es el string display).
+  // posPerLocation = precio del POS integrado por local en este tier (USD/mes).
+  //   Cae progresivamente con cada tier mayor — descuento por volumen.
+  //   USD 20 = paridad con mercado AR (Fudo/Maxirest típico). null = enterprise.
+  // Lo usa la calculadora detallada para mapear input → tier en vivo y computar costos.
   scaleTiers: [
     {
       name: 'Inicio',
       tagline: 'Marca arrancando o pequeña — 1-3 locales típicos.',
       ordersLabel: 'Hasta 300',
+      maxOrders: 300,
       fee: 69,
+      commissionPct: 1.5,
       commissionLabel: '1,5%',
+      posPerLocation: 20,
     },
     {
       name: 'Crecimiento',
       tagline: 'Operación consolidada — 3-10 locales o alto delivery.',
       ordersLabel: '301 – 1.000',
+      maxOrders: 1000,
       fee: 169,
+      commissionPct: 1.25,
       commissionLabel: '1,25%',
+      posPerLocation: 17,
       highlight: true,
     },
     {
       name: 'Escala',
       tagline: 'Cadena con operación 24/7 — 10-30 locales activos.',
       ordersLabel: '1.001 – 3.000',
+      maxOrders: 3000,
       fee: 349,
+      commissionPct: 1.0,
       commissionLabel: '1,0%',
+      posPerLocation: 13,
     },
     {
       name: 'Performance',
       tagline: 'Cadena establecida — 30-100 locales con tráfico alto.',
       ordersLabel: '3.001 – 7.500',
+      maxOrders: 7500,
       fee: 599,
+      commissionPct: 0.85,
       commissionLabel: '0,85%',
+      posPerLocation: 10,
     },
     {
       name: 'Pro',
       tagline: 'Líder de categoría — 100+ locales o eventos masivos.',
       ordersLabel: '7.501 – 25.000',
+      maxOrders: 25000,
       fee: 1199,
+      commissionPct: 0.75,
       commissionLabel: '0,75%',
+      posPerLocation: 7,
     },
     {
       name: 'Enterprise',
       tagline: 'Operación nacional o multi-marca — 25k+ pedidos/mes.',
       ordersLabel: '25.001+',
+      maxOrders: null,
       fee: null,
+      commissionPct: 0.5,
       commissionLabel: 'Desde 0,5%',
+      posPerLocation: null,
     },
   ],
+
+  // Costo de mercado del POS típico (Fudo, Maxirest, Bistrosoft) en AR/LATAM.
+  // Usado para calcular el AHORRO en POS = locales × (industryCost - tier.posPerLocation).
+  // Al subir de tier el lead paga menos por local → mayor ahorro vs mercado.
+  posIndustryCostPerLocation: 20,
+
+  // ── Calculadora detallada ──────────────────────────────────────
+  // Sección dedicada con sliders interactivos. Output en vivo:
+  // pedidos totales, GMV, tier asignado, costo Deenex vs costo
+  // apps de terceros, ahorro mensual/anual. Cierra con "Cómo empezar".
+  calculatorEyebrow: 'Calculadora en vivo',
+  calculatorTitle: 'Calculá tu ahorro real.',
+  calculatorSubtitle:
+    'Movés los sliders con tus datos reales. La columna de la derecha te dice EN VIVO en qué tier caés, cuánto pagás y cuánto te ahorrás vs Rappi/PedidosYa. Sin trucos, sin "consultá a ventas".',
+  // Defaults pensados para un caso típico: 5 locales × 300 pedidos = 1.500 pedidos
+  // → cae en tier Crecimiento (el "más común"). 50% via apps terceros = ahorro visible.
+  calculatorDefaults: {
+    locations: 5,
+    ordersPerLocation: 300,
+    avgTicket: 15,
+    pctViaApps: 50,
+  },
+  // % típico de comisión que cobran Rappi/PedidosYa. Lo exponemos en
+  // el footnote para que el lead pueda auditar el cálculo si quiere.
+  calculatorAppsCommissionPct: 30,
+  // Supuestos de uplift por activar Deenex (Loyalty + Marketing).
+  // Conservadores vs lo que vemos en clientes con 6+ meses (promedio real
+  // suele ser más alto). El lead los ve en el footnote para auditar.
+  valueAssumptions: {
+    // +X% de GMV adicional por mayor recurrencia con Loyalty/Wallet/cupones.
+    // Promedio observado: 25-40%. Usamos 20% conservador.
+    recurrenceUpliftPct: 20,
+    // +X% en ticket promedio por cross-sell + campañas personalizadas + cupones.
+    // Promedio observado: 18-30%. Usamos 15% conservador.
+    ticketUpliftPct: 15,
+  },
+  calculatorFootnote:
+    'Asumimos 30% de comisión en apps (Rappi/PedidosYa típico AR/LATAM) y USD 20/local de POS de mercado (Fudo/Maxirest típico). Uplifts +20% recurrencia y +15% ticket son promedios conservadores de clientes Deenex con 6+ meses. Tu resultado real depende de cuánto actives Loyalty, campañas por WhatsApp y promociones — clientes top promedian +35% / +25%.',
+
+  // ── Cómo empezar (al cierre de la calculadora) ─────────────────
+  calculatorHowToStartEyebrow: 'Cómo empezar',
+  calculatorHowToStartTitle: 'Tres pasos y estás operando.',
+  calculatorHowToStartSubtitle:
+    'De ver el número a tener tu marca corriendo en menos de una semana. Sin venta consultiva forzada, sin contrato anual.',
+  calculatorSteps: [
+    {
+      num: '01',
+      title: 'Decinos quién sos',
+      desc: 'Nombre, email y WhatsApp. Te creamos la cuenta y te mandamos el link al panel.',
+      durationLabel: '30 seg',
+    },
+    {
+      num: '02',
+      title: 'Conectás POS + marca',
+      desc: 'Subís logo y paleta, elegís tu POS (Fudo, Maxirest, Bistrosoft, Odoo…) y canales. Te ayuda un CSM real.',
+      durationLabel: '5–10 min',
+    },
+    {
+      num: '03',
+      title: 'Activás el trial',
+      desc: '15 días gratis. Cobro recién al día 16 si seguís. Cancelás en 1 click si no convence.',
+      durationLabel: '15 días gratis',
+    },
+  ],
+  calculatorCtaPrimaryLabel: 'Empezar mi trial ahora',
+  calculatorCtaSecondaryLabel: 'Hablar con ventas',
   scaleFootnote:
     'Pedidos = transacciones procesadas por Deenex/mes (online + presencial). Setup USD 0 — implementación incluida. Sin permanencia: cancelás en 1 click cuando quieras.',
 
