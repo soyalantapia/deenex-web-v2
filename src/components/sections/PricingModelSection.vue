@@ -132,12 +132,11 @@
         </div>
       </div>
 
-      <!-- ═══ Calculadora detallada ═══════════════════════════════════════
-           4 inputs (locales · pedidos/local · ticket · % via apps) con
-           sliders + numerics. Output en vivo: tier asignado, costo Deenex
-           (bundle + comisión delivery + Marketing AI fee) vs costo apps,
-           ahorro mensual y anual. El anchor #calculadora-deenex lo target
-           el link "Calcular mi ahorro" del hero card. -->
+      <!-- ═══ Calculadora rediseñada: Sin Deenex vs Con Deenex ═════════
+           3 inputs simples (locales, facturación mensual, % delivery) →
+           comparativa side-by-side de costos actuales vs con Deenex →
+           hero verde con ganancia neta mensual/anual + ROI.
+           Filosofía: el lead VE su número en <10 segundos. -->
       <div id="calculadora-deenex" class="mb-12 scroll-mt-24">
         <div class="text-center mb-8">
           <span class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-100 text-emerald-700 text-[10px] font-black uppercase tracking-widest mb-4">
@@ -152,473 +151,410 @@
           </p>
         </div>
 
-        <div class="rounded-3xl border border-slate-200 bg-white p-6 sm:p-8 lg:p-10 shadow-sm">
-          <div class="grid lg:grid-cols-2 gap-10 lg:gap-14">
-            <!-- ── INPUTS ──────────────────────────────────────────── -->
+        <div class="rounded-3xl border border-slate-200 bg-white p-5 sm:p-8 lg:p-10 shadow-sm">
+          <!-- ═══ INPUTS — 3 preguntas simples ════════════════════════════ -->
+          <div class="grid sm:grid-cols-3 gap-5 sm:gap-8 mb-8 pb-8 border-b border-slate-200">
+            <!-- Input 1: Locales (chips clickeables + custom) -->
             <div>
-              <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-5">
-                Tu operación actual
-              </p>
-              <div class="space-y-6">
-                <!-- Locales -->
-                <div>
-                  <div class="flex items-center justify-between mb-2 gap-3">
-                    <label for="calc-locations" class="text-sm font-bold text-slate-700">
-                      Cantidad de locales
-                    </label>
-                    <div class="flex items-center gap-1.5">
-                      <input
-                        id="calc-locations"
-                        v-model.number="calc.locations"
-                        type="number"
-                        min="1"
-                        max="500"
-                        class="w-16 px-2 py-1 border border-slate-300 rounded-lg text-sm font-bold tabular-nums text-right focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary"
-                      />
-                      <span class="text-[11px] text-slate-500">locales</span>
-                    </div>
-                  </div>
-                  <input
-                    v-model.number="calc.locations"
-                    type="range"
-                    min="1"
-                    max="200"
-                    step="1"
-                    class="w-full h-2 bg-slate-200 rounded-full appearance-none cursor-pointer accent-primary"
-                    aria-label="Locales slider"
-                  />
-                  <div class="flex justify-between text-[10px] text-slate-400 mt-1 font-semibold tabular-nums">
-                    <span>1</span>
-                    <span>50</span>
-                    <span>100</span>
-                    <span>200+</span>
-                  </div>
-                </div>
-
-                <!-- Pedidos por local -->
-                <div>
-                  <div class="flex items-center justify-between mb-2 gap-3">
-                    <label for="calc-opl" class="text-sm font-bold text-slate-700">
-                      Pedidos / local / mes
-                    </label>
-                    <div class="flex items-center gap-1.5">
-                      <input
-                        id="calc-opl"
-                        v-model.number="calc.ordersPerLocation"
-                        type="number"
-                        min="0"
-                        max="10000"
-                        step="10"
-                        class="w-20 px-2 py-1 border border-slate-300 rounded-lg text-sm font-bold tabular-nums text-right focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary"
-                      />
-                      <span class="text-[11px] text-slate-500">pedidos</span>
-                    </div>
-                  </div>
-                  <input
-                    v-model.number="calc.ordersPerLocation"
-                    type="range"
-                    min="0"
-                    max="2500"
-                    step="10"
-                    class="w-full h-2 bg-slate-200 rounded-full appearance-none cursor-pointer accent-primary"
-                    aria-label="Pedidos por local slider"
-                  />
-                  <div class="flex justify-between text-[10px] text-slate-400 mt-1 font-semibold tabular-nums">
-                    <span>0</span>
-                    <span>500</span>
-                    <span>1.500</span>
-                    <span>2.500+</span>
-                  </div>
-                </div>
-
-                <!-- Ticket promedio -->
-                <div>
-                  <div class="flex items-center justify-between mb-2 gap-3">
-                    <label for="calc-ticket" class="text-sm font-bold text-slate-700">
-                      Ticket promedio
-                    </label>
-                    <div class="flex items-center gap-1.5">
-                      <span class="text-[11px] text-slate-500">USD</span>
-                      <input
-                        id="calc-ticket"
-                        v-model.number="calc.avgTicket"
-                        type="number"
-                        min="1"
-                        max="500"
-                        step="1"
-                        class="w-16 px-2 py-1 border border-slate-300 rounded-lg text-sm font-bold tabular-nums text-right focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary"
-                      />
-                    </div>
-                  </div>
-                  <input
-                    v-model.number="calc.avgTicket"
-                    type="range"
-                    min="5"
-                    max="100"
-                    step="1"
-                    class="w-full h-2 bg-slate-200 rounded-full appearance-none cursor-pointer accent-primary"
-                    aria-label="Ticket promedio slider"
-                  />
-                  <div class="flex justify-between text-[10px] text-slate-400 mt-1 font-semibold tabular-nums">
-                    <span>USD 5</span>
-                    <span>USD 25</span>
-                    <span>USD 50</span>
-                    <span>USD 100+</span>
-                  </div>
-                </div>
-
-                <!-- Mix de canales, agrupador visual con 2 sliders separados.
-                     Modelo nuevo: comisión Deenex aplica SOLO a delivery propio,
-                     y el lead controla el % de Rappi por separado (con su % de
-                     comisión editable, porque varía 25-40% según país/segmento).
-                     El % que no es ni delivery propio ni apps queda implícito
-                     como mesa/takeaway presencial (sin comisión). -->
-                <div class="rounded-xl bg-slate-50/50 border border-slate-200 p-3.5 space-y-4">
-                  <p class="text-[10px] font-black text-slate-500 uppercase tracking-widest flex items-center gap-1.5">
-                    <Repeat class="w-3 h-3" />
-                    Mix de canales (% del GMV total)
-                  </p>
-
-                  <!-- % delivery (canal Deenex, todos los pedidos delivery) -->
-                  <div>
-                    <div class="flex items-center justify-between mb-2 gap-3">
-                      <label for="calc-pct-delivery" class="text-sm font-bold text-slate-700 leading-tight">
-                        % delivery (canal Deenex)
-                      </label>
-                      <div class="flex items-center gap-1.5">
-                        <input
-                          id="calc-pct-delivery"
-                          v-model.number="calc.pctDeliveryPropio"
-                          type="number"
-                          min="0"
-                          max="100"
-                          step="5"
-                          class="w-14 px-2 py-1 border border-slate-300 rounded-lg text-sm font-bold tabular-nums text-right focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary"
-                        />
-                        <span class="text-[11px] text-slate-500">%</span>
-                      </div>
-                    </div>
-                    <input
-                      v-model.number="calc.pctDeliveryPropio"
-                      type="range"
-                      min="0"
-                      max="100"
-                      step="5"
-                      class="w-full h-2 bg-slate-200 rounded-full appearance-none cursor-pointer accent-primary"
-                      aria-label="% delivery propio slider"
-                    />
-                    <p class="text-[10px] text-slate-400 mt-1 font-medium">
-                      La comisión Deenex (<span class="font-bold">{{ calcTier.commissionLabel }}</span>) aplica solo sobre este %.
-                    </p>
-                  </div>
-
-                  <!-- % via apps -->
-                  <div>
-                    <div class="flex items-center justify-between mb-2 gap-3">
-                      <label for="calc-pct-apps" class="text-sm font-bold text-slate-700 leading-tight">
-                        % via Rappi / PedidosYa
-                      </label>
-                      <div class="flex items-center gap-1.5">
-                        <input
-                          id="calc-pct-apps"
-                          v-model.number="calc.pctViaApps"
-                          type="number"
-                          min="0"
-                          max="100"
-                          step="5"
-                          class="w-14 px-2 py-1 border border-slate-300 rounded-lg text-sm font-bold tabular-nums text-right focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary"
-                        />
-                        <span class="text-[11px] text-slate-500">%</span>
-                      </div>
-                    </div>
-                    <input
-                      v-model.number="calc.pctViaApps"
-                      type="range"
-                      min="0"
-                      max="100"
-                      step="5"
-                      class="w-full h-2 bg-slate-200 rounded-full appearance-none cursor-pointer accent-primary"
-                      aria-label="% apps slider"
-                    />
-                    <!-- Sub-input: % comisión que cobran las apps (editable) -->
-                    <div class="mt-2 flex items-center gap-2 flex-wrap text-[11px] text-slate-500">
-                      <span>Comisión que te cobran:</span>
-                      <div class="flex items-center gap-1">
-                        <input
-                          v-model.number="calc.pctCommissionApps"
-                          type="number"
-                          min="0"
-                          max="60"
-                          step="1"
-                          class="w-12 px-1.5 py-0.5 border border-slate-300 rounded text-[11px] font-bold tabular-nums text-right focus:outline-none focus:ring-1 focus:ring-primary/30 focus:border-primary"
-                          aria-label="% comisión apps"
-                        />
-                        <span class="font-bold">%</span>
-                      </div>
-                      <span class="text-slate-400">(default 30% típico AR)</span>
-                    </div>
-                  </div>
-
-                  <!-- Validación visual: muestra % presencial implícito -->
-                  <p
-                    v-if="pctPresencial > 0"
-                    class="text-[10px] text-slate-400 leading-snug pt-2 border-t border-slate-200"
-                  >
-                    <span class="font-bold tabular-nums">{{ pctPresencial }}%</span> implícito en mesa/takeaway presencial (sin comisión).
-                  </p>
-                  <p
-                    v-else-if="pctPresencial < 0"
-                    class="text-[10px] text-rose-600 leading-snug pt-2 border-t border-rose-100 font-medium"
-                  >
-                    ⚠️ La suma supera el 100%. Ajustá los sliders para que delivery + apps ≤ 100%.
-                  </p>
-                </div>
-
-                <!-- Toggle: ¿Tenés POS hoy? Compact UI, marcado por default
-                     porque la mayoría de las cadenas SÍ usan POS. -->
-                <label
-                  for="calc-has-pos"
-                  class="flex items-start gap-3 cursor-pointer rounded-xl border border-slate-200 hover:border-primary/40 transition-colors p-3.5"
-                  :class="calc.hasPos ? 'bg-primary/[0.04] border-primary/30' : 'bg-white'"
+              <label class="text-[11px] font-black text-slate-500 uppercase tracking-widest mb-2 flex items-center gap-1.5">
+                <Store class="w-3 h-3 text-primary" />
+                ¿Cuántos locales tenés?
+              </label>
+              <div class="flex flex-wrap gap-1.5 mb-2">
+                <button
+                  v-for="opt in locationsPresets"
+                  :key="opt"
+                  type="button"
+                  @click="calc.locations = opt"
+                  class="px-3 py-1.5 rounded-lg text-sm font-bold tabular-nums transition-all"
+                  :class="calc.locations === opt
+                    ? 'bg-primary text-white shadow-sm shadow-primary/30'
+                    : 'bg-slate-100 text-slate-600 hover:bg-slate-200'"
                 >
-                  <input
-                    id="calc-has-pos"
-                    v-model="calc.hasPos"
-                    type="checkbox"
-                    class="mt-0.5 w-4 h-4 rounded border-slate-300 text-primary focus:ring-2 focus:ring-primary/30"
-                  />
-                  <div class="flex-1 min-w-0">
-                    <div class="flex items-center gap-2 flex-wrap">
-                      <Cpu class="w-3.5 h-3.5 text-primary shrink-0" />
-                      <span class="text-sm font-bold text-slate-800">Ya uso un POS hoy</span>
-                      <span class="text-[10px] font-black text-slate-400 uppercase tracking-wider">(Fudo · Maxirest · Bistrosoft…)</span>
-                    </div>
-                    <p class="text-[11px] text-slate-500 leading-snug mt-1">
-                      Hoy pagás ~USD {{ POS_INDUSTRY_COST }}/local. Con Deenex el POS se integra y el costo cae con cada tier.
-                    </p>
-                  </div>
-                </label>
+                  {{ opt }}
+                </button>
               </div>
-
-              <p class="text-[11px] text-slate-400 leading-relaxed mt-6 flex items-start gap-1.5">
-                <Info class="w-3.5 h-3.5 text-slate-400 shrink-0 mt-0.5" />
-                <span>{{ content.calculatorFootnote }}</span>
-              </p>
+              <input
+                v-model.number="calc.locations"
+                type="number"
+                min="1"
+                max="500"
+                class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm font-bold tabular-nums focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary"
+                aria-label="Cantidad de locales custom"
+              />
             </div>
 
-            <!-- ── OUTPUTS ─────────────────────────────────────────── -->
-            <div class="lg:border-l lg:border-slate-200 lg:pl-14">
-              <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-5">
-                Tu cotización en vivo
-              </p>
+            <!-- Input 2: Facturación mensual (USD, input + slider grueso) -->
+            <div>
+              <label for="calc-revenue" class="text-[11px] font-black text-slate-500 uppercase tracking-widest mb-2 flex items-center gap-1.5">
+                <CircleDollarSign class="w-3 h-3 text-primary" />
+                ¿Cuánto facturás por mes?
+              </label>
+              <div class="flex items-center gap-2 mb-2">
+                <span class="text-xs text-slate-500 font-semibold">USD</span>
+                <input
+                  id="calc-revenue"
+                  v-model.number="calc.monthlyRevenueUsd"
+                  type="number"
+                  min="1000"
+                  max="10000000"
+                  step="1000"
+                  class="flex-1 px-3 py-2 border border-slate-300 rounded-lg text-base font-bold tabular-nums focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary"
+                  aria-label="Facturación mensual"
+                />
+              </div>
+              <input
+                v-model.number="calc.monthlyRevenueUsd"
+                type="range"
+                min="5000"
+                max="500000"
+                step="1000"
+                class="w-full h-2 bg-slate-200 rounded-full appearance-none cursor-pointer accent-primary"
+                aria-label="Facturación slider"
+              />
+              <div class="flex justify-between text-[10px] text-slate-400 mt-1 font-semibold tabular-nums">
+                <span>USD 5k</span>
+                <span>USD 100k</span>
+                <span>USD 500k</span>
+              </div>
+            </div>
 
-              <!-- Métricas de volumen -->
-              <div class="grid grid-cols-2 gap-3 mb-5">
-                <div class="rounded-xl bg-slate-50 p-3.5">
-                  <p class="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1">
-                    Pedidos / mes
+            <!-- Input 3: % delivery (slider con %) -->
+            <div>
+              <label for="calc-pct-delivery" class="text-[11px] font-black text-slate-500 uppercase tracking-widest mb-2 flex items-center gap-1.5">
+                <Bike class="w-3 h-3 text-primary" />
+                ¿Qué % es delivery?
+              </label>
+              <div class="flex items-center gap-2 mb-2">
+                <input
+                  id="calc-pct-delivery"
+                  v-model.number="calc.pctDelivery"
+                  type="number"
+                  min="0"
+                  max="100"
+                  step="5"
+                  class="w-16 px-2 py-2 border border-slate-300 rounded-lg text-base font-bold tabular-nums text-right focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary"
+                />
+                <span class="text-xs text-slate-500 font-semibold">% del total</span>
+              </div>
+              <input
+                v-model.number="calc.pctDelivery"
+                type="range"
+                min="0"
+                max="100"
+                step="5"
+                class="w-full h-2 bg-slate-200 rounded-full appearance-none cursor-pointer accent-primary"
+                aria-label="% delivery slider"
+              />
+              <div class="flex justify-between text-[10px] text-slate-400 mt-1 font-semibold tabular-nums">
+                <span>0%</span>
+                <span>50%</span>
+                <span>100%</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- ═══ Tu tier badge (resumen rápido del tier asignado) ════════ -->
+          <div class="flex items-center justify-center gap-2 flex-wrap mb-6 text-sm">
+            <span class="text-slate-500">Con tu volumen, caés en</span>
+            <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-primary text-white font-bold tabular-nums">
+              <Sparkles class="w-3 h-3" />
+              {{ calcTier.name }}
+            </span>
+            <span class="text-slate-400 tabular-nums">{{ fmt(totalOrders) }} pedidos/mes estimados</span>
+          </div>
+
+          <!-- ═══ COMPARATIVA Sin vs Con Deenex ═══════════════════════════ -->
+          <div class="grid lg:grid-cols-2 gap-4 mb-6">
+            <!-- SIN DEENEX (rojo) -->
+            <div class="rounded-2xl border-2 border-rose-200 bg-rose-50/40 p-5 sm:p-6">
+              <div class="flex items-start justify-between gap-2 mb-4">
+                <div>
+                  <p class="text-[10px] font-black text-rose-700 uppercase tracking-widest mb-1 flex items-center gap-1.5">
+                    <X class="w-3 h-3" />
+                    Sin Deenex (hoy)
                   </p>
-                  <p class="text-2xl font-extrabold text-slate-900 tabular-nums leading-tight">
-                    {{ fmt(totalOrders) }}
-                  </p>
+                  <h4 class="text-lg font-bold text-slate-900 leading-tight">Tus costos actuales</h4>
                 </div>
-                <div class="rounded-xl bg-slate-50 p-3.5">
-                  <p class="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1">
-                    GMV / mes
-                  </p>
-                  <p class="text-2xl font-extrabold text-slate-900 tabular-nums leading-tight">
-                    {{ fmtUsd(gmvUsd) }}
-                  </p>
-                </div>
+                <span class="text-[10px] font-black text-rose-700 bg-rose-200/60 px-2 py-1 rounded-full uppercase tracking-wider whitespace-nowrap">
+                  Sin canal propio
+                </span>
               </div>
 
-              <!-- Tier asignado (highlighted en violeta) con precio POS/local
-                   incluido como línea complementaria si hasPos === true. -->
-              <div class="rounded-xl bg-primary text-white p-4 mb-5 relative overflow-hidden">
-                <div class="absolute -right-8 -top-8 w-32 h-32 rounded-full bg-white/10 blur-2xl pointer-events-none"></div>
-                <div class="relative">
-                  <p class="text-[10px] font-black text-white/60 uppercase tracking-widest mb-1.5 flex items-center gap-1.5">
-                    <Sparkles class="w-3 h-3" />
-                    Tu tier en Deenex
-                  </p>
-                  <div class="flex items-baseline gap-2 flex-wrap">
-                    <span class="text-2xl font-black tracking-tighter">{{ calcTier.name }}</span>
-                    <span class="text-white/40">·</span>
-                    <span class="text-xl font-bold tabular-nums">
-                      <template v-if="calcTier.fee !== null">USD {{ calcTier.fee }}<span class="text-sm text-white/70 font-normal"> / mes</span></template>
+              <ul class="space-y-3 mb-4">
+                <li class="flex items-baseline justify-between gap-3 pb-2 border-b border-rose-100">
+                  <div class="min-w-0">
+                    <p class="text-sm font-semibold text-slate-700">POS típico</p>
+                    <p class="text-[11px] text-slate-400">USD {{ POS_INDUSTRY_COST }}/local × {{ calc.locations }} locales</p>
+                  </div>
+                  <span class="text-base font-bold text-slate-700 tabular-nums whitespace-nowrap">
+                    {{ fmtUsd(sinDeenexPosCost) }}
+                  </span>
+                </li>
+                <li class="flex items-baseline justify-between gap-3 pb-2 border-b border-rose-100">
+                  <div class="min-w-0">
+                    <p class="text-sm font-semibold text-slate-700">Comisión apps de delivery</p>
+                    <p class="text-[11px] text-slate-400">{{ calc.pctCommissionApps }}% sobre tu delivery</p>
+                  </div>
+                  <span class="text-base font-bold text-slate-700 tabular-nums whitespace-nowrap">
+                    {{ fmtUsd(sinDeenexAppsCost) }}
+                  </span>
+                </li>
+                <li class="flex items-baseline justify-between gap-3 text-[11px] text-rose-700/80">
+                  <span class="flex items-center gap-1.5">
+                    <X class="w-3 h-3 shrink-0" />
+                    Sin recompras ni data de cliente
+                  </span>
+                  <span class="font-semibold whitespace-nowrap">USD 0 extra</span>
+                </li>
+              </ul>
+
+              <div class="pt-3 border-t-2 border-rose-200">
+                <div class="flex items-baseline justify-between gap-2 mb-1">
+                  <span class="text-sm font-bold text-rose-700">Te cuesta hoy</span>
+                  <span class="text-2xl font-black text-rose-700 tabular-nums">{{ fmtUsd(sinDeenexTotal) }}<span class="text-xs font-bold">/mes</span></span>
+                </div>
+                <p class="text-[11px] text-rose-600/80 leading-snug">
+                  Sin contar el margen que perdés por no tener data de cliente ni recompras propias.
+                </p>
+              </div>
+            </div>
+
+            <!-- CON DEENEX (verde) -->
+            <div class="rounded-2xl border-2 border-emerald-300 bg-emerald-50/60 p-5 sm:p-6 relative overflow-hidden">
+              <div class="absolute -right-4 -top-4 w-24 h-24 rounded-full bg-emerald-200/40 blur-2xl pointer-events-none"></div>
+              <div class="relative">
+                <div class="flex items-start justify-between gap-2 mb-4">
+                  <div>
+                    <p class="text-[10px] font-black text-emerald-700 uppercase tracking-widest mb-1 flex items-center gap-1.5">
+                      <Check class="w-3 h-3" stroke-width="3" />
+                      Con Deenex ({{ calcTier.name }})
+                    </p>
+                    <h4 class="text-lg font-bold text-slate-900 leading-tight">Tu inversión mensual</h4>
+                  </div>
+                  <span class="text-[10px] font-black text-emerald-700 bg-emerald-200/70 px-2 py-1 rounded-full uppercase tracking-wider whitespace-nowrap">
+                    Canal propio + AI
+                  </span>
+                </div>
+
+                <ul class="space-y-3 mb-4">
+                  <li class="flex items-baseline justify-between gap-3 pb-2 border-b border-emerald-100">
+                    <div class="min-w-0">
+                      <p class="text-sm font-semibold text-slate-700">Bundle Full Suite</p>
+                      <p class="text-[11px] text-slate-400">App + Loyalty + canal propio</p>
+                    </div>
+                    <span class="text-base font-bold text-slate-700 tabular-nums whitespace-nowrap">
+                      <template v-if="calcTier.fee !== null">{{ fmtUsd(calcTier.fee) }}</template>
                       <template v-else>A medida</template>
                     </span>
-                  </div>
-                  <p class="text-[12px] text-white/80 mt-1">
-                    + <span class="font-bold tabular-nums">{{ calcTier.commissionLabel }}</span> de comisión <span class="text-white/60">solo en delivery</span>
-                  </p>
-                  <!-- Marketing AI: INCLUIDO en el bundle, performance-based.
-                       Deenex corre las campañas; solo cobra el % sobre las
-                       ventas EXTRAS que genera. Sin uplift = sin fee. Sin riesgo. -->
-                  <p
-                    v-if="calcTier.marketingAiPct !== undefined && calcTier.marketingAiPct !== null"
-                    class="text-[12px] text-white/85 mt-1.5 flex items-start gap-1.5 leading-snug"
-                  >
-                    <Sparkles class="w-3 h-3 mt-0.5 shrink-0 text-emerald-300" />
-                    <span>
-                      Marketing AI <span class="font-bold">incluido</span>: cobramos <span class="font-bold tabular-nums">{{ calcTier.marketingAiPct }}%</span> <span class="text-white/65">solo sobre las recompras extras que generamos</span>
+                  </li>
+                  <li class="flex items-baseline justify-between gap-3 pb-2 border-b border-emerald-100">
+                    <div class="min-w-0">
+                      <p class="text-sm font-semibold text-slate-700">Comisión delivery</p>
+                      <p class="text-[11px] text-slate-400">{{ calcTier.commissionLabel }} sobre tu delivery</p>
+                    </div>
+                    <span class="text-base font-bold text-slate-700 tabular-nums whitespace-nowrap">
+                      {{ fmtUsd(conDeenexDeliveryCommission) }}
                     </span>
-                  </p>
-                  <!-- POS / local en este tier (si aplica) -->
-                  <p
-                    v-if="calc.hasPos && posCostPerLocationCurrentTier !== null"
-                    class="text-[12px] text-white/80 mt-1 flex items-center gap-1.5"
-                  >
-                    <Cpu class="w-3 h-3" />
-                    POS integrado: <span class="font-bold tabular-nums">USD {{ posCostPerLocationCurrentTier }}/local</span>
-                    <span
-                      v-if="posCostPerLocationCurrentTier < POS_INDUSTRY_COST"
-                      class="text-[10px] font-black bg-emerald-400 text-emerald-950 px-1.5 py-0.5 rounded-full uppercase tracking-wider"
-                    >
-                      −{{ Math.round((1 - posCostPerLocationCurrentTier / POS_INDUSTRY_COST) * 100) }}%
+                  </li>
+                  <li class="flex items-baseline justify-between gap-3 pb-2 border-b border-emerald-100">
+                    <div class="min-w-0">
+                      <p class="text-sm font-semibold text-slate-700 flex items-center gap-1.5">
+                        Marketing AI
+                        <span class="text-[9px] font-black text-emerald-700 bg-emerald-200/70 px-1.5 py-0.5 rounded uppercase tracking-wider">Performance</span>
+                      </p>
+                      <p class="text-[11px] text-slate-400">{{ calcTier.marketingAiPct }}% solo sobre recompras extras</p>
+                    </div>
+                    <span class="text-base font-bold text-slate-700 tabular-nums whitespace-nowrap">
+                      {{ fmtUsd(marketingAiFee) }}
                     </span>
+                  </li>
+                  <li class="flex items-baseline justify-between gap-3">
+                    <div class="min-w-0">
+                      <p class="text-sm font-semibold text-slate-700">POS integrado</p>
+                      <p class="text-[11px] text-slate-400">USD {{ calcTier.posPerLocation }}/local × {{ calc.locations }} locales</p>
+                    </div>
+                    <span class="text-base font-bold text-slate-700 tabular-nums whitespace-nowrap">
+                      {{ fmtUsd(conDeenexPosCost) }}
+                    </span>
+                  </li>
+                </ul>
+
+                <div class="pt-3 border-t-2 border-emerald-300">
+                  <div class="flex items-baseline justify-between gap-2 mb-1">
+                    <span class="text-sm font-bold text-emerald-700">Tu inversión Deenex</span>
+                    <span class="text-2xl font-black text-emerald-700 tabular-nums">{{ fmtUsd(conDeenexTotal) }}<span class="text-xs font-bold">/mes</span></span>
+                  </div>
+                  <p class="text-[11px] text-emerald-700/80 leading-snug">
+                    Incluye canal propio, app branded, loyalty, campañas AI y data 100% tuya.
                   </p>
                 </div>
               </div>
+            </div>
+          </div>
 
-              <!-- Comparativa: Deenex vs apps de terceros.
-                   La row de "apps" se oculta si pctViaApps === 0, sino genera
-                   ruido visual (USD 0 tachado no aporta nada al lead). -->
-              <div class="space-y-2.5 mb-5">
-                <div class="flex items-baseline justify-between gap-3 pb-2.5 border-b border-slate-200">
-                  <div class="min-w-0">
-                    <p class="text-sm font-semibold text-slate-700">Tu costo con Deenex</p>
-                    <p v-if="calcTier.fee !== null" class="text-[11px] text-slate-400 leading-snug">
-                      USD {{ calcTier.fee }} bundle + {{ fmtUsd(commissionCost) }} comisión delivery + {{ fmtUsd(marketingAiFee) }} Marketing AI
-                    </p>
-                    <p v-else class="text-[11px] text-slate-400 leading-snug">
-                      Volumen Enterprise, acuerdo dedicado
-                    </p>
-                  </div>
-                  <span class="text-xl font-extrabold text-slate-900 tabular-nums whitespace-nowrap">
-                    {{ fmtUsd(deenexMonthlyCost) }}<span v-if="deenexMonthlyCost !== null" class="text-xs text-slate-400 font-normal">/mes</span>
-                  </span>
-                </div>
-                <div
-                  v-if="calc.pctViaApps > 0"
-                  class="flex items-baseline justify-between gap-3 pb-2.5 border-b border-slate-200"
-                >
-                  <div class="min-w-0">
-                    <p class="text-sm font-semibold text-slate-700">Comisión que pagás en apps de delivery</p>
-                    <p class="text-[11px] text-slate-400 leading-snug">
-                      {{ calc.pctViaApps }}% del GMV × {{ calc.pctCommissionApps }}% (Rappi/PedidosYa)
-                    </p>
-                  </div>
-                  <span class="text-xl font-extrabold text-slate-400 line-through tabular-nums whitespace-nowrap">
-                    {{ fmtUsd(appsMonthlyCost) }}<span class="text-xs font-normal">/mes</span>
-                  </span>
-                </div>
-              </div>
+          <!-- ═══ HERO: Tu inversión se paga sola ════════════════════════ -->
+          <div
+            v-if="conDeenexTotal !== null"
+            class="rounded-3xl bg-gradient-to-br from-emerald-500 via-emerald-600 to-emerald-700 text-white p-6 sm:p-8 relative overflow-hidden mb-6"
+          >
+            <div class="absolute -right-10 -top-10 w-48 h-48 rounded-full bg-white/10 blur-3xl pointer-events-none"></div>
+            <div class="absolute -left-10 -bottom-10 w-48 h-48 rounded-full bg-emerald-300/20 blur-3xl pointer-events-none"></div>
 
-              <!-- ═══ Bloque "Tu ganancia neta con Deenex" ════════════════
-                   Suma 3 componentes:
-                   1. Ahorro de comisión vs apps (si pctApps > 0)
-                   2. Recompras extra (Loyalty +20% sobre GMV)
-                   3. Ticket promedio +15% sobre GMV
-                   Enterprise tiene su propio bloque (no aplica este cálculo). -->
-              <div
-                v-if="deenexMonthlyCost === null"
-                class="rounded-xl bg-slate-50 border border-slate-200 p-4"
-              >
-                <p class="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1.5 flex items-center gap-1.5">
-                  <Sparkles class="w-3 h-3" />
-                  Volumen Enterprise
-                </p>
-                <p class="text-sm text-slate-700 leading-relaxed">
-                  A este volumen te asignamos un CSM dedicado que arma tu acuerdo comercial en menos de 24h. Comisión desde 0,5% + proyección de uplift dedicada.
-                </p>
-              </div>
-              <div
-                v-else
-                class="rounded-2xl bg-gradient-to-br from-emerald-50 to-emerald-100/60 border border-emerald-200 p-5"
-              >
-                <!-- Hero del bloque: total mensual + anual -->
-                <p class="text-[10px] font-black text-emerald-700 uppercase tracking-widest mb-2 flex items-center gap-1.5">
+            <div class="relative grid sm:grid-cols-[1fr_auto] gap-6 items-center">
+              <div>
+                <p class="text-[10px] font-black text-white/70 uppercase tracking-widest mb-2 flex items-center gap-1.5">
                   <TrendingUp class="w-3 h-3" />
-                  Tu ganancia neta con Deenex
+                  Tu inversión se paga sola
                 </p>
-                <p class="text-4xl sm:text-5xl font-black text-emerald-700 tabular-nums tracking-tighter leading-none mb-1">
-                  {{ fmtUsd(totalMonthlyValue) }}<span class="text-base text-emerald-700/70 font-bold"> / mes</span>
-                </p>
-                <p class="text-sm text-emerald-700/85 leading-relaxed mt-2 mb-4">
-                  <span class="font-bold tabular-nums">{{ fmtUsd(totalAnnualValue) }}</span> al año combinando ahorro de comisión + recompras extra + uplift de ticket.
+                <h3 class="text-3xl sm:text-4xl font-extrabold tracking-tighter leading-tight mb-2">
+                  Ganás <span class="tabular-nums">{{ fmtUsd(totalMonthlyBenefit) }}</span> netos / mes
+                </h3>
+                <p class="text-base text-white/90 leading-relaxed mb-4">
+                  <span class="font-bold tabular-nums">{{ fmtUsd(totalAnnualBenefit) }}</span> al año en tu bolsillo entre ahorro de costos y crecimiento adicional.
                 </p>
 
-                <!-- Desglose de los 4 componentes de valor -->
-                <div class="space-y-2 pt-4 border-t border-emerald-200/60">
-                  <div
-                    v-if="monthlySavings > 0"
-                    class="flex items-baseline justify-between gap-2 text-sm"
-                  >
-                    <span class="text-emerald-800/85 flex items-center gap-1.5 leading-snug">
+                <ul class="space-y-1.5 text-sm">
+                  <li class="flex items-baseline justify-between gap-2">
+                    <span class="text-white/85 flex items-center gap-1.5">
                       <PiggyBank class="w-3.5 h-3.5 shrink-0" />
-                      Ahorro de comisión vs apps
+                      Ahorro vs costos actuales
                     </span>
-                    <span class="font-bold tabular-nums text-emerald-800 whitespace-nowrap">
-                      {{ fmtUsd(monthlySavings) }}
-                    </span>
-                  </div>
-                  <div class="flex items-baseline justify-between gap-2 text-sm">
-                    <span class="text-emerald-800/85 flex items-center gap-1.5 leading-snug">
+                    <span class="font-bold tabular-nums whitespace-nowrap">{{ fmtUsd(monthlyCostSavings) }}</span>
+                  </li>
+                  <li class="flex items-baseline justify-between gap-2">
+                    <span class="text-white/85 flex items-center gap-1.5">
                       <Repeat class="w-3.5 h-3.5 shrink-0" />
-                      Recompras extra · Loyalty +{{ content.valueAssumptions.recurrenceUpliftPct }}%
+                      Recompras por Loyalty (neto MAI)
                     </span>
-                    <span class="font-bold tabular-nums text-emerald-800 whitespace-nowrap">
-                      {{ fmtUsd(loyaltyUplift) }}
-                    </span>
-                  </div>
-                  <div class="flex items-baseline justify-between gap-2 text-sm">
-                    <span class="text-emerald-800/85 flex items-center gap-1.5 leading-snug">
+                    <span class="font-bold tabular-nums whitespace-nowrap">{{ fmtUsd(loyaltyGainNet) }}</span>
+                  </li>
+                  <li class="flex items-baseline justify-between gap-2">
+                    <span class="text-white/85 flex items-center gap-1.5">
                       <Ticket class="w-3.5 h-3.5 shrink-0" />
-                      Ticket promedio +{{ content.valueAssumptions.ticketUpliftPct }}% (cross-sell + campañas)
+                      Ticket promedio extra (+15%)
                     </span>
-                    <span class="font-bold tabular-nums text-emerald-800 whitespace-nowrap">
-                      {{ fmtUsd(ticketUplift) }}
-                    </span>
-                  </div>
-                  <!-- Ahorro POS: solo si el lead tiene POS Y el tier ofrece
-                       descuento vs mercado (tier ≠ Inicio donde hay paridad). -->
-                  <div
-                    v-if="posSavings > 0"
-                    class="flex items-baseline justify-between gap-2 text-sm"
-                  >
-                    <span class="text-emerald-800/85 flex items-center gap-1.5 leading-snug">
-                      <Cpu class="w-3.5 h-3.5 shrink-0" />
-                      Ahorro de POS · USD {{ posCostPerLocationCurrentTier }}/local vs USD {{ POS_INDUSTRY_COST }} mercado
-                    </span>
-                    <span class="font-bold tabular-nums text-emerald-800 whitespace-nowrap">
-                      {{ fmtUsd(posSavings) }}
-                    </span>
-                  </div>
-                  <!-- Mensaje informativo en tier Inicio: paridad, no ahorro -->
-                  <div
-                    v-else-if="calc.hasPos && posCostPerLocationCurrentTier === POS_INDUSTRY_COST"
-                    class="flex items-baseline justify-between gap-2 text-[11px] text-slate-500"
-                  >
-                    <span class="flex items-center gap-1.5 leading-snug">
-                      <Cpu class="w-3 h-3 shrink-0 text-slate-400" />
-                      POS integrado a paridad de mercado (sin descuento en tier Inicio)
-                    </span>
-                    <span class="tabular-nums whitespace-nowrap">USD 0</span>
-                  </div>
-                </div>
+                    <span class="font-bold tabular-nums whitespace-nowrap">{{ fmtUsd(ticketUplift) }}</span>
+                  </li>
+                </ul>
+              </div>
 
-                <!-- Mensaje contextual para casos sin apps -->
-                <p
-                  v-if="calc.pctViaApps === 0"
-                  class="text-[11px] text-emerald-700/70 leading-snug mt-4 pt-3 border-t border-emerald-200/60"
-                >
-                  <Zap class="w-3 h-3 inline -mt-0.5" />
-                  Tu ganancia viene 100% de la palanca de canal propio (recompras + ticket). Cuando sumes algo de delivery por terceros, vas a ver también el ahorro de comisión.
+              <!-- ROI sidebox -->
+              <div class="bg-white/10 border border-white/20 rounded-2xl p-5 text-center backdrop-blur-sm min-w-[180px]">
+                <p class="text-[10px] font-black text-white/70 uppercase tracking-widest mb-1">
+                  Cada USD que invertís
+                </p>
+                <p class="text-5xl sm:text-6xl font-black tabular-nums tracking-tighter leading-none mb-1">
+                  {{ roiMultiple }}x
+                </p>
+                <p class="text-[11px] text-white/80 leading-snug">
+                  Te vuelve en ganancia
+                </p>
+                <p class="text-[10px] text-emerald-200 mt-3 pt-3 border-t border-white/20 font-bold uppercase tracking-wider">
+                  Payback: día 1
                 </p>
               </div>
             </div>
           </div>
+
+          <!-- Caso Enterprise: bloque distinto -->
+          <div
+            v-else
+            class="rounded-3xl bg-slate-900 text-white p-7 mb-6 relative overflow-hidden"
+          >
+            <div class="absolute inset-0 bg-gradient-to-br from-primary/30 to-transparent pointer-events-none"></div>
+            <div class="relative">
+              <p class="text-[10px] font-black text-white/60 uppercase tracking-widest mb-2 flex items-center gap-1.5">
+                <Sparkles class="w-3 h-3" />
+                Volumen Enterprise
+              </p>
+              <h3 class="text-2xl sm:text-3xl font-extrabold tracking-tighter mb-3">
+                Tu volumen requiere un acuerdo dedicado.
+              </h3>
+              <p class="text-sm text-white/80 leading-relaxed">
+                Te asignamos un CSM dedicado que arma tu pricing custom en menos de 24h. Comisión desde 1,75%, Marketing AI desde 7%, POS a medida. ROI típico: 15x a 30x mensual.
+              </p>
+            </div>
+          </div>
+
+          <!-- ═══ CTA prominente ═════════════════════════════════════════ -->
+          <div class="flex flex-col sm:flex-row gap-3 justify-center items-center mb-6">
+            <RouterLink
+              :to="{ path: '/comenzar', query: { from: 'cadenas_calculator' } }"
+              class="inline-flex items-center gap-2 bg-primary hover:bg-[#3c1fc9] text-white font-bold rounded-xl px-6 py-4 text-base transition-all shadow-md shadow-primary/20"
+            >
+              {{ content.starterCtaLabel }}
+              <ArrowRight class="w-4 h-4" />
+            </RouterLink>
+            <a
+              :href="content.ctaSecondaryHref"
+              class="inline-flex items-center gap-2 text-sm font-bold text-slate-700 hover:text-slate-900 transition-colors px-4 py-3"
+            >
+              Hablar con ventas
+            </a>
+          </div>
+
+          <!-- ═══ Avanzado colapsable (ajustar supuestos) ════════════════ -->
+          <details class="rounded-xl bg-slate-50 border border-slate-200 mb-4">
+            <summary class="px-4 py-3 cursor-pointer text-sm font-bold text-slate-700 hover:text-slate-900 flex items-center gap-2 select-none">
+              <ChevronDown class="w-3.5 h-3.5 transition-transform" />
+              Ajustar supuestos (avanzado)
+            </summary>
+            <div class="px-4 pb-4 pt-2 grid sm:grid-cols-3 gap-4 border-t border-slate-200">
+              <div>
+                <label class="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1.5 block">
+                  Ticket promedio (USD)
+                </label>
+                <input
+                  v-model.number="calc.avgTicket"
+                  type="number"
+                  min="1"
+                  max="500"
+                  class="w-full px-2 py-1.5 border border-slate-300 rounded-lg text-sm font-bold tabular-nums focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary"
+                />
+                <p class="text-[10px] text-slate-400 mt-1 leading-snug">
+                  Para estimar pedidos = facturación / ticket
+                </p>
+              </div>
+              <div>
+                <label class="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1.5 block">
+                  % comisión que cobran las apps
+                </label>
+                <input
+                  v-model.number="calc.pctCommissionApps"
+                  type="number"
+                  min="0"
+                  max="60"
+                  step="1"
+                  class="w-full px-2 py-1.5 border border-slate-300 rounded-lg text-sm font-bold tabular-nums focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary"
+                />
+                <p class="text-[10px] text-slate-400 mt-1 leading-snug">
+                  Rappi/PedidosYa típico AR: 25-35%
+                </p>
+              </div>
+              <div>
+                <label class="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1.5 block">
+                  % de tu delivery que va por apps hoy
+                </label>
+                <input
+                  v-model.number="calc.pctDeliveryViaApps"
+                  type="number"
+                  min="0"
+                  max="100"
+                  step="5"
+                  class="w-full px-2 py-1.5 border border-slate-300 rounded-lg text-sm font-bold tabular-nums focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary"
+                />
+                <p class="text-[10px] text-slate-400 mt-1 leading-snug">
+                  Default 80%: dependés mucho de Rappi
+                </p>
+              </div>
+            </div>
+          </details>
+
+          <p class="text-[11px] text-slate-400 leading-relaxed flex items-start gap-1.5">
+            <Info class="w-3.5 h-3.5 text-slate-400 shrink-0 mt-0.5" />
+            <span>{{ content.calculatorFootnote }}</span>
+          </p>
         </div>
       </div>
 
@@ -866,7 +802,7 @@
 <script setup>
 import { reactive, computed } from 'vue'
 import { RouterLink } from 'vue-router'
-import { Sparkles, Rocket, Check, Info, ArrowRight, ShieldCheck, Calculator, TrendingUp, Zap, PiggyBank, Repeat, Ticket, Cpu } from 'lucide-vue-next'
+import { Sparkles, Rocket, Check, Info, ArrowRight, ShieldCheck, Calculator, TrendingUp, Zap, PiggyBank, Repeat, Ticket, Cpu, Store, CircleDollarSign, Bike, X, ChevronDown } from 'lucide-vue-next'
 
 const props = defineProps({
   content: {
@@ -891,39 +827,43 @@ const props = defineProps({
 // APPS_COMMISSION_PCT viene del content para que sea auditable y editable
 // sin tocar código.
 
+// Modelo 2026 v3 — Calculadora rediseñada (Sin Deenex vs Con Deenex):
+//   3 inputs principales: locations, monthlyRevenueUsd, pctDelivery.
+//   3 inputs avanzados (colapsables): avgTicket, pctCommissionApps,
+//   pctDeliveryViaApps (qué % del delivery actualmente va por apps).
+//   Output: dos cards comparativas con desglose + hero de ganancia neta.
+const locationsPresets = [1, 3, 5, 10, 25, 50]
+
 const calc = reactive({
   locations: props.content.calculatorDefaults?.locations ?? 5,
-  ordersPerLocation: props.content.calculatorDefaults?.ordersPerLocation ?? 300,
+  monthlyRevenueUsd: props.content.calculatorDefaults?.monthlyRevenueUsd ?? 50000,
+  pctDelivery: props.content.calculatorDefaults?.pctDelivery ?? 40,
+  // ── Avanzado (colapsable) ───────────────────────────────────────
+  // avgTicket: para estimar pedidos totales = revenue / ticket.
   avgTicket: props.content.calculatorDefaults?.avgTicket ?? 15,
-  // Modelo 2026 v2: separamos canal en 2 inputs.
-  // pctDeliveryPropio: % del GMV que es delivery propio (canal Deenex)
-  //   → SOBRE este % aplica la comisión Deenex (3% solo en delivery).
-  // pctViaApps: % del GMV que va por Rappi/PedidosYa
-  //   → SOBRE este % aplica el costo de comisión de apps de terceros.
-  // El resto (100 - delivery - apps) es mesa/takeaway presencial → sin comisión.
-  pctDeliveryPropio: props.content.calculatorDefaults?.pctDeliveryPropio ?? 30,
-  pctViaApps: props.content.calculatorDefaults?.pctViaApps ?? 30,
-  // pctCommissionApps: % de comisión que el lead paga a Rappi/PedidosYa.
-  // Editable porque varía 25-40% según país/segmento. Default 30 (típico AR).
+  // pctCommissionApps: lo que cobra Rappi/PedidosYa (típico AR 25-35%).
   pctCommissionApps: props.content.calculatorDefaults?.pctCommissionApps ?? 30,
-  // hasPos: si el lead ya tiene un sistema POS hoy (Fudo, Maxirest, etc.).
-  // Default true porque la inmensa mayoría de cadenas gastronómicas SÍ tienen.
-  // Toggleable para que el lead que no tiene POS no vea el ahorro irrelevante.
-  hasPos: props.content.calculatorDefaults?.hasPos ?? true,
+  // pctDeliveryViaApps: del delivery del lead, qué % va por apps HOY.
+  // Default 80 — la mayoría de marcas sin canal propio dependen mucho de apps.
+  pctDeliveryViaApps: props.content.calculatorDefaults?.pctDeliveryViaApps ?? 80,
 })
 
 const POS_INDUSTRY_COST = props.content.posIndustryCostPerLocation ?? 20
 
-// ── Métricas de volumen ─────────────────────────────────────────────
+// ── Métricas derivadas ──────────────────────────────────────────────
+// gmvUsd = facturación mensual ingresada por el lead (es el input directo).
+const gmvUsd = computed(() => Math.max(0, Number(calc.monthlyRevenueUsd) || 0))
+
+// totalOrders = facturación / ticket promedio. Estimación para mapear tier.
 const totalOrders = computed(() => {
-  const l = Math.max(0, Number(calc.locations) || 0)
-  const o = Math.max(0, Number(calc.ordersPerLocation) || 0)
-  return l * o
+  const ticket = Math.max(1, Number(calc.avgTicket) || 15)
+  return Math.round(gmvUsd.value / ticket)
 })
 
-const gmvUsd = computed(() => {
-  const t = Math.max(0, Number(calc.avgTicket) || 0)
-  return totalOrders.value * t
+// deliveryGmv = porción del GMV que es delivery (de cualquier canal).
+const deliveryGmv = computed(() => {
+  const pct = Math.max(0, Math.min(100, Number(calc.pctDelivery) || 0))
+  return gmvUsd.value * (pct / 100)
 })
 
 // ── Tier asignado según pedidos totales ─────────────────────────────
@@ -933,113 +873,87 @@ const calcTier = computed(() => {
   return tiers.find((t) => t.maxOrders === null || n <= t.maxOrders) || tiers[0]
 })
 
-// % presencial implícito = 100 - delivery propio - apps. Si negativo,
-// significa que el lead puso una suma >100 entre los 2 sliders (error UX).
-const pctPresencial = computed(() => {
-  const del = Math.max(0, Number(calc.pctDeliveryPropio) || 0)
-  const apps = Math.max(0, Number(calc.pctViaApps) || 0)
-  return 100 - del - apps
+// ═══ SIN DEENEX (estado actual del lead) ════════════════════════════
+// El lead hoy paga POS típico ($20/local) + comisión a apps de delivery
+// sobre la porción de su delivery que efectivamente pasa por Rappi/PedidosYa.
+const sinDeenexPosCost = computed(() => {
+  const locations = Math.max(0, Number(calc.locations) || 0)
+  return locations * POS_INDUSTRY_COST
 })
 
-// ── Costos mensuales ────────────────────────────────────────────────
-// Comisión Deenex aplica SOLO al delivery propio (no al GMV total).
-// Por eso multiplica por pctDeliveryPropio antes del % del tier.
-// Útil para el desglose ("USD 119 fee + USD X comisión delivery").
-const commissionCost = computed(() => {
-  const tier = calcTier.value
-  if (tier.fee === null || tier.commissionPct === undefined) return 0
-  const pctDel = Math.max(0, Math.min(100, Number(calc.pctDeliveryPropio) || 0))
-  return gmvUsd.value * (pctDel / 100) * (tier.commissionPct / 100)
-})
-
-const deenexMonthlyCost = computed(() => {
-  const tier = calcTier.value
-  // Enterprise → fee null → "a medida" (no calculamos un número).
-  if (tier.fee === null) return null
-  // Suma: bundle + comisión delivery + marketing AI fee (performance,
-  // solo aplica si hay loyaltyUplift que generar — sin uplift = sin fee).
-  return tier.fee + commissionCost.value + marketingAiFee.value
-})
-
-// Costo de comisión de Rappi/PedidosYa. Aplica al % via apps del GMV
-// usando el `pctCommissionApps` editable (default 30%, range 20-40).
-const appsMonthlyCost = computed(() => {
-  const pct = Math.max(0, Math.min(100, Number(calc.pctViaApps) || 0))
+const sinDeenexAppsCost = computed(() => {
+  const pctViaApps = Math.max(0, Math.min(100, Number(calc.pctDeliveryViaApps) || 0))
   const commPct = Math.max(0, Math.min(100, Number(calc.pctCommissionApps) || 0))
-  return gmvUsd.value * (pct / 100) * (commPct / 100)
+  return deliveryGmv.value * (pctViaApps / 100) * (commPct / 100)
 })
 
-// ── Ahorro de comisión vs apps ──────────────────────────────────────
-// 1er componente del valor total. Solo > 0 si el lead vende por apps hoy.
-const monthlySavings = computed(() => {
-  if (deenexMonthlyCost.value === null) return null
-  return Math.max(0, appsMonthlyCost.value - deenexMonthlyCost.value)
+const sinDeenexTotal = computed(() => sinDeenexPosCost.value + sinDeenexAppsCost.value)
+
+// ═══ CON DEENEX (4 componentes del costo) ═══════════════════════════
+// Comisión Deenex aplica sobre el delivery total (canal propio + reemplaza apps).
+const conDeenexDeliveryCommission = computed(() => {
+  const tier = calcTier.value
+  if (tier.fee === null || tier.commissionPct == null) return 0
+  return deliveryGmv.value * (tier.commissionPct / 100)
 })
 
-// ── Uplift por Loyalty (recompras extra) ────────────────────────────
-// 2do componente: GMV adicional generado por mayor recurrencia gracias
-// a Loyalty + Marketing AI (puntos, niveles VIP, cupones segmentados,
-// campañas auto). Asumimos +20% sobre el GMV — promedio conservador.
+// Loyalty uplift = recompras extras generadas por Marketing AI + Loyalty.
 const loyaltyUplift = computed(() => {
   const pct = props.content.valueAssumptions?.recurrenceUpliftPct ?? 20
   return gmvUsd.value * (pct / 100)
 })
 
-// ── Marketing AI Fee (performance-based) ────────────────────────────
-// Deenex corre las campañas de marketing/retargeting para generar el
-// loyaltyUplift. Si ese uplift se genera, Deenex cobra X% sobre las
-// ventas extras generadas (no sobre el GMV total). Esto es performance:
-// si NO hay uplift (campañas no funcionan), no hay fee. Sin riesgo upfront.
+// Marketing AI Fee (performance) = % sobre loyaltyUplift. Sin uplift = sin fee.
 const marketingAiFee = computed(() => {
   const tier = calcTier.value
   if (tier.marketingAiPct == null) return 0
   return loyaltyUplift.value * (tier.marketingAiPct / 100)
 })
 
-// ── Uplift por Ticket promedio ──────────────────────────────────────
-// 3er componente: GMV extra por aumento del ticket promedio (cross-sell
-// con cupones, campañas personalizadas, productos sugeridos en checkout).
+// POS integrado con Deenex (escala por tier de USD 20 a USD 7).
+const conDeenexPosCost = computed(() => {
+  const tier = calcTier.value
+  const perLoc = Math.max(0, Number(tier.posPerLocation) || 0)
+  const locations = Math.max(0, Number(calc.locations) || 0)
+  return locations * perLoc
+})
+
+// Total Deenex monthly = bundle + delivery commission + MAI fee + POS.
+// null si Enterprise → muestra bloque "a medida" separado.
+const conDeenexTotal = computed(() => {
+  const tier = calcTier.value
+  if (tier.fee === null) return null
+  return tier.fee + conDeenexDeliveryCommission.value + marketingAiFee.value + conDeenexPosCost.value
+})
+
+// ═══ GANANCIA NETA = ahorro + uplift loyalty (neto MAI) + uplift ticket ══
+const monthlyCostSavings = computed(() => {
+  if (conDeenexTotal.value === null) return 0
+  return Math.max(0, sinDeenexTotal.value - conDeenexTotal.value)
+})
+
+const loyaltyGainNet = computed(() => Math.max(0, loyaltyUplift.value - marketingAiFee.value))
+
 const ticketUplift = computed(() => {
   const pct = props.content.valueAssumptions?.ticketUpliftPct ?? 15
   return gmvUsd.value * (pct / 100)
 })
 
-// ── Ahorro de POS por integración (4° componente) ───────────────────
-// Si el lead ya tiene un POS hoy (Fudo/Maxirest/etc.) paga ~USD 20/local.
-// Deenex tiene precio escalonado de POS por tier: arranca en USD 20/local
-// (paridad Inicio) y cae progresivamente hasta USD 7/local (Pro). El
-// ahorro = locales × (mercado - tier.posPerLocation). En tier Inicio
-// el ahorro es 0 (paridad). En tier Pro es máximo (USD 13/local).
-// Solo se computa si hasPos === true.
-const posSavings = computed(() => {
-  if (!calc.hasPos) return 0
-  const tier = calcTier.value
-  if (tier.posPerLocation === null || tier.posPerLocation === undefined) return 0
-  const locations = Math.max(0, Number(calc.locations) || 0)
-  return locations * Math.max(0, POS_INDUSTRY_COST - tier.posPerLocation)
+const totalMonthlyBenefit = computed(() => {
+  if (conDeenexTotal.value === null) return 0
+  return monthlyCostSavings.value + loyaltyGainNet.value + ticketUplift.value
 })
 
-// Precio del POS por local en el tier actual (para mostrar en la card del tier).
-// Null si Enterprise.
-const posCostPerLocationCurrentTier = computed(() => {
-  return calcTier.value.posPerLocation ?? null
-})
+const totalAnnualBenefit = computed(() => Math.round(totalMonthlyBenefit.value) * 12)
 
-// ── Ganancia total mensual con Deenex (suma de los 4 componentes) ───
-// Esto es lo que realmente importa al lead: cuánto MÁS dinero le entra
-// (o deja de salir) cada mes activando Deenex.
-const totalMonthlyValue = computed(() => {
-  if (deenexMonthlyCost.value === null) return null
-  const savings = monthlySavings.value ?? 0
-  return savings + loyaltyUplift.value + ticketUplift.value + posSavings.value
+// ROI multiple = cada USD invertido en Deenex te vuelve Xx en ganancia neta.
+// Useful frame para que el lead vea el ratio inversión/retorno.
+const roiMultiple = computed(() => {
+  if (conDeenexTotal.value === null || conDeenexTotal.value <= 0) return '—'
+  const ratio = totalMonthlyBenefit.value / conDeenexTotal.value
+  if (!isFinite(ratio) || ratio <= 0) return '—'
+  return ratio.toFixed(1)
 })
-
-// Anual = ganancia mensual REDONDEADA × 12. Sin redondear, monthly se
-// muestra como USD 3.244 pero el anual usa el raw (3243.5), generando
-// inconsistencia visible (3.244 × 12 ≠ 38.922). Redondeamos primero.
-const totalAnnualValue = computed(() =>
-  totalMonthlyValue.value !== null ? Math.round(totalMonthlyValue.value) * 12 : null
-)
 
 // ── Formatters ──────────────────────────────────────────────────────
 function fmt(n) {
