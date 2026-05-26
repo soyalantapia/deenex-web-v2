@@ -6,11 +6,11 @@
     <h1 class="text-[clamp(1.8rem,4vw,2.6rem)] font-extrabold tracking-tighter leading-[1.05] text-slate-900 mb-4">
       <template v-if="onboarding.greeting.value">
         {{ onboarding.greeting.value }}, arrancás<br />
-        <span class="text-primary italic font-light">en USD 69 / mes.</span>
+        <span class="text-primary italic font-light">en USD 29 / mes.</span>
       </template>
       <template v-else>
         Arrancás en<br />
-        <span class="text-primary italic font-light">USD 69 / mes.</span>
+        <span class="text-primary italic font-light">USD 29 / mes.</span>
       </template>
     </h1>
     <!-- Mensaje clave: TODOS arrancan acá independiente del tamaño actual.
@@ -18,7 +18,8 @@
          crece automáticamente cuando el VOLUMEN REAL lo justifica. -->
     <p class="text-base text-slate-500 leading-relaxed mb-6 max-w-md">
       Todas las marcas arrancan con el mismo plan de entrada — pagás solo
-      <span class="font-bold text-slate-900">USD 69 hasta 300 pedidos/mes</span>.
+      <span class="font-bold text-slate-900">USD 29 hasta 300 pedidos/mes</span>
+      + <span class="font-bold text-slate-900">3% solo en delivery</span>.
       Cuando tu volumen real supere ese límite, escalás automáticamente al
       siguiente tier. Sin renegociar nada.
     </p>
@@ -113,20 +114,25 @@
           Cobrado anualmente: USD {{ (effectiveFee(recommendedPlan) * 12).toLocaleString('es-AR') }} / año.
         </p>
         <p class="text-white/80 text-sm leading-relaxed mb-1 flex items-center gap-1.5 flex-wrap">
-          + <span class="font-bold">{{ recommendedPlan.commissionPct }}%</span>
-          por venta procesada.
+          + <span class="font-bold tabular-nums">{{ recommendedPlan.commissionPct }}%</span>
+          comisión <span class="text-white/60">solo en delivery</span>.
           <Tooltip variant="light" placement="top" align="left" label="Sobre qué se aplica la comisión">
             <strong class="block mb-1">¿Sobre qué se aplica?</strong>
-            Sobre el GMV (Gross Merchandise Value) — es decir, el monto total de ventas que pasen por Deenex. No se aplica sobre propinas ni impuestos.
+            Solo sobre el GMV de delivery (los pedidos que despacha tu canal Deenex). NO aplica a mesa, takeaway ni a las ventas que entran por Rappi/PedidosYa. Tampoco sobre propinas ni impuestos.
           </Tooltip>
         </p>
-        <p class="text-white/60 text-xs leading-relaxed">
+        <p v-if="recommendedPlan.marketingAiPct" class="text-white/70 text-xs leading-relaxed mb-1 flex items-center gap-1.5 flex-wrap">
+          <Sparkles class="w-3 h-3" />
+          + Marketing AI opcional: <span class="font-bold tabular-nums">{{ recommendedPlan.marketingAiPct }}%</span>
+          <span class="text-white/50">sobre ventas atribuidas</span>
+        </p>
+        <p class="text-white/60 text-xs leading-relaxed mt-1">
           Primer cargo el <span class="font-bold text-white">{{ onboarding.firstChargeDateShort.value }}</span>.
           Antes no te cobramos nada.
         </p>
 
         <!-- Toggle de Fidelización Dinámica removido — ya viene incluida en
-             el Bundle de entrada (USD 69), no es add-on opcional. -->
+             el Bundle de entrada (USD 29), no es add-on opcional. -->
       </div>
     </div>
 
@@ -217,7 +223,7 @@
               v-else-if="tier.key === projectedTier.key"
               class="text-[10px] font-black text-white bg-emerald-500 px-2.5 py-0.5 rounded-full uppercase tracking-widest"
             >
-              Próxima parada
+              Siguiente paso
             </span>
           </div>
 
@@ -245,10 +251,28 @@
             <!-- Comisión -->
             <div class="min-w-0">
               <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-0.5">
-                Comisión
+                Comisión delivery
               </p>
               <p class="text-sm font-bold tabular-nums" :class="tier.key === recommendedPlan.key ? 'text-primary' : 'text-slate-700'">
-                {{ tier.commissionPct }}% por venta
+                {{ formatPct(tier.commissionPct) }} en delivery
+              </p>
+            </div>
+            <!-- Marketing AI (opcional) -->
+            <div v-if="tier.marketingAiPct" class="min-w-0">
+              <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-0.5">
+                Marketing AI
+              </p>
+              <p class="text-sm font-bold text-slate-700 tabular-nums whitespace-nowrap">
+                {{ tier.marketingAiPct }}% atribución
+              </p>
+            </div>
+            <!-- POS por local (opcional) -->
+            <div v-if="tier.posPerLocation" class="min-w-0">
+              <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-0.5">
+                POS / local
+              </p>
+              <p class="text-sm font-bold text-slate-700 tabular-nums whitespace-nowrap">
+                USD {{ tier.posPerLocation }}/mes
               </p>
             </div>
           </div>
@@ -345,9 +369,16 @@ const selectablePlans = computed(() => onboarding.PLAN_TIERS)
 // real) en lugar de "X-Y locales". Resuelve la pregunta clave del lead:
 // "¿en cuál caigo yo?" — porque los locales son ambiguos, los pedidos no.
 function planVolumeLabel(tier) {
-  if (tier.key === 'enterprise') return '75.000+ pedidos/mes'
+  if (tier.key === 'enterprise') return '25.000+ pedidos/mes'
   if (tier.minOrders === 0) return `Hasta ${tier.maxOrders.toLocaleString('es-AR')} pedidos/mes`
   return `${tier.minOrders.toLocaleString('es-AR')}–${tier.maxOrders.toLocaleString('es-AR')} pedidos/mes`
+}
+
+// Formatea % con coma decimal estilo es-AR. Ej: 2.75 → "2,75%"; 3 → "3%".
+function formatPct(n) {
+  if (n == null) return '—'
+  const rounded = Math.round(n * 100) / 100
+  return rounded.toLocaleString('es-AR', { maximumFractionDigits: 2 }) + '%'
 }
 
 function onSubmit() {

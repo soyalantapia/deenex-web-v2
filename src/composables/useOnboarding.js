@@ -178,12 +178,19 @@ watch(
 // el volumen real lo justifica.
 //
 // La escalera de tiers se muestra como roadmap a futuro, no como selector.
+// Modelo pricing 2026 v2:
+//   monthlyFee = Bundle "Ventas + Loyalty" (precio fijo mensual).
+//   commissionPct = % comisión SOLO en delivery (no aplica a salón ni Rappi).
+//   marketingAiPct = % opcional cobrado sobre ventas atribuidas a Marketing AI.
+//   posPerLocation = USD/local del POS integrado (cae progresivo por tier).
+// Todos los % bajan progresivamente para premiar volumen.
 const PLAN_TIERS = [
   {
     key: 'inicio', name: 'Inicio',
     minOrders: 0, maxOrders: 300,
     minLocations: 1, maxLocations: 3,
-    monthlyFee: 69, commissionPct: 1.5,
+    monthlyFee: 29, commissionPct: 3.0,
+    marketingAiPct: 12, posPerLocation: 20,
     keyFeatures: ['Self-service · 1 admin', 'Soporte por email + WhatsApp CSM'],
     tagline: 'Tu punto de partida — sin importar tu tamaño actual',
   },
@@ -191,7 +198,8 @@ const PLAN_TIERS = [
     key: 'crecimiento', name: 'Crecimiento',
     minOrders: 301, maxOrders: 1000,
     minLocations: 3, maxLocations: 10,
-    monthlyFee: 169, commissionPct: 1.25,
+    monthlyFee: 119, commissionPct: 2.75,
+    marketingAiPct: 11, posPerLocation: 17,
     keyFeatures: ['CSM compartido · 3 admins', 'Branding propio + dominio'],
     tagline: 'Operación consolidada, alto delivery',
   },
@@ -199,7 +207,8 @@ const PLAN_TIERS = [
     key: 'escala', name: 'Escala',
     minOrders: 1001, maxOrders: 3000,
     minLocations: 10, maxLocations: 30,
-    monthlyFee: 349, commissionPct: 1.0,
+    monthlyFee: 349, commissionPct: 2.5,
+    marketingAiPct: 10, posPerLocation: 13,
     keyFeatures: ['CSM dedicado 4h/mes · 10 admins', 'API pública + webhooks'],
     tagline: 'Cadena con operación 24/7',
   },
@@ -207,7 +216,8 @@ const PLAN_TIERS = [
     key: 'performance', name: 'Performance',
     minOrders: 3001, maxOrders: 7500,
     minLocations: 30, maxLocations: 100,
-    monthlyFee: 599, commissionPct: 0.85,
+    monthlyFee: 599, commissionPct: 2.25,
+    marketingAiPct: 9, posPerLocation: 10,
     keyFeatures: ['CSM dedicado full-time', 'SSO + multi-región'],
     tagline: 'Cadena establecida con tráfico alto',
   },
@@ -215,7 +225,8 @@ const PLAN_TIERS = [
     key: 'pro', name: 'Pro',
     minOrders: 7501, maxOrders: 25000,
     minLocations: 100, maxLocations: 500,
-    monthlyFee: 1199, commissionPct: 0.75,
+    monthlyFee: 1199, commissionPct: 2.0,
+    marketingAiPct: 8, posPerLocation: 7,
     keyFeatures: ['CSM 24/7 · admins ilimitados', 'SLA 99,5% + audit logs'],
     tagline: 'Líder de categoría o eventos masivos',
   },
@@ -223,7 +234,8 @@ const PLAN_TIERS = [
     key: 'enterprise', name: 'Enterprise',
     minOrders: 25001, maxOrders: Infinity,
     minLocations: 200, maxLocations: Infinity,
-    monthlyFee: null, commissionPct: 0.5,
+    monthlyFee: null, commissionPct: 1.75,
+    marketingAiPct: 7, posPerLocation: null,
     keyFeatures: ['SLA 99,9% + soporte L3', 'Integraciones custom + on-prem'],
     tagline: 'Operación nacional o multi-marca',
   },

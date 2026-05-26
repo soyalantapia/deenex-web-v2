@@ -254,11 +254,11 @@
                     Mix de canales (% del GMV total)
                   </p>
 
-                  <!-- % delivery propio -->
+                  <!-- % delivery (canal Deenex, todos los pedidos delivery) -->
                   <div>
                     <div class="flex items-center justify-between mb-2 gap-3">
                       <label for="calc-pct-delivery" class="text-sm font-bold text-slate-700 leading-tight">
-                        % delivery propio (canal Deenex)
+                        % delivery (canal Deenex)
                       </label>
                       <div class="flex items-center gap-1.5">
                         <input
@@ -425,7 +425,7 @@
                     </span>
                   </div>
                   <p class="text-[12px] text-white/80 mt-1">
-                    + <span class="font-bold tabular-nums">{{ calcTier.commissionLabel }}</span> de comisión <span class="text-white/60">solo en delivery propio</span>
+                    + <span class="font-bold tabular-nums">{{ calcTier.commissionLabel }}</span> de comisión <span class="text-white/60">solo en delivery</span>
                   </p>
                   <!-- Marketing AI: add-on opcional (% sobre venta atribuida) -->
                   <p
@@ -460,7 +460,7 @@
                   <div class="min-w-0">
                     <p class="text-sm font-semibold text-slate-700">Tu costo con Deenex</p>
                     <p v-if="calcTier.fee !== null" class="text-[11px] text-slate-400 leading-snug">
-                      USD {{ calcTier.fee }} bundle + {{ fmtUsd(commissionCost) }} comisión <span class="font-medium">({{ calcTier.commissionLabel }} sobre {{ calc.pctDeliveryPropio }}% delivery propio)</span>
+                      USD {{ calcTier.fee }} bundle + {{ fmtUsd(commissionCost) }} comisión <span class="font-medium">({{ calcTier.commissionLabel }} sobre {{ calc.pctDeliveryPropio }}% delivery)</span>
                     </p>
                     <p v-else class="text-[11px] text-slate-400 leading-snug">
                       Volumen Enterprise — acuerdo dedicado

@@ -428,7 +428,7 @@ export const pricingModel = {
   ],
   starterPrice: 29,
   starterCommission: '3',
-  starterCommissionScope: 'solo en delivery propio',
+  starterCommissionScope: 'solo en delivery',
   starterOrders: 300,
   starterCtaLabel: 'Empezar 15 días gratis',
 
