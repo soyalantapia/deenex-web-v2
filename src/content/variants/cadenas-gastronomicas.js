@@ -554,7 +554,7 @@ export const pricingModel = {
     ticketUpliftPct: 15,
   },
   calculatorFootnote:
-    'Comisión Deenex aplica solo a delivery propio (no en mesa/takeaway/Rappi). % comisión apps editable (default 30%, típico AR). USD 20/local de POS mercado (Fudo/Maxirest típico). Uplifts +20% recurrencia y +15% ticket son promedios conservadores de clientes Deenex con 6+ meses, clientes top promedian +35% / +25%.',
+    'Comisión Deenex aplica solo a delivery (no en mesa/takeaway/Rappi). Marketing AI es performance: cobramos el % solo sobre las recompras EXTRAS que generamos con nuestras campañas (sin uplift, sin fee). % comisión apps editable (default 30%, típico AR). USD 20/local de POS mercado (Fudo/Maxirest típico). Uplifts +20% recurrencia y +15% ticket son promedios conservadores de clientes Deenex con 6+ meses, clientes top promedian +35% / +25%.',
 
   // ── Cómo empezar (al cierre de la calculadora) ─────────────────
   calculatorHowToStartEyebrow: 'Cómo empezar',

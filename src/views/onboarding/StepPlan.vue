@@ -121,10 +121,12 @@
             Solo sobre el GMV de delivery (los pedidos que despacha tu canal Deenex). NO aplica a mesa, takeaway ni a las ventas que entran por Rappi/PedidosYa. Tampoco sobre propinas ni impuestos.
           </Tooltip>
         </p>
-        <p v-if="recommendedPlan.marketingAiPct" class="text-white/70 text-xs leading-relaxed mb-1 flex items-center gap-1.5 flex-wrap">
-          <Sparkles class="w-3 h-3" />
-          + Marketing AI opcional: <span class="font-bold tabular-nums">{{ recommendedPlan.marketingAiPct }}%</span>
-          <span class="text-white/50">sobre ventas atribuidas</span>
+        <p v-if="recommendedPlan.marketingAiPct" class="text-white/85 text-xs leading-relaxed mb-1 flex items-start gap-1.5 flex-wrap">
+          <Sparkles class="w-3 h-3 mt-0.5 shrink-0 text-emerald-300" />
+          <span>
+            Marketing AI <span class="font-bold">incluido</span>: cobramos <span class="font-bold tabular-nums">{{ recommendedPlan.marketingAiPct }}%</span>
+            <span class="text-white/65">solo sobre las recompras extras que generamos</span>
+          </span>
         </p>
         <p class="text-white/60 text-xs leading-relaxed mt-1">
           Primer cargo el <span class="font-bold text-white">{{ onboarding.firstChargeDateShort.value }}</span>.
@@ -257,13 +259,14 @@
                 {{ formatPct(tier.commissionPct) }} en delivery
               </p>
             </div>
-            <!-- Marketing AI (opcional) -->
+            <!-- Marketing AI: INCLUIDO performance, cobra solo sobre recompras
+                 EXTRAS que el sistema genera (sin uplift = sin fee). -->
             <div v-if="tier.marketingAiPct" class="min-w-0">
               <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-0.5">
                 Marketing AI
               </p>
               <p class="text-sm font-bold text-slate-700 tabular-nums whitespace-nowrap">
-                {{ tier.marketingAiPct }}% atribución
+                {{ tier.marketingAiPct }}% performance
               </p>
             </div>
             <!-- POS por local (opcional) -->

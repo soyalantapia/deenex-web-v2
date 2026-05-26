@@ -108,11 +108,36 @@
         </div>
       </div>
 
+      <!-- ═══ Callout: Cómo funciona Marketing AI ═══════════════════════
+           El lead debe entender ANTES de la calculadora por qué el % de MAI
+           no es un cobro extra arbitrario sino un modelo performance: solo
+           pagás sobre las ventas EXTRAS que generamos con nuestras campañas. -->
+      <div class="mb-10 rounded-2xl border-2 border-emerald-200 bg-gradient-to-br from-emerald-50 to-white p-5 sm:p-7 relative overflow-hidden">
+        <div class="absolute -right-6 -top-6 w-32 h-32 rounded-full bg-emerald-200/30 blur-3xl pointer-events-none"></div>
+        <div class="relative grid sm:grid-cols-[auto_1fr] gap-4 sm:gap-6 items-start">
+          <div class="w-12 h-12 rounded-xl bg-emerald-500 text-white flex items-center justify-center shrink-0">
+            <Sparkles class="w-6 h-6" />
+          </div>
+          <div class="min-w-0">
+            <p class="text-[10px] font-black text-emerald-700 uppercase tracking-widest mb-1.5">
+              Marketing AI · Performance
+            </p>
+            <h3 class="text-xl sm:text-2xl font-extrabold tracking-tighter text-slate-900 leading-tight mb-2">
+              Solo cobramos cuando generamos recompras.
+            </h3>
+            <p class="text-sm text-slate-600 leading-relaxed">
+              Está <span class="font-bold text-slate-900">incluido en tu bundle</span>: corremos campañas de WhatsApp, push y email para reactivar a tus clientes inactivos. Si las campañas generan recompras, cobramos el porcentaje del tier <span class="font-bold tabular-nums">solo sobre esas ventas extras</span>. Sin uplift no hay fee. Cero riesgo upfront, cero costo fijo de marketing.
+            </p>
+          </div>
+        </div>
+      </div>
+
       <!-- ═══ Calculadora detallada ═══════════════════════════════════════
            4 inputs (locales · pedidos/local · ticket · % via apps) con
            sliders + numerics. Output en vivo: tier asignado, costo Deenex
-           vs costo apps, ahorro mensual y anual. El anchor #calculadora-deenex
-           lo target el link "Calcular mi ahorro" del hero card. -->
+           (bundle + comisión delivery + Marketing AI fee) vs costo apps,
+           ahorro mensual y anual. El anchor #calculadora-deenex lo target
+           el link "Calcular mi ahorro" del hero card. -->
       <div id="calculadora-deenex" class="mb-12 scroll-mt-24">
         <div class="text-center mb-8">
           <span class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-100 text-emerald-700 text-[10px] font-black uppercase tracking-widest mb-4">
@@ -427,13 +452,17 @@
                   <p class="text-[12px] text-white/80 mt-1">
                     + <span class="font-bold tabular-nums">{{ calcTier.commissionLabel }}</span> de comisión <span class="text-white/60">solo en delivery</span>
                   </p>
-                  <!-- Marketing AI: add-on opcional (% sobre venta atribuida) -->
+                  <!-- Marketing AI: INCLUIDO en el bundle, performance-based.
+                       Deenex corre las campañas; solo cobra el % sobre las
+                       ventas EXTRAS que genera. Sin uplift = sin fee. Sin riesgo. -->
                   <p
                     v-if="calcTier.marketingAiPct !== undefined && calcTier.marketingAiPct !== null"
-                    class="text-[12px] text-white/80 mt-1 flex items-center gap-1.5"
+                    class="text-[12px] text-white/85 mt-1.5 flex items-start gap-1.5 leading-snug"
                   >
-                    <Sparkles class="w-3 h-3" />
-                    Marketing AI opcional: <span class="font-bold tabular-nums">{{ calcTier.marketingAiPct }}%</span> sobre venta atribuida
+                    <Sparkles class="w-3 h-3 mt-0.5 shrink-0 text-emerald-300" />
+                    <span>
+                      Marketing AI <span class="font-bold">incluido</span>: cobramos <span class="font-bold tabular-nums">{{ calcTier.marketingAiPct }}%</span> <span class="text-white/65">solo sobre las recompras extras que generamos</span>
+                    </span>
                   </p>
                   <!-- POS / local en este tier (si aplica) -->
                   <p
@@ -460,7 +489,7 @@
                   <div class="min-w-0">
                     <p class="text-sm font-semibold text-slate-700">Tu costo con Deenex</p>
                     <p v-if="calcTier.fee !== null" class="text-[11px] text-slate-400 leading-snug">
-                      USD {{ calcTier.fee }} bundle + {{ fmtUsd(commissionCost) }} comisión <span class="font-medium">({{ calcTier.commissionLabel }} sobre {{ calc.pctDeliveryPropio }}% delivery)</span>
+                      USD {{ calcTier.fee }} bundle + {{ fmtUsd(commissionCost) }} comisión delivery + {{ fmtUsd(marketingAiFee) }} Marketing AI
                     </p>
                     <p v-else class="text-[11px] text-slate-400 leading-snug">
                       Volumen Enterprise, acuerdo dedicado
@@ -742,13 +771,14 @@
                   {{ tier.commissionLabel }} en delivery
                 </p>
               </div>
-              <!-- Marketing AI (opcional, add-on % sobre ventas atribuidas) -->
+              <!-- Marketing AI: INCLUIDO performance — Deenex corre campañas
+                   y cobra X% solo sobre recompras EXTRAS que genera. -->
               <div v-if="tier.marketingAiPct" class="min-w-0">
                 <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-0.5">
                   Marketing AI
                 </p>
                 <p class="text-sm font-bold text-slate-700 tabular-nums whitespace-nowrap">
-                  {{ tier.marketingAiPct }}% atribución
+                  {{ tier.marketingAiPct }}% performance
                 </p>
               </div>
               <!-- POS por local (opcional, baja con tier) -->
@@ -926,7 +956,9 @@ const deenexMonthlyCost = computed(() => {
   const tier = calcTier.value
   // Enterprise → fee null → "a medida" (no calculamos un número).
   if (tier.fee === null) return null
-  return tier.fee + commissionCost.value
+  // Suma: bundle + comisión delivery + marketing AI fee (performance,
+  // solo aplica si hay loyaltyUplift que generar — sin uplift = sin fee).
+  return tier.fee + commissionCost.value + marketingAiFee.value
 })
 
 // Costo de comisión de Rappi/PedidosYa. Aplica al % via apps del GMV
@@ -946,12 +978,22 @@ const monthlySavings = computed(() => {
 
 // ── Uplift por Loyalty (recompras extra) ────────────────────────────
 // 2do componente: GMV adicional generado por mayor recurrencia gracias
-// a Loyalty (puntos, niveles VIP, cupones segmentados). Asumimos margen
-// casi total sobre el uplift (porque la comisión Deenex es marginal vs el
-// valor incremental). El usuario ve el % en el footnote para auditar.
+// a Loyalty + Marketing AI (puntos, niveles VIP, cupones segmentados,
+// campañas auto). Asumimos +20% sobre el GMV — promedio conservador.
 const loyaltyUplift = computed(() => {
   const pct = props.content.valueAssumptions?.recurrenceUpliftPct ?? 20
   return gmvUsd.value * (pct / 100)
+})
+
+// ── Marketing AI Fee (performance-based) ────────────────────────────
+// Deenex corre las campañas de marketing/retargeting para generar el
+// loyaltyUplift. Si ese uplift se genera, Deenex cobra X% sobre las
+// ventas extras generadas (no sobre el GMV total). Esto es performance:
+// si NO hay uplift (campañas no funcionan), no hay fee. Sin riesgo upfront.
+const marketingAiFee = computed(() => {
+  const tier = calcTier.value
+  if (tier.marketingAiPct == null) return 0
+  return loyaltyUplift.value * (tier.marketingAiPct / 100)
 })
 
 // ── Uplift por Ticket promedio ──────────────────────────────────────
