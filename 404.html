@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- SEO Básico -->
+  <title>Deenex | Tu canal propio</title>
+  <meta name="description"
+    content="Lanzá tu propio canal de venta. App PWA, pedidos por WhatsApp, Fidelización (CRM) y Marketing con IA para cadenas de foodservice y gastronomía.">
+  <meta name="keywords"
+    content="deenex, delivery propio, crm gastronomico, marketing para restaurantes, software para restaurantes, pedidos qr, fidelizacion clientes, app de delivery propia, gastronomía 4.0">
+  <meta name="author" content="Deenex">
+  <meta name="robots" content="index, follow">
+  <link rel="canonical" href="https://deenex.com" />
+
+  <!-- Open Graph / Facebook -->
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://deenex.com/">
+  <meta property="og:title" content="Deenex | Tu canal propio">
+  <meta property="og:description"
+    content="Plataforma omnicanal para cadenas de foodservice. Fidelización, Marketing y Delivery con tu propia marca.">
+  <meta property="og:image" content="https://deenex.com/og-image.jpg">
+
+  <!-- Twitter -->
+  <meta property="twitter:card" content="summary_large_image">
+  <meta property="twitter:url" content="https://deenex.com/">
+  <meta property="twitter:title" content="Deenex | El canal propio que mejor te conecta con tus clientes">
+  <meta property="twitter:description"
+    content="Tus clientes, tus datos, tu marca. Sin intermediarios">
+  <meta property="twitter:image" content="https://deenex.com/og-image.jpg">
+
+  <!-- Tematización y Favicons -->
+  <link rel="icon" type="image/x-icon" href="/deenex-web-v2/favicon.ico">
+  <link rel="icon" type="image/png" sizes="96x96" href="/deenex-web-v2/favicon-96x96.png">
+  <link rel="icon" type="image/svg+xml" href="/deenex-web-v2/favicon.svg">
+  <link rel="apple-touch-icon" sizes="180x180" href="/deenex-web-v2/apple-touch-icon.png">
+  <link rel="manifest" href="/deenex-web-v2/site.webmanifest">
+  <meta name="theme-color" content="#695EDE">
+  
+  <!-- Google tag (gtag.js) con Consent Mode v2.
+       Por default analytics está DENIED hasta que el lead acepte el banner.
+       El CookieConsentBanner.vue llama a gtag('consent', 'update', {...})
+       cuando el lead opta-in. Sin esto: multa Ley 25.326 (Arg) o RGPD. -->
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    window.gtag = gtag;
+    // Consent default: deny everything. La función readConsent() abajo
+    // chequea localStorage por una elección previa para no mostrar el banner
+    // dos veces en la misma máquina.
+    var stored = null;
+    try { stored = localStorage.getItem('deenex_consent_v1'); } catch (e) {}
+    var hasConsent = stored === 'granted';
+    gtag('consent', 'default', {
+      ad_storage: hasConsent ? 'granted' : 'denied',
+      analytics_storage: hasConsent ? 'granted' : 'denied',
+      ad_user_data: hasConsent ? 'granted' : 'denied',
+      ad_personalization: hasConsent ? 'granted' : 'denied',
+      wait_for_update: 500
+    });
+    gtag('js', new Date());
+    gtag('config', 'G-E7GPE100LK', { anonymize_ip: true });
+  </script>
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-E7GPE100LK"></script>
+  <script src="https://player.vimeo.com/api/player.js"></script>
+  <script type="module" crossorigin src="/deenex-web-v2/assets/index-BITw0_eC.js"></script>
+  <link rel="stylesheet" crossorigin href="/deenex-web-v2/assets/index-XvYIZ1FU.css">
+</head>
+
+<body>
+  <div id="app"></div>
+</body>
+
+</html>
