@@ -1,5 +1,5 @@
 /**
- * useOnboarding — estado compartido del flow de auto-onboarding.
+ * useOnboarding, estado compartido del flow de auto-onboarding.
  *
  * Persiste en localStorage (clave `deenex_onboarding_v1`) para que el lead pueda
  * cerrar la pestaña y volver sin perder progreso. Expone:
@@ -7,7 +7,7 @@
  *   - actions: setIdentity, setBusiness, setPlan, markTrialActivated, reset
  *   - computed: recommendedPlan (basado en N locales), monthlyEstimateUsd,
  *     savingsVsThirdParty, currentStep, isStepUnlocked(stepKey)
- *   - track(event, payload) — wrapper de trackEvent para namespacear los eventos
+ *   - track(event, payload), wrapper de trackEvent para namespacear los eventos
  *     GA4 del flow con prefijo `onboarding_`.
  */
 
@@ -20,7 +20,7 @@ const DEFAULT_STATE = {
   // Step 1
   identity: {
     fullName: '', // un solo campo "Nombre" (antes era firstName + lastName)
-    firstName: '', // derivado de fullName.split(' ')[0] — mantenido por compat con greeting
+    firstName: '', // derivado de fullName.split(' ')[0], mantenido por compat con greeting
     lastName: '',
     email: '',
     whatsapp: '',
@@ -37,7 +37,7 @@ const DEFAULT_STATE = {
     // ROI inputs reales del lead (editados en Step Plan)
     avgTicketUsd: null, // null = usar default por volumen
     ordersPerLocation: null,
-    // Override del subdomain — cuando el slug derivado de brand está tomado
+    // Override del subdomain, cuando el slug derivado de brand está tomado
     // y el lead acepta la sugerencia (ej. "palta-ar"), guardamos ese override
     // acá. `subdomainPreview` computed lo respeta antes de slugify(brand).
     subdomainOverride: '',
@@ -134,7 +134,7 @@ const state = reactive(loadFromStorage())
 //   'saved'  → mostrando "Guardado ✓" (1.5s después de persistir)
 //   'error'  → falló localStorage (cuota llena, modo privado de Safari)
 //
-// Le permite al lead VER que su progreso queda guardado — crítico para
+// Le permite al lead VER que su progreso queda guardado, crítico para
 // dar tranquilidad en flows largos.
 const saveStatus = ref('idle')
 const lastSavedAt = ref(null)
@@ -142,7 +142,7 @@ let saveStatusTimer = null
 
 // Persist on every mutation with debounce + status update.
 // safeSetItem retorna el tier que persistió ('local'|'session'|'memory'):
-// si cae a memory, el progreso se pierde al cerrar la pestaña — surfaceamos
+// si cae a memory, el progreso se pierde al cerrar la pestaña, surfaceamos
 // como 'error' visible para que el ConnectivityBanner avise.
 watch(
   state,
@@ -153,7 +153,7 @@ watch(
     saveStatusTimer = setTimeout(() => {
       const tier = safeSetItem(STORAGE_KEY, JSON.stringify(val))
       if (tier === 'memory') {
-        // memoria volátil — alertamos al lead que su data no persistirá.
+        // memoria volátil, alertamos al lead que su data no persistirá.
         saveStatus.value = 'error'
         return
       }
@@ -167,7 +167,7 @@ watch(
   { deep: true }
 )
 
-// ── Plan recommendation engine — Bundle único escalonado 2026 ──────────
+// ── Plan recommendation engine, Bundle único escalonado 2026 ──────────
 // Decisión de pricing: TODOS los leads arrancan en el tier "Inicio" (USD 69
 // con hasta 300 pedidos/mes), independiente de cuántos locales tengan o
 // cuánto volumen DECLAREN inicialmente. Solo escalan al siguiente tier cuando
@@ -192,7 +192,7 @@ const PLAN_TIERS = [
     monthlyFee: 29, commissionPct: 3.0,
     marketingAiPct: 12, posPerLocation: 20,
     keyFeatures: ['Self-service · 1 admin', 'Soporte por email + WhatsApp CSM'],
-    tagline: 'Tu punto de partida — sin importar tu tamaño actual',
+    tagline: 'Tu punto de partida, sin importar tu tamaño actual',
   },
   {
     key: 'crecimiento', name: 'Crecimiento',
@@ -242,7 +242,7 @@ const PLAN_TIERS = [
 ]
 
 // Default declarado de pedidos/local cuando el lead todavía no editó.
-// Coincide con el cap del tier de entrada — todos los leads arrancan en
+// Coincide con el cap del tier de entrada, todos los leads arrancan en
 // "Inicio" con USD 69 / hasta 300 pedidos.
 const DEFAULT_ORDERS_PER_LOCATION = 300
 
@@ -252,7 +252,7 @@ const DEFAULT_ORDERS_PER_LOCATION = 300
 // sube de tier si su volumen real lo dispara.
 //
 // `projectedTier` (computed más abajo) sí proyecta el tier teórico basado
-// en lo que declaró — útil para mostrar en la "escalera" como roadmap.
+// en lo que declaró, útil para mostrar en la "escalera" como roadmap.
 const recommendedPlan = computed(() => PLAN_TIERS[0])
 
 // Tier teórico basado en volumen declarado por el lead. Lo usamos sólo para
@@ -279,7 +279,7 @@ const monthlyEstimateUsd = computed(() => {
   // Si el usuario manualmente eligió otro plan, usamos ese
   const chosenTier = state.plan.key ? PLAN_TIERS.find((t) => t.key === state.plan.key) || tier : tier
   const base = chosenTier.monthlyFee || 0
-  // Loyalty viene incluida en el Bundle — sin add-on extra.
+  // Loyalty viene incluida en el Bundle, sin add-on extra.
   const subtotal = base
   // Si anual, descuento 20% sobre el subtotal mensual equivalente.
   return state.plan.billingCycle === 'annual'
@@ -287,7 +287,7 @@ const monthlyEstimateUsd = computed(() => {
     : subtotal
 })
 
-// Ahorro anual al pagar anual (en USD) — para mostrar en el toggle.
+// Ahorro anual al pagar anual (en USD), para mostrar en el toggle.
 const annualSavingsUsd = computed(() => {
   const tier = state.plan.key
     ? PLAN_TIERS.find((t) => t.key === state.plan.key) || recommendedPlan.value
@@ -300,14 +300,14 @@ const annualSavingsUsd = computed(() => {
  * Estimación de ahorro vs apps de terceros (PedidosYa, Rappi).
  * Asunción: ticket promedio USD 15, comisión típica de apps de terceros 25%,
  * y un volumen mensual estimado por local según el rango del plan.
- * Esto es una aproximación de marketing — el cálculo real lo hace el equipo
+ * Esto es una aproximación de marketing, el cálculo real lo hace el equipo
  * comercial. Pero da una idea conservadora.
  */
 // Defaults conservadores. Para PEDIDOS por local·mes usamos un único valor
 // base (300) porque el modelo de pricing 2026 es por VOLUMEN TOTAL de
 // pedidos: si el lead nunca edita, asumimos 300 × locales. Esto:
 //   1) Es consistente con DEFAULT_ORDERS_PER_LOCATION del recommendedPlan.
-//   2) Es honesto — no inflamos números por tier de locales.
+//   2) Es honesto, no inflamos números por tier de locales.
 //   3) Habilita al lead a editarlo en RoiCalculator → cambia tier en vivo.
 const defaultAvgTicketUsd = 12
 const computeDefaultOrders = () => DEFAULT_ORDERS_PER_LOCATION
@@ -357,7 +357,7 @@ const breakEvenDays = computed(() => {
 })
 
 // ── Fecha del primer cargo (today + trial length) ────────────────────────
-// Trial base de 15 días. Si el lead aceptó el bonus del exit intent
+// Trial base de 14 días. Si el lead aceptó el bonus del exit intent
 // (DEENEX30), se extiende a 30 días.
 const TRIAL_DAYS_BASE = 15
 const TRIAL_DAYS_WITH_BONUS = 30
@@ -494,7 +494,7 @@ const currentStep = computed(() => {
 
 // ── Actions ──────────────────────────────────────────────────────────────
 function ensureStarted(variant) {
-  // Captura UTMs en el primer touch — los siguientes events los heredan.
+  // Captura UTMs en el primer touch, los siguientes events los heredan.
   const utms = captureUtmsFromUrl()
   // Rehidrata user_id de localStorage si volvió cross-device.
   getStoredUserId()

@@ -102,7 +102,7 @@ onMounted(() => {
     landing_path: '/cadenas-gastronomicas',
   })
 
-  // IntersectionObserver para los .v-reveal — replica el patrón de HomeView.
+  // IntersectionObserver para los .v-reveal, replica el patrón de HomeView.
   const observer = new IntersectionObserver(
     (entries) => {
       entries.forEach((entry) => {

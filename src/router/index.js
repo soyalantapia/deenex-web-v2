@@ -9,7 +9,7 @@ const router = createRouter({
       component: () => import('../views/HomeView.vue'), // Lazy loading
     },
     {
-      // Variante A/B "Cadenas Gastronómicas" — landing dedicada con copy
+      // Variante A/B "Cadenas Gastronómicas", landing dedicada con copy
       // y pricing focalizados en chains (vs la home genérica). Recuperado
       // del branch original feat/landing-cadenas-gastronomicas-abtest.
       path: '/cadenas-gastronomicas',
@@ -17,7 +17,7 @@ const router = createRouter({
       component: () => import('../views/CadenasGastronomicasView.vue'),
     },
     {
-      // Auto-onboarding self-serve flow — 5 pasos con persistencia en localStorage.
+      // Auto-onboarding self-serve flow, 5 pasos con persistencia en localStorage.
       // El layout vive en views/onboarding/OnboardingLayout.vue y los steps son
       // children que rotan dentro de un <RouterView> con transition.
       path: '/comenzar',
@@ -37,7 +37,7 @@ const router = createRouter({
           meta: { step: 'business', requires: 'identity' },
         },
         {
-          // Step "ahorro" — calculadora ROI + savings hero. Antes vivía
+          // Step "ahorro", calculadora ROI + savings hero. Antes vivía
           // dentro de StepPlan; separamos para que el lead procese una idea
           // a la vez (entender el ahorro vs elegir el plan).
           path: 'ahorro',
@@ -52,7 +52,7 @@ const router = createRouter({
           meta: { step: 'plan', requires: 'business' },
         },
         {
-          // El step sandbox/preview fue removido — el lead va directo de
+          // El step sandbox/preview fue removido, el lead va directo de
           // plan → activar para reducir fricción. La demo pública sigue
           // viva en /demo para el A/B "see_demo" del hero CTA.
           path: 'activar',
@@ -70,7 +70,7 @@ const router = createRouter({
     },
     {
       // Demo público del dashboard. Conversion path para la variante "see_demo"
-      // del Hero CTA — el lead ve el producto antes de poner sus datos.
+      // del Hero CTA, el lead ve el producto antes de poner sus datos.
       path: '/demo',
       name: 'public-demo',
       component: () => import('../views/PublicDemoView.vue'),
@@ -118,7 +118,7 @@ function safeReadStorage(key) {
 // Step gating: si querés saltar a un step sin haber completado el anterior,
 // te redirigimos al primer step pendiente. Excepción: Enterprise puede llegar
 // directo a /comenzar/listo desde plan con ?enterprise=1.
-// Guards en Vue Router 4 — return value en lugar de next(value). Antes
+// Guards en Vue Router 4, return value en lugar de next(value). Antes
 // usábamos `next(map[pending])` que estaba deprecated y rompía la navegación
 // en algunos casos (síntoma: pantalla blanca al pasar de /ahorro → /plan en
 // SPA mode, ok al recargar).

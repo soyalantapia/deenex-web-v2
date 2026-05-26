@@ -49,7 +49,7 @@
         con campañas por <span class="font-semibold text-slate-800">WhatsApp y Push Notifications</span>.
       </p>
 
-      <!-- CTAs — primary: self-serve trial · secondary: scroll to product details -->
+      <!-- CTAs, primary: self-serve trial · secondary: scroll to product details -->
       <div :class="{ 'animate-rise': ready, 'opacity-0': !ready }"
         class="mt-9 mb-5 sm:mb-0 flex items-center justify-center gap-3 sm:gap-4" style="animation-delay:0.4s">
         <RouterLink :to="ctaTarget"
@@ -82,7 +82,7 @@
       <p :class="{ 'animate-rise': ready, 'opacity-0': !ready }"
         class="mt-3 text-[11px] text-slate-400 font-medium"
         style="animation-delay:0.45s">
-        Sin cargo durante 15 días · Cancelás en 1 click · Setup en menos de 30 min
+        Sin cargo durante 14 días · Cancelás en 1 click · Setup en menos de 30 min
       </p>
 
       <!-- Social Proof -->
@@ -155,14 +155,14 @@ import { useExperiment } from '@/composables/useExperiment'
 
 // A/B/C test del CTA primario del Hero. Cada variante mantiene la misma
 // promesa pero con framing distinto. La conversión se mide cuando el lead
-// completa el step 4 (StepTrial) — ahí firamos experiment_conversion.
+// completa el step 4 (StepTrial), ahí firamos experiment_conversion.
 //
 // `target` controla a dónde lleva el click: la variante "see_demo" entra al
 // sandbox público (/demo) primero, las demás van directo al onboarding form.
 // Cuando el lead activa el trial desde /demo, lo sumamos como la misma
-// conversion del experimento — el tracking lo hace StepTrial igual.
+// conversion del experimento, el tracking lo hace StepTrial igual.
 const heroCta = useExperiment('hero_cta_v1', [
-  { id: 'control', weight: 1, payload: { label: 'Empezar 15 días gratis', target: '/comenzar' } },
+  { id: 'control', weight: 1, payload: { label: 'Empezar 14 días gratis', target: '/comenzar' } },
   { id: 'no_card', weight: 1, payload: { label: 'Probar Deenex sin tarjeta', target: '/comenzar' } },
   { id: 'see_demo', weight: 1, payload: { label: 'Ver demo del dashboard', target: '/demo' } },
 ])

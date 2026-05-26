@@ -1,7 +1,7 @@
 <template>
   <!--
     Banner persistente que aparece en la landing si el lead ya activó su
-    trial pero aún no llegó al cargo del día 16. Lo ven al volver a deenex.tech
+    trial pero aún no llegó al cargo del día 15. Lo ven al volver a deenex.tech
     para recordarles que tienen una cuenta activa, sin agresividad.
 
     Lógica:
@@ -70,7 +70,7 @@ const onboarding = useOnboarding()
 
 // Dismiss persiste por sesión. Si quisiéramos un dismiss más duradero
 // usaríamos localStorage, pero ese caso lo cubre el botón "Cancelar trial"
-// en el dashboard real — acá queremos que el lead que cierra el banner
+// en el dashboard real, acá queremos que el lead que cierra el banner
 // igual lo vea en su próxima visita.
 const DISMISS_KEY = 'deenex_trial_banner_dismissed'
 const dismissed = ref(false)

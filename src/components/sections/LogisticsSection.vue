@@ -11,7 +11,7 @@
 
       <div class="grid lg:grid-cols-2 lg:items-stretch gap-0 lg:gap-24">
 
-        <!-- Carrusel — estructura original intacta, solo se agrega ref y eventos -->
+        <!-- Carrusel, estructura original intacta, solo se agrega ref y eventos -->
         <div ref="carouselRef"
           class="flex flex-row lg:grid lg:grid-cols-2 gap-4 order-2 lg:order-1 overflow-x-auto lg:overflow-visible snap-x snap-mandatory scrollbar-hide pb-6 lg:pb-0 pt-4 lg:pt-0 -mx-6 px-6 lg:mx-0 lg:px-0 -mt-14 lg:mt-0 relative z-30 lg:content-center"
           @scroll="onScroll" @touchstart="isPaused = true" @touchend="resumeAuto">
@@ -48,7 +48,7 @@
 
       <Partners class="v-reveal mt-20" />
 
-      <!-- Dots indicadores — solo mobile, fuera del grid para no romper el layout -->
+      <!-- Dots indicadores, solo mobile, fuera del grid para no romper el layout -->
       <div class="flex lg:hidden items-center justify-center gap-2 mt-3">
         <button v-for="(_, i) in logisticsFeatures" :key="i" @click="scrollToCard(i)"
           class="transition-all duration-300 rounded-full"

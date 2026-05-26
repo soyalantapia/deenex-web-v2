@@ -73,7 +73,7 @@ import { useOnboarding } from '@/composables/useOnboarding'
 const onboarding = useOnboarding()
 
 // El pricing 2026 se calcula por VOLUMEN TOTAL de pedidos (locales ×
-// pedidos/local). Default: 300 pedidos/local — sirve como punto de partida
+// pedidos/local). Default: 300 pedidos/local, sirve como punto de partida
 // honesto para marcas nuevas. El lead lo ajusta acá en vivo y la tier
 // recomendada se actualiza al toque (es reactiva al state).
 const form = reactive({
@@ -83,7 +83,7 @@ const form = reactive({
     onboarding.computeDefaultOrders(),
 })
 
-// Sincronizamos en vivo hacia el state global — el hero del Step 3 reactivo
+// Sincronizamos en vivo hacia el state global, el hero del Step 3 reactivo
 // al cambio porque depende de los mismos computeds.
 watch(
   () => [form.ticket, form.ordersPerLocation],
@@ -111,7 +111,7 @@ function resetToDefaults() {
 
 onMounted(() => {
   // Sincronizar al mount con los defaults globales (sin parametrizar por
-  // locales — ahora el default es 300 fijo, el lead lo ajusta a su realidad).
+  // locales, ahora el default es 300 fijo, el lead lo ajusta a su realidad).
   if (!onboarding.state.business.avgTicketUsd) {
     form.ticket = onboarding.defaultAvgTicketUsd
   }

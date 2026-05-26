@@ -1,6 +1,6 @@
 <template>
   <!--
-    Cookie consent banner — GDPR (UE) y Ley 25.326 (Argentina).
+    Cookie consent banner, GDPR (UE) y Ley 25.326 (Argentina).
 
     Por defecto el index.html carga gtag con consent='denied' para todo.
     Este banner es la SUPERFICIE donde el lead da opt-in explícito; al
@@ -83,7 +83,7 @@
               <input v-model="granularConsent.analytics" type="checkbox" class="mt-0.5" />
               <div class="min-w-0">
                 <p class="text-xs font-bold leading-tight">Analítica</p>
-                <p class="text-[10px] text-slate-400 mt-0.5 leading-snug">Google Analytics 4 — nos ayuda a saber qué funciona y qué no.</p>
+                <p class="text-[10px] text-slate-400 mt-0.5 leading-snug">Google Analytics 4, nos ayuda a saber qué funciona y qué no.</p>
               </div>
             </label>
             <label class="flex items-start gap-2.5 p-3 rounded-lg bg-slate-800/60 border border-slate-700 cursor-pointer hover:border-primary">
@@ -118,7 +118,7 @@ const CONSENT_GRANULAR_KEY = 'deenex_consent_granular_v1'
 const visible = ref(false)
 const detailsOpen = ref(false)
 
-// Granular opt-in (defaults: analytics OFF, marketing OFF — el lead lo activa).
+// Granular opt-in (defaults: analytics OFF, marketing OFF, el lead lo activa).
 const granularConsent = reactive({
   analytics: false,
   marketing: false,
@@ -132,7 +132,7 @@ function persistConsent(state, granular) {
   try {
     localStorage.setItem(CONSENT_KEY, state)
     if (granular) localStorage.setItem(CONSENT_GRANULAR_KEY, JSON.stringify(granular))
-  } catch { /* private mode — el flow sigue funcionando */ }
+  } catch { /* private mode, el flow sigue funcionando */ }
 }
 
 function applyConsentToGtag(consent) {

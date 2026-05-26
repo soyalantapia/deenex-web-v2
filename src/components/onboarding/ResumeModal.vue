@@ -90,7 +90,7 @@ function onDecline() {
   emit('decline')
 }
 
-// ESC cierra el modal — accesibilidad básica.
+// ESC cierra el modal, accesibilidad básica.
 function onKeyDown(e) {
   if (e.key === 'Escape' && props.show) onDecline()
 }

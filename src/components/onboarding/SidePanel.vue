@@ -1,8 +1,8 @@
 <template>
   <aside class="hidden lg:block sticky top-32">
     <Transition name="panel" mode="out-in">
-      <!-- IDENTITY · MARCA — social proof + guarantee ─────────────────── -->
-      <!-- Identity, Business y Savings comparten el mismo card "Trial 15 días"
+      <!-- IDENTITY · MARCA, social proof + guarantee ─────────────────── -->
+      <!-- Identity, Business y Savings comparten el mismo card "Trial 14 días"
            (sin cargo hoy + garantías + logos clientes). Estos 3 steps son
            pre-conversión, sin contexto de plan elegido. -->
       <div v-if="mode === 'identity' || mode === 'business' || mode === 'savings'" key="trust" class="bg-slate-50/60 border border-slate-200 rounded-3xl p-7 relative overflow-hidden">
@@ -10,7 +10,7 @@
         <div class="relative">
           <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 text-primary text-[10px] font-bold uppercase tracking-wider mb-5">
             <span class="w-1.5 h-1.5 rounded-full bg-primary animate-pulse"></span>
-            Trial 15 días
+            Trial 14 días
           </div>
           <h3 class="text-xl font-extrabold tracking-tighter text-slate-900 mb-3 leading-tight">
             Sin cargo hoy.<br />
@@ -27,7 +27,7 @@
               <span class="w-5 h-5 rounded-full bg-primary/10 flex items-center justify-center shrink-0 mt-0.5">
                 <Check class="w-3 h-3 text-primary" />
               </span>
-              Cobramos con MercadoPago recién al día 16. Antes no pagás nada.
+              Cobramos con MercadoPago recién al día 15. Antes no pagás nada.
             </li>
             <li class="flex items-start gap-2.5">
               <span class="w-5 h-5 rounded-full bg-primary/10 flex items-center justify-center shrink-0 mt-0.5">
@@ -68,7 +68,7 @@
         </div>
       </div>
 
-      <!-- PLAN — savings highlight + testimonial ───────────────────────── -->
+      <!-- PLAN, savings highlight + testimonial ───────────────────────── -->
       <div v-else-if="mode === 'plan'" key="plan" class="space-y-4">
         <div class="rounded-3xl bg-emerald-50/60 border border-emerald-100 p-7 relative overflow-hidden">
           <div class="absolute inset-0 bg-gradient-to-br from-emerald-500/[0.05] to-transparent pointer-events-none"></div>
@@ -107,7 +107,7 @@
         </div>
       </div>
 
-      <!-- PREVIEW (sandbox) — tips de uso + founder note ───────────────── -->
+      <!-- PREVIEW (sandbox), tips de uso + founder note ───────────────── -->
       <div v-else-if="mode === 'preview'" key="preview" class="space-y-4">
         <div class="rounded-3xl bg-slate-900 text-white p-7 relative overflow-hidden">
           <div class="absolute inset-0 bg-gradient-to-br from-primary/30 to-transparent pointer-events-none"></div>
@@ -160,7 +160,7 @@
         </div>
       </div>
 
-      <!-- TRIAL — trust badges (security, garantías, MP) ───────────────── -->
+      <!-- TRIAL, trust badges (security, garantías, MP) ───────────────── -->
       <div v-else-if="mode === 'trial'" key="trial" class="space-y-4">
         <div class="rounded-3xl bg-slate-50/60 border border-slate-200 p-7 relative overflow-hidden">
           <div class="absolute inset-0 bg-gradient-to-br from-primary/[0.05] to-transparent pointer-events-none"></div>
@@ -188,7 +188,7 @@
         </div>
       </div>
 
-      <!-- WELCOME — celebración + next steps recap ─────────────────────── -->
+      <!-- WELCOME, celebración + next steps recap ─────────────────────── -->
       <div v-else-if="mode === 'welcome'" key="welcome" class="space-y-4">
         <div class="rounded-3xl bg-gradient-to-br from-emerald-500 to-emerald-600 text-white p-7 relative overflow-hidden">
           <div class="absolute inset-0 bg-gradient-to-br from-white/15 to-transparent pointer-events-none"></div>
@@ -199,7 +199,7 @@
             </div>
             <h3 class="text-xl font-extrabold tracking-tighter mb-3 leading-tight">
               Tu trial está activo.<br />
-              <span class="text-emerald-100 italic font-light">15 días para enamorarte.</span>
+              <span class="text-emerald-100 italic font-light">14 días para enamorarte.</span>
             </h3>
             <p class="text-sm text-white/90 leading-relaxed">
               Estás entre las primeras cadenas de la región en operar 100% sobre canal propio. Te queda un equipo de Customer Success listo para ayudarte.
@@ -226,7 +226,7 @@ const props = defineProps({
 
 import { Vue3Marquee } from 'vue3-marquee'
 
-// Logos reales de clientes — los mismos `.webp` que usa la landing en el
+// Logos reales de clientes, los mismos `.webp` que usa la landing en el
 // social proof del Hero. Vite resuelve el path al asset hashed en build.
 import paltaLogo from '@/assets/images/clients/palta.webp'
 import hatsuLogo from '@/assets/images/clients/hatsu.webp'

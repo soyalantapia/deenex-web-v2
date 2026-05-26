@@ -1,5 +1,5 @@
 /**
- * useExperiment — lightweight A/B/n testing sin dependencias externas.
+ * useExperiment, lightweight A/B/n testing sin dependencias externas.
  *
  * Asigna una variante de forma persistente (localStorage) y emite el evento
  * GA4 `experiment_view` la primera vez. Convertir es responsabilidad del
@@ -8,7 +8,7 @@
  *
  * Uso:
  *   const ctaCopy = useExperiment('hero_cta_v1', [
- *     { id: 'control', weight: 1, payload: { label: 'Empezar 15 días gratis' } },
+ *     { id: 'control', weight: 1, payload: { label: 'Empezar 14 días gratis' } },
  *     { id: 'no_card', weight: 1, payload: { label: 'Probar sin tarjeta' } },
  *     { id: 'see_demo', weight: 1, payload: { label: 'Ver demo del dashboard' } },
  *   ])
@@ -35,7 +35,7 @@ function persistAssignments(map) {
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(map))
   } catch {
-    // quota / private mode — silent skip
+    // quota / private mode, silent skip
   }
 }
 

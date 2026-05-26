@@ -112,10 +112,10 @@
     <main class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-16">
       <!-- Grid del shell: columna izquierda (form) toma el espacio disponible,
            columna derecha (side panel) tiene ancho fijo de 320px. Antes era
-           1.4fr_1fr que daba ~42% al panel — demasiado para una columna
+           1.4fr_1fr que daba ~42% al panel, demasiado para una columna
            informativa. Ahora siempre 320px independiente del viewport. -->
       <div class="grid lg:grid-cols-[minmax(0,1fr)_320px] gap-10 lg:gap-12 items-start">
-        <!-- Main column — sin max-width hard cap. Antes era max-w-xl (576px)
+        <!-- Main column, sin max-width hard cap. Antes era max-w-xl (576px)
              y eso limitaba al form del Plan que tiene cards anchas (tabla de
              tiers). Ahora ocupa la totalidad del espacio asignado por el grid.
              Cada Step puede agregar su propio max-w-* a los párrafos largos
@@ -133,7 +133,7 @@
       </div>
     </main>
 
-    <!-- Save & exit modal — guarda progreso y manda magic link al email -->
+    <!-- Save & exit modal, guarda progreso y manda magic link al email -->
     <Teleport to="body">
       <Transition name="exit-overlay">
         <div
@@ -157,7 +157,7 @@
               </h3>
               <p class="text-sm text-slate-500 leading-relaxed mb-5">
                 Te enviamos un link único a tu email. Lo abrís cuando quieras y
-                volvés exactamente donde lo dejaste — desde cualquier dispositivo.
+                volvés exactamente donde lo dejaste, desde cualquier dispositivo.
               </p>
               <input
                 v-model="saveEmail"
@@ -210,7 +210,7 @@
       </Transition>
     </Teleport>
 
-    <!-- Exit intent modal — aparece UNA vez si el lead mueve el mouse hacia
+    <!-- Exit intent modal, aparece UNA vez si el lead mueve el mouse hacia
          arriba del viewport (típico cuando va a cerrar la tab) y tiene
          progreso parcial. Diferente al exit modal del logo: este es
          proactivo, lo dispara el detector. -->
@@ -290,13 +290,13 @@
               ⏳
             </div>
             <h3 class="text-xl sm:text-2xl font-extrabold tracking-tight text-slate-900 mb-2 leading-tight">
-              ¿Seguro que querés perderte los <span class="text-emerald-600">15 días gratis</span>?
+              ¿Seguro que querés perderte los <span class="text-emerald-600">14 días gratis</span>?
             </h3>
             <p class="text-sm text-slate-600 leading-relaxed mb-6">
               Es una oportunidad <span class="font-bold text-slate-900">de una sola vez</span> para
-              probar Deenex con los datos reales de tu cadena, sin pagar nada hasta el día 16.
+              probar Deenex con los datos reales de tu cadena, sin pagar nada hasta el día 15.
               <br /><br />
-              Si te vas ahora, perdés el setup que ya hiciste — y mañana podemos no tener cupo
+              Si te vas ahora, perdés el setup que ya hiciste, y mañana podemos no tener cupo
               de Customer Success para activarte.
             </p>
             <div class="flex flex-col-reverse sm:flex-row sm:items-center sm:justify-end gap-2">
@@ -328,7 +328,7 @@
 import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
 import { useRoute, RouterLink, RouterView } from 'vue-router'
 import { Gift, Save, Check } from 'lucide-vue-next'
-// `Check` ya está importado — se usa en el modal Save & exit Y ahora también
+// `Check` ya está importado, se usa en el modal Save & exit Y ahora también
 // en el auto-save indicator (success state).
 import SidePanel from '@/components/onboarding/SidePanel.vue'
 import ConnectivityBanner from '@/components/onboarding/ConnectivityBanner.vue'
@@ -364,12 +364,12 @@ const hasProgress = computed(() => onboarding.state.meta.completedSteps.length >
 const currentMode = computed(() => steps[activeStepIndex.value]?.key || 'identity')
 
 // Social proof: número aproximado de activaciones del día/semana. Es un
-// valor frontend-only por ahora — cuando exista endpoint /api/onboarding/stats
+// valor frontend-only por ahora, cuando exista endpoint /api/onboarding/stats
 // reemplazamos por live data. El número se "mueve" sutilmente para que se
 // sienta vivo, pero queda estable durante la sesión del lead.
 const liveActivations = ref(0)
 const activationWindow = ref('esta semana')
-// Guardamos el handle para cleanup en onUnmounted — antes era leak: el
+// Guardamos el handle para cleanup en onUnmounted, antes era leak: el
 // interval seguía vivo después de salir del onboarding.
 let socialProofTimer = null
 function initSocialProof() {
@@ -418,14 +418,14 @@ function dismissExitIntent() {
 function continueWithBonus() {
   showExitIntent.value = false
   onboarding.track('exit_intent_bonus_accepted', { code: 'DEENEX30' })
-  // Aplica el bonus REAL — el composable extiende trial a 30 días y todos los
+  // Aplica el bonus REAL, el composable extiende trial a 30 días y todos los
   // computeds (firstChargeDate, días restantes) reactúan automáticamente.
   onboarding.markBonusApplied('DEENEX30')
 }
 
 const planCommissionLabel = computed(() => {
   const tier = onboarding.recommendedPlan.value
-  // Devuelve string tipo "1,25%" — formato hispano para mostrar al lead.
+  // Devuelve string tipo "1,25%", formato hispano para mostrar al lead.
   return `${String(tier?.commissionPct ?? 1.25).replace('.', ',')}%`
 })
 
@@ -467,7 +467,7 @@ async function sendSaveLink() {
 
 const showExitModal = ref(false)
 function onExit() {
-  // Si está en Welcome (último paso), no abrimos modal — solo navegamos.
+  // Si está en Welcome (último paso), no abrimos modal, solo navegamos.
   if (route.path === '/comenzar/listo') {
     window.location.href = '/'
     return
@@ -520,7 +520,7 @@ onMounted(() => {
   document.addEventListener('keydown', onKeyDown)
 })
 
-// ESC handler global — cierra modals con jerarquía: el más arriba primero.
+// ESC handler global, cierra modals con jerarquía: el más arriba primero.
 function onKeyDown(e) {
   if (e.key !== 'Escape') return
   if (showSaveModal.value) {

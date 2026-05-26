@@ -11,7 +11,7 @@
  *
  * Limitaciones aceptadas:
  *  - Solo Byte mode (no numeric/alphanumeric optimization)
- *  - Solo ECC level L (7% recovery — suficiente para uso en pantalla limpia)
+ *  - Solo ECC level L (7% recovery, suficiente para uso en pantalla limpia)
  *  - Versión 5 fija (caben 106 bytes en L) → si el token + URL supera ~100
  *    chars, fallback a usar una versión mayor en el futuro.
  *

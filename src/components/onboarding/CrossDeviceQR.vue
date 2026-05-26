@@ -40,7 +40,7 @@
               Continuá en tu celular
             </h3>
             <p class="text-sm text-slate-500 leading-relaxed mb-5">
-              Escaneá el código y retomás exactamente donde estás ahora — sin
+              Escaneá el código y retomás exactamente donde estás ahora, sin
               perder progreso, sin tener que volver a llenar nada.
             </p>
             <!-- QR generado 100% local (sin fetch a 3rd parties).
@@ -99,13 +99,13 @@ const onboarding = useOnboarding()
 const open = ref(false)
 const copied = ref(false)
 
-// Token "resume" — en producción esto sería un JWT firmado por el backend
+// Token "resume", en producción esto sería un JWT firmado por el backend
 // con expiración. Frontend-only por ahora: hash determinístico de email +
 // startedAt para que el QR sea reproducible si el lead lo abre varias veces.
 const resumeToken = computed(() => {
   const email = onboarding.state.identity.email || ''
   const started = onboarding.state.meta.startedAt || ''
-  // btoa simple — suficiente para el stub.
+  // btoa simple, suficiente para el stub.
   return btoa(`${email}|${started}|${Date.now()}`).replace(/[^A-Za-z0-9]/g, '').slice(0, 24)
 })
 
@@ -116,7 +116,7 @@ const resumeUrl = computed(() => {
   return `${base}/comenzar?resume=${resumeToken.value}`
 })
 
-// QR generado 100% local — SVG inline. Sin fetch a 3rd parties, sin leak
+// QR generado 100% local, SVG inline. Sin fetch a 3rd parties, sin leak
 // de datos del lead. Cuando el modal se abre por primera vez se genera al
 // vuelo; si el resumeUrl cambia, el computed reactúa.
 const qrSvg = computed(() => generateQrSvg(resumeUrl.value, { size: 192, margin: 2 }))
@@ -128,7 +128,7 @@ async function copyLink() {
     onboarding.track('cross_device_link_copied')
     setTimeout(() => { copied.value = false }, 2000)
   } catch {
-    /* clipboard puede fallar en algunos browsers — UX queda igual */
+    /* clipboard puede fallar en algunos browsers, UX queda igual */
   }
 }
 </script>

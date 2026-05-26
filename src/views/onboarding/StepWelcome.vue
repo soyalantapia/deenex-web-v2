@@ -1,6 +1,6 @@
 <template>
   <div>
-    <!-- Confetti cañón doble — solo cuando no es Enterprise -->
+    <!-- Confetti cañón doble, solo cuando no es Enterprise -->
     <ConfettiCanvas v-if="!isEnterprise && playConfetti" :duration="3500" :particle-count="160" />
 
     <!-- Header con check + sparks -->
@@ -38,7 +38,7 @@
       </p>
     </div>
 
-    <!-- Trial info — descriptivo, no agresivo. Antes era countdown ansiogénico. -->
+    <!-- Trial info, descriptivo, no agresivo. Antes era countdown ansiogénico. -->
     <div v-if="!isEnterprise" class="rounded-2xl bg-slate-50 border border-slate-200 p-5 mb-6">
       <div class="flex items-start gap-4">
         <Clock class="w-7 h-7 text-primary shrink-0 mt-0.5" />
@@ -74,10 +74,10 @@
       </div>
     </div>
 
-    <!-- Next steps — cada uno linkea al app a la sección concreta -->
+    <!-- Next steps, cada uno linkea al app a la sección concreta -->
     <div v-if="!isEnterprise" class="space-y-3 mb-8">
       <p class="text-[11px] font-black text-slate-400 uppercase tracking-widest mb-3">
-        Lo que sigue · Tenés 15 días para configurar todo
+        Lo que sigue · Tenés 14 días para configurar todo
       </p>
       <a
         v-for="(step, i) in nextSteps"
@@ -102,7 +102,7 @@
       </a>
     </div>
 
-    <!-- Provisioning checklist — qué pasa después que el lead activó.
+    <!-- Provisioning checklist, qué pasa después que el lead activó.
          Mostramos un counter "N/4" + barra de progreso para que el lead
          entienda al toque que es un proceso de ~4 pasos finitos, no un
          "loading infinito" ansiogénico. -->
@@ -210,7 +210,7 @@
           {{ emailPreviewOpen ? 'Ocultar' : 'Ver preview' }}
         </button>
       </div>
-      <!-- Preview del email — colapsable -->
+      <!-- Preview del email, colapsable -->
       <Transition name="email-preview">
         <div v-if="emailPreviewOpen" class="border-t border-amber-200 bg-white p-4 text-xs">
           <div class="rounded-lg border border-slate-200 overflow-hidden">
@@ -395,7 +395,7 @@ const dashboardUrl = computed(() => {
   return `${base}?session=${tok}&from=onboarding`
 })
 
-// Helper para deep-links a settings/branding etc — preserva el token de sesión.
+// Helper para deep-links a settings/branding etc, preserva el token de sesión.
 function buildDashboardLink(path) {
   const base = `${DASHBOARD_BASE}${path}`
   const tok = dashboardSessionToken.value
@@ -466,7 +466,7 @@ async function copyReferral() {
     onboarding.track('referral_copied', { code: referralCode.value })
     setTimeout(() => { copied.value = false }, 2000)
   } catch {
-    // Clipboard fallido — UX queda igual, no rompemos nada.
+    // Clipboard fallido, UX queda igual, no rompemos nada.
   }
 }
 const whatsappShareUrl = computed(() => {
@@ -522,7 +522,7 @@ const emailPreviewOpen = ref(false)
 const playConfetti = ref(false)
 
 
-// ── Provisioning steps — TODOS done desde el inicio en Welcome ─────────
+// ── Provisioning steps, TODOS done desde el inicio en Welcome ─────────
 // El provisioning visual se hace ahora en ActivationOverlay (modal que
 // aparece después del click "Activar" en StepTrial). Cuando el lead llega
 // a Welcome, todos los pasos están terminados. Esta lista se muestra como
@@ -538,7 +538,7 @@ const provisioningComplete = computed(() =>
   provisioningTasks.value.every((t) => t.status === 'done')
 )
 
-// Progress visible — el lead ve "2/4 listos" + barra avanzando, mucho menos
+// Progress visible, el lead ve "2/4 listos" + barra avanzando, mucho menos
 // ansiógeno que un spinner indefinido.
 const provisioningProgress = computed(() => {
   const total = provisioningTasks.value.length
@@ -546,7 +546,7 @@ const provisioningProgress = computed(() => {
   return { total, done, pct: Math.round((done / total) * 100) }
 })
 
-// startProvisioning() removido — el provisioning visual ahora lo hace
+// startProvisioning() removido, el provisioning visual ahora lo hace
 // ActivationOverlay en el step anterior (después de "Activar cuenta").
 // Cuando el lead llega a Welcome todos los tasks están done desde el inicio.
 
@@ -586,7 +586,7 @@ function trackCsmClick() {
 </script>
 
 <style scoped>
-/* Colapsable del email preview — slide suave para no romper el reading flow. */
+/* Colapsable del email preview, slide suave para no romper el reading flow. */
 .email-preview-enter-active,
 .email-preview-leave-active {
   transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
@@ -604,7 +604,7 @@ function trackCsmClick() {
   max-height: 400px;
 }
 
-/* Referral preview — slide+fade. max-height más alto porque incluye un mock hero. */
+/* Referral preview, slide+fade. max-height más alto porque incluye un mock hero. */
 .referral-preview-enter-active,
 .referral-preview-leave-active {
   transition: all 0.32s cubic-bezier(0.16, 1, 0.3, 1);

@@ -2,7 +2,7 @@
   <section id="demo" class="py-24 px-6 sm:px-12 bg-white overflow-hidden" ref="sectionRef">
     <div class="max-w-6xl mx-auto">
 
-      <!-- Header — mismo patrón editorial de las otras secciones -->
+      <!-- Header, mismo patrón editorial de las otras secciones -->
       <div class="flex flex-col lg:flex-row lg:items-end justify-between gap-8 mb-16">
         <h2 class="text-[clamp(1.8rem,4vw,2.8rem)] font-extrabold tracking-tighter leading-[1.05] text-slate-900">
           La plataforma completa,<br />
@@ -28,13 +28,13 @@
         </div>
       </div>
 
-      <!-- CTA — trial self-serve. RouterLink para evitar full reload al navegar
+      <!-- CTA, trial self-serve. RouterLink para evitar full reload al navegar
            al onboarding (era #agendar anchor hardcoded). -->
       <div class="mt-12 flex flex-col sm:flex-row items-start sm:items-center gap-5">
         <RouterLink :to="{ path: '/comenzar', query: { from: 'demo_video' } }"
           @click="trackEvent('click_trial_start', { source: 'demo_video' })"
           class="demo-link-primary">
-          Empezar 15 días gratis
+          Empezar 14 días gratis
         </RouterLink>
         <a href="#infraestructura" class="demo-link-ghost">Ver toda la infraestructura</a>
       </div>
@@ -127,7 +127,7 @@ onUnmounted(() => {
   display: block;
 }
 
-/* ── CTAs texto — mismo estilo del resto del sitio ── */
+/* ── CTAs texto, mismo estilo del resto del sitio ── */
 .demo-link-primary {
   display: inline-flex;
   align-items: center;

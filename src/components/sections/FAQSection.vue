@@ -102,7 +102,7 @@ const faqs = [
   },
   {
     q: '¿Puedo usar Deenex si ya tengo delivery en Rappi o PedidosYa?',
-    a: 'Completamente. Muchos de nuestros clientes operan en paralelo. Deenex no reemplaza esos canales de inmediato — los complementa mientras construís tu propia base de clientes registrados. Con el tiempo, la mayoría migra la mayor parte de sus pedidos al canal propio.',
+    a: 'Completamente. Muchos de nuestros clientes operan en paralelo. Deenex no reemplaza esos canales de inmediato, los complementa mientras construís tu propia base de clientes registrados. Con el tiempo, la mayoría migra la mayor parte de sus pedidos al canal propio.',
   },
   {
     q: '¿Qué soporte incluye el plan?',

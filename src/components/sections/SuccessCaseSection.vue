@@ -2,7 +2,7 @@
   <section id="success-case" class="py-24 px-6 sm:px-12">
     <div class="max-w-6xl mx-auto">
 
-      <!-- Header — mismo patrón que la sección marketing -->
+      <!-- Header, mismo patrón que la sección marketing -->
       <div class="flex flex-col lg:flex-row lg:items-end justify-between gap-8 mb-16">
         <h2 class="text-[clamp(1.8rem,4vw,2.8rem)] font-extrabold tracking-tighter leading-[1.05] text-slate-900">
           El impacto real <br />
@@ -22,18 +22,18 @@
         <!-- Features col -->
         <div class="flex flex-col gap-3 order-1 pt-4 lg:pt-0">
 
-          <!-- Testimonios — 3 citas con barra primary -->
+          <!-- Testimonios, 3 citas con barra primary -->
           <blockquote v-for="t in testimonials" :key="t.author"
             class="relative border border-slate-200 rounded-2xl p-5 pl-6 bg-white shadow-sm hover:border-primary/20 transition-colors">
             <div class="absolute left-0 top-4 bottom-4 w-[3px] rounded-full bg-primary" />
             <p class="text-sm text-slate-500 leading-relaxed italic">{{ t.quote }}</p>
             <footer class="mt-2 flex items-center justify-between gap-2">
-              <span class="text-[11px] text-slate-400 tracking-wide uppercase font-semibold">— {{ t.author }}</span>
+              <span class="text-[11px] text-slate-400 tracking-wide uppercase font-semibold">{{ t.author }}</span>
               <span class="text-[10px] text-primary/60 font-bold uppercase tracking-wider">{{ t.brand }}</span>
             </footer>
           </blockquote>
 
-          <!-- Feature cards — idénticas a las de marketing -->
+          <!-- Feature cards, idénticas a las de marketing -->
           <div v-for="item in successFeatures" :key="item.title"
             class="flex items-start gap-4 border border-slate-200 hover:border-slate-300 rounded-2xl p-5 bg-white transition-colors">
             <div class="w-9 h-9 rounded-lg bg-primary flex items-center justify-center shrink-0 mt-0.5">
@@ -59,14 +59,14 @@
 
         </div>
 
-        <!-- Video — Dentro de Mockup iPhone 14 Pro Deep Purple -->
+        <!-- Video, Dentro de Mockup iPhone 14 Pro Deep Purple -->
         <div class="flex items-center justify-center order-2 lg:order-2 lg:pl-12 mt-5 lg:mt-0">
           <div class="relative w-full max-w-[300px] cursor-pointer group" @click="togglePlay">
             <!-- Mockup PNG con mix-blend-mode para quitar el fondo blanco -->
             <img src="https://mockuphone.com/images/devices_picture/apple-iphone14pro-deeppurple-portrait.png"
               class="relative z-20 w-full h-auto pointer-events-none mix-blend-multiply" alt="iPhone 14 Pro Mockup" />
 
-            <!-- Contenedor del Video — Ajustado para tapar bordes blancos -->
+            <!-- Contenedor del Video, Ajustado para tapar bordes blancos -->
             <div
               class="absolute top-[2.2%] left-[6.1%] right-[6.1%] bottom-[2.2%] z-10 rounded-[2.5rem] sm:rounded-[2.8rem] overflow-hidden bg-black">
               <video ref="videoRef" class="w-full h-full object-cover" loop playsinline preload="metadata">

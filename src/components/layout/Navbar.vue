@@ -28,14 +28,14 @@
         <div class="flex items-center gap-3">
           <!-- CTA principal: trial gratis. Antes era "Agendar Demo" (sales-led),
                ahora self-serve: lleva directo al onboarding self-serve para
-               activar el trial de 15 días. -->
+               activar el trial de 14 días. -->
           <RouterLink :to="{ path: '/comenzar', query: { from: 'navbar' } }"
             @click="trackEvent('click_trial_start', { source: 'navbar' })"
             class="hidden md:inline-flex items-center gap-2 text-[0.82rem] font-bold px-4 py-2.5 rounded-xl transition-all duration-300 shrink-0"
             :class="scrolled
               ? 'bg-white text-primary hover:bg-slate-50'
               : 'bg-primary text-white hover:bg-[#3c1fc9] shadow-md shadow-primary/25'">
-            Empezar 15 días gratis
+            Empezar 14 días gratis
           </RouterLink>
 
           <!-- Hamburger -->
@@ -72,7 +72,7 @@
           <RouterLink :to="{ path: '/comenzar', query: { from: 'navbar_mobile' } }"
             @click="isMenuOpen = false; trackEvent('click_trial_start', { source: 'navbar_mobile' })"
             class="flex items-center justify-center gap-2 text-sm font-bold py-3 rounded-xl bg-primary text-white hover:bg-[#3c1fc9] transition-colors shadow-md shadow-primary/20">
-            Empezar 15 días gratis
+            Empezar 14 días gratis
             <svg width="10" height="10" viewBox="0 0 13 13" fill="none">
               <path d="M2 6.5h9M7.5 3l3.5 3.5L7.5 10" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"
                 stroke-linejoin="round" />

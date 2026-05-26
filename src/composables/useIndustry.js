@@ -1,5 +1,5 @@
 /**
- * useIndustry — detecta el rubro gastronómico del lead a partir del nombre
+ * useIndustry, detecta el rubro gastronómico del lead a partir del nombre
  * de marca, el email o canales. Devuelve un seed de pedidos demo, ticket
  * promedio sugerido y emojis/labels apropiados para el Sandbox.
  *
@@ -44,7 +44,7 @@ const INDUSTRY_RULES = [
       { customer: 'Diego Castro', items: ['Combo familiar 3 pizzas', 'Empanadas x6'], channel: 'Delivery propio', total: 42 },
     ],
     sampleCampaigns: [
-      { title: 'Martes 2x1 — recuperación', audience: '1.247 clientes · WhatsApp + Push', openRate: 71 },
+      { title: 'Martes 2x1, recuperación', audience: '1.247 clientes · WhatsApp + Push', openRate: 71 },
       { title: 'Combo fin de semana', audience: '3.847 clientes · Push notification', openRate: 44 },
       { title: 'Cumpleaños del mes', audience: '124 clientes · Email', openRate: 0, status: 'draft' },
     ],
@@ -108,7 +108,7 @@ const INDUSTRY_RULES = [
   },
 ]
 
-// Industria genérica de fallback — para marcas sin keyword match.
+// Industria genérica de fallback, para marcas sin keyword match.
 const GENERIC_INDUSTRY = {
   key: 'generic',
   label: 'gastronómico',

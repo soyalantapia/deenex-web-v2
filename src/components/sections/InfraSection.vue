@@ -31,7 +31,7 @@
         </div>
       </div>
 
-      <!-- Dots — solo mobile, con auto-scroll -->
+      <!-- Dots, solo mobile, con auto-scroll -->
       <div class="flex justify-center gap-2 mt-4 md:hidden">
         <button v-for="(_, i) in features" :key="i" @click="scrollToCard(i)"
           class="transition-all duration-300 rounded-full"

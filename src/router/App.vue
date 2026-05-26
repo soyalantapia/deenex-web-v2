@@ -19,7 +19,7 @@
     <TrialBanner v-if="showLanding && isReady" />
     <!--
       CookieConsentBanner: GDPR + Ley 25.326. Aparece en cualquier ruta si el
-      lead no eligió previamente. Pre-condición regulatoria — sin esto, multas
+      lead no eligió previamente. Pre-condición regulatoria, sin esto, multas
       potenciales de USD 100k+. Se muestra una sola vez por máquina.
     -->
     <CookieConsentBanner />

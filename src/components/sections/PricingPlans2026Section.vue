@@ -1,6 +1,6 @@
 <template>
   <!--
-    Pricing Plans 2026 — sección de la landing que muestra los mismos planes
+    Pricing Plans 2026, sección de la landing que muestra los mismos planes
     que el onboarding usa para recomendar (Starter / Growth / Scale / Pro /
     Enterprise) como single source of truth desde useOnboarding.PLAN_TIERS.
 
@@ -51,7 +51,7 @@
         </div>
       </div>
 
-      <!-- Grid de planes — 4 columnas en desktop, 1 en mobile con snap horizontal -->
+      <!-- Grid de planes, 4 columnas en desktop, 1 en mobile con snap horizontal -->
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-10">
         <div
           v-for="(tier, i) in mainTiers"
@@ -118,12 +118,12 @@
               ? 'bg-primary text-white hover:bg-[#3c1fc9] shadow-md shadow-primary/20'
               : 'bg-slate-100 text-slate-900 hover:bg-slate-200'"
           >
-            {{ tier.key === 'growth' ? 'Empezar 15 días gratis' : 'Empezar gratis' }}
+            {{ tier.key === 'growth' ? 'Empezar 14 días gratis' : 'Empezar gratis' }}
           </RouterLink>
         </div>
       </div>
 
-      <!-- Enterprise — card aparte, más ancha, energía premium -->
+      <!-- Enterprise, card aparte, más ancha, energía premium -->
       <div class="rounded-3xl bg-slate-900 text-white p-8 sm:p-10 relative overflow-hidden">
         <div class="absolute inset-0 bg-gradient-to-br from-primary/20 via-transparent to-transparent pointer-events-none"></div>
         <div class="relative grid lg:grid-cols-[1.4fr_1fr] gap-8 items-start">
@@ -242,7 +242,7 @@ function trackEnterpriseClick() {
 const faqs = [
   {
     q: '¿Cómo se calcula la comisión por venta?',
-    a: 'Es un porcentaje sobre el GMV (Gross Merchandise Value) — el monto total de ventas que pasen por Deenex. No se aplica sobre propinas, impuestos, ni operaciones cash del salón que no toquen el sistema.',
+    a: 'Es un porcentaje sobre el GMV (Gross Merchandise Value), el monto total de ventas que pasen por Deenex. No se aplica sobre propinas, impuestos, ni operaciones cash del salón que no toquen el sistema.',
   },
   {
     q: '¿Qué pasa si crezco y supero el rango de locales del plan?',
@@ -254,7 +254,7 @@ const faqs = [
   },
   {
     q: '¿Cuánto dura el trial gratis?',
-    a: '15 días para todos los planes. Activás con MercadoPago pero el primer cargo es recién al día 16. Si cancelás antes, no te cobramos nada.',
+    a: '14 días para todos los planes. Activás con MercadoPago pero el primer cargo es recién al día 15. Si cancelás antes, no te cobramos nada.',
   },
   {
     q: '¿Puedo cambiar de plan después?',

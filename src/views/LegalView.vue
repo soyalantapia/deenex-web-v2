@@ -37,16 +37,16 @@
 
           <h2>2. Trial gratuito</h2>
           <p>
-            Te damos 15 días gratis para probar la plataforma. Durante ese período no
-            te cobramos nada. El primer cargo se hace el día 16 según el plan
+            Te damos 14 días gratis para probar la plataforma. Durante ese período no
+            te cobramos nada. El primer cargo se hace el día 15 según el plan
             seleccionado y el método de pago configurado.
           </p>
 
           <h2>3. Pagos y cancelaciones</h2>
           <p>
-            Si elegiste MercadoPago, el cobro se hace automáticamente el día 16 y
+            Si elegiste MercadoPago, el cobro se hace automáticamente el día 15 y
             cada mes en la misma fecha. Si cancelás antes, no te cobramos. Podés
-            cancelar en 1 click desde tu panel — sin permanencia, sin penalidades.
+            cancelar en 1 click desde tu panel, sin permanencia, sin penalidades.
           </p>
 
           <h2>4. Tus datos</h2>
@@ -126,7 +126,7 @@
           <h2>5. Seguridad</h2>
           <p>
             Datos cifrados en tránsito (TLS 1.3) y en reposo (AES-256).
-            MercadoPago procesa los pagos — nunca vemos tu tarjeta directamente.
+            MercadoPago procesa los pagos, nunca vemos tu tarjeta directamente.
           </p>
 
           <h2>6. Cambios</h2>

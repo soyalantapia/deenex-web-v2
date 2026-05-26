@@ -186,7 +186,7 @@ function onStartOver() {
 }
 
 // ── Validación robusta ───────────────────────────────────────────────────
-// Emails desechables — bloqueamos los más comunes. En producción esto sería
+// Emails desechables, bloqueamos los más comunes. En producción esto sería
 // una lookup table del backend que se actualiza periódicamente. Por ahora
 // frontend-only, suficiente para filtrar el 90% de los abusos.
 const DISPOSABLE_EMAIL_DOMAINS = new Set([
@@ -221,7 +221,7 @@ function validate(field) {
       } else {
         const domain = value.split('@')[1]?.toLowerCase() || ''
         if (DISPOSABLE_EMAIL_DOMAINS.has(domain)) {
-          errors.email = 'Usá un email permanente — te mandamos cosas importantes acá.'
+          errors.email = 'Usá un email permanente, te mandamos cosas importantes acá.'
         } else {
           errors.email = ''
         }
@@ -235,7 +235,7 @@ function validate(field) {
       } else if (digits.length > 15) {
         errors.whatsapp = 'Número demasiado largo.'
       } else if (/^(\d)\1+$/.test(digits)) {
-        // 11111111, 00000000, etc — son números fake típicos.
+        // 11111111, 00000000, etc, son números fake típicos.
         errors.whatsapp = 'Ese número no parece real.'
       } else {
         errors.whatsapp = ''
@@ -251,7 +251,7 @@ function validateAll() {
 
 // El cómputo lee directamente los VALORES del form, no `errors`. Los errores
 // se muestran on blur (mejor UX, no spamea al lead mientras tipea) pero el
-// botón "Continuar" reactúa al instante al tipear cada caracter — antes había
+// botón "Continuar" reactúa al instante al tipear cada caracter, antes había
 // un bug de doble-click: click #1 disparaba blur del input, validate limpiaba
 // el error, isFormValid pasaba a true, pero el evento click ya había pegado
 // en el botón disabled. Click #2 ya enabled → submit. Ahora no hay race.

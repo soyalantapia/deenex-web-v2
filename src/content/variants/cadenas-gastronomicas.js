@@ -50,8 +50,8 @@ export const hero = {
     suffix: '.',
   },
   // CTA primario apunta al onboarding self-serve. Antes era "Agendar demo"
-  // sales-led; ahora invitamos al lead a probar el producto solo durante 15 días.
-  ctaPrimary: { label: 'Empezar 15 días gratis', href: '/comenzar?from=cadenas_hero', event: 'click_trial_start' },
+  // sales-led; ahora invitamos al lead a probar el producto solo durante 14 días.
+  ctaPrimary: { label: 'Empezar 14 días gratis', href: '/comenzar?from=cadenas_hero', event: 'click_trial_start' },
   ctaSecondary: { label: 'Ver cómo funciona', href: '#infraestructura' },
   socialProof: {
     badges: [
@@ -214,7 +214,7 @@ export const demoVideo = {
   sidequote:
     '"Así se ve la experiencia para tu cliente y el control que tenés desde el dashboard."',
   vimeoId: '1183253994',
-  ctaPrimary: { label: 'Empezar 15 días gratis', href: '/comenzar?from=cadenas_demo' },
+  ctaPrimary: { label: 'Empezar 14 días gratis', href: '/comenzar?from=cadenas_demo' },
   ctaSecondary: { label: 'Ver toda la infraestructura', href: '#infraestructura' },
 }
 
@@ -364,7 +364,7 @@ export const faq = {
     },
     {
       q: '¿Puedo usar Deenex si ya tengo delivery en Rappi o PedidosYa?',
-      a: 'Completamente. Muchos de nuestros clientes operan en paralelo. Deenex no reemplaza esos canales de inmediato — los complementa mientras construís tu propia base de clientes registrados. Con el tiempo, la mayoría migra la mayor parte de sus pedidos al canal propio.',
+      a: 'Completamente. Muchos de nuestros clientes operan en paralelo. Deenex no reemplaza esos canales de inmediato, los complementa mientras construís tu propia base de clientes registrados. Con el tiempo, la mayoría migra la mayor parte de sus pedidos al canal propio.',
     },
     {
       q: '¿Qué soporte incluye el plan?',
@@ -383,7 +383,7 @@ export const calendar = {
 }
 
 /**
- * Nuevo modelo de pricing 2026 — alineado al PDF "Deenex — Pricing OFICIAL".
+ * Nuevo modelo de pricing 2026, alineado al PDF "Deenex, Pricing OFICIAL".
  *
  * 3 capas:
  *  1. Planes mensuales (Comercio + Partners + Bundle): fee fijo + comisión que baja con volumen.
@@ -391,7 +391,7 @@ export const calendar = {
  *  3. Deenex Activa (performance): cobramos solo sobre la venta atribuida.
  */
 /*
- * Pricing 2026 — Bundle único escalonado por volumen de pedidos.
+ * Pricing 2026, Bundle único escalonado por volumen de pedidos.
  *
  * Razonamiento del modelo (acordado con founders):
  *  - Siempre fee mensual + comisión por venta. Eliminamos la opción "sin pago
@@ -410,7 +410,7 @@ export const pricingModel = {
   title: 'Empezás simple.',
   titleAccent: 'Crecemos con vos.',
   subtitle:
-    'Un solo plan: fee mensual + comisión por venta. El precio se ajusta automáticamente cuando crece tu volumen — no pagás por capacidad que no usás.',
+    'Un solo plan: fee mensual + comisión por venta. El precio se ajusta automáticamente cuando crece tu volumen, no pagás por capacidad que no usás.',
 
   // ── Hero del Bundle inicial ────────────────────────────────────
   starterEyebrow: 'Punto de entrada',
@@ -430,7 +430,7 @@ export const pricingModel = {
   starterCommission: '3',
   starterCommissionScope: 'solo en delivery',
   starterOrders: 300,
-  starterCtaLabel: 'Empezar 15 días gratis',
+  starterCtaLabel: 'Empezar 14 días gratis',
 
   // ── Escalera de crecimiento ─────────────────────────────────────
   scaleEyebrow: 'Tu plan crece cuando vos crecés',
@@ -448,7 +448,7 @@ export const pricingModel = {
   scaleTiers: [
     {
       name: 'Inicio',
-      tagline: 'Marca arrancando o pequeña — 1-3 locales típicos.',
+      tagline: 'Marca arrancando o pequeña, 1-3 locales típicos.',
       ordersLabel: 'Hasta 300',
       maxOrders: 300,
       fee: 29,
@@ -459,8 +459,8 @@ export const pricingModel = {
     },
     {
       name: 'Crecimiento',
-      tagline: 'Operación consolidada — 3-10 locales o alto delivery.',
-      ordersLabel: '301 – 1.000',
+      tagline: 'Operación consolidada, 3-10 locales o alto delivery.',
+      ordersLabel: '301-1.000',
       maxOrders: 1000,
       fee: 119,
       commissionPct: 2.75,
@@ -471,8 +471,8 @@ export const pricingModel = {
     },
     {
       name: 'Escala',
-      tagline: 'Cadena con operación 24/7 — 10-30 locales activos.',
-      ordersLabel: '1.001 – 3.000',
+      tagline: 'Cadena con operación 24/7, 10-30 locales activos.',
+      ordersLabel: '1.001-3.000',
       maxOrders: 3000,
       fee: 349,
       commissionPct: 2.5,
@@ -482,8 +482,8 @@ export const pricingModel = {
     },
     {
       name: 'Performance',
-      tagline: 'Cadena establecida — 30-100 locales con tráfico alto.',
-      ordersLabel: '3.001 – 7.500',
+      tagline: 'Cadena establecida, 30-100 locales con tráfico alto.',
+      ordersLabel: '3.001-7.500',
       maxOrders: 7500,
       fee: 599,
       commissionPct: 2.25,
@@ -493,8 +493,8 @@ export const pricingModel = {
     },
     {
       name: 'Pro',
-      tagline: 'Líder de categoría — 100+ locales o eventos masivos.',
-      ordersLabel: '7.501 – 25.000',
+      tagline: 'Líder de categoría, 100+ locales o eventos masivos.',
+      ordersLabel: '7.501-25.000',
       maxOrders: 25000,
       fee: 1199,
       commissionPct: 2.0,
@@ -504,7 +504,7 @@ export const pricingModel = {
     },
     {
       name: 'Enterprise',
-      tagline: 'Operación nacional o multi-marca — 25k+ pedidos/mes.',
+      tagline: 'Operación nacional o multi-marca, 25k+ pedidos/mes.',
       ordersLabel: '25.001+',
       maxOrders: null,
       fee: null,
@@ -554,7 +554,7 @@ export const pricingModel = {
     ticketUpliftPct: 15,
   },
   calculatorFootnote:
-    'Comisión Deenex aplica solo a delivery propio (no en mesa/takeaway/Rappi). % comisión apps editable (default 30%, típico AR). USD 20/local de POS mercado (Fudo/Maxirest típico). Uplifts +20% recurrencia y +15% ticket son promedios conservadores de clientes Deenex con 6+ meses — clientes top promedian +35% / +25%.',
+    'Comisión Deenex aplica solo a delivery propio (no en mesa/takeaway/Rappi). % comisión apps editable (default 30%, típico AR). USD 20/local de POS mercado (Fudo/Maxirest típico). Uplifts +20% recurrencia y +15% ticket son promedios conservadores de clientes Deenex con 6+ meses, clientes top promedian +35% / +25%.',
 
   // ── Cómo empezar (al cierre de la calculadora) ─────────────────
   calculatorHowToStartEyebrow: 'Cómo empezar',
@@ -570,21 +570,21 @@ export const pricingModel = {
     },
     {
       num: '02',
-      title: 'Conectás POS + marca',
-      desc: 'Subís logo y paleta, elegís tu POS (Fudo, Maxirest, Bistrosoft, Odoo…) y canales. Te ayuda un CSM real.',
-      durationLabel: '5–10 min',
+      title: 'Completá los datos de tu marca',
+      desc: 'Subís logo y paleta, elegís tu POS (Fudo, Maxirest, Bistrosoft, Odoo) y canales. Te ayuda un CSM real.',
+      durationLabel: '5 a 10 min',
     },
     {
       num: '03',
-      title: 'Activás el trial',
-      desc: '15 días gratis. Cobro recién al día 16 si seguís. Cancelás en 1 click si no convence.',
-      durationLabel: '15 días gratis',
+      title: 'Empezás a enviar el link',
+      desc: 'Compartís tu link de marca con tus clientes y arrancan a pedir. 14 días gratis, cobro recién al día 15 si seguís.',
+      durationLabel: '14 días gratis',
     },
   ],
   calculatorCtaPrimaryLabel: 'Empezar mi trial ahora',
   calculatorCtaSecondaryLabel: 'Hablar con ventas',
   scaleFootnote:
-    'Pedidos = transacciones procesadas por Deenex/mes (online + presencial). Setup USD 0 — implementación incluida. Sin permanencia: cancelás en 1 click cuando quieras.',
+    'Pedidos = transacciones procesadas por Deenex/mes (online + presencial). Setup USD 0, implementación incluida. Sin permanencia: cancelás en 1 click cuando quieras.',
 
   // ── Cómo crecemos juntos ────────────────────────────────────────
   growthPromises: [
@@ -606,16 +606,16 @@ export const pricingModel = {
   ],
 
   // ── Footer CTA ─────────────────────────────────────────────────
-  ctaTitle: 'Probalo 15 días, sin cargo.',
+  ctaTitle: 'Probalo 14 días, sin cargo.',
   ctaSubtitle:
-    'Activás con MercadoPago, no te cobramos nada hasta el día 16 y podés cancelar en 1 click. Sin permanencia, sin setup fee, sin letra chica.',
+    'Activás con MercadoPago, no te cobramos nada hasta el día 15 y podés cancelar en 1 click. Sin permanencia, sin setup fee, sin letra chica.',
   ctaPrimaryLabel: 'Empezar mi trial',
   ctaSecondaryLabel: 'Hablar con ventas',
   ctaSecondaryHref: '#agendar',
   ctaGuarantees: [
     'Setup en menos de 30 minutos guiado por CSM real',
-    'MercadoPago oficial — partner certificado',
-    'Cobro recién al día 16 — si cancelás antes, USD 0',
+    'MercadoPago oficial, partner certificado',
+    'Cobro recién al día 15, si cancelás antes, USD 0',
     'Migración asistida desde apps de terceros',
   ],
 }

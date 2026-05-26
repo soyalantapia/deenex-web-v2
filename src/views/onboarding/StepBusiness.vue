@@ -54,7 +54,7 @@
               <Check class="w-3 h-3" />Disponible
             </span>
           </div>
-          <!-- Sugerencia explícita cuando está tomado — el lead ve qué va a quedar. -->
+          <!-- Sugerencia explícita cuando está tomado, el lead ve qué va a quedar. -->
           <button
             v-if="domainAvailable === false && domainSuggestion"
             type="button"
@@ -125,7 +125,7 @@
             </div>
           </div>
           <p v-if="form.locations >= 200" class="mt-1 text-xs text-emerald-600 font-semibold">
-            Tu volumen requiere un plan Enterprise — te asignamos un CSM dedicado.
+            Tu volumen requiere un plan Enterprise, te asignamos un CSM dedicado.
           </p>
         </div>
       </div>
@@ -248,7 +248,7 @@ const form = reactive({
   pos: onboarding.state.business.pos,
   posOther: onboarding.state.business.posOther || '',
   channels: [...onboarding.state.business.channels],
-  // Hidratamos desde state — si el lead aceptó una sugerencia antes y vuelve
+  // Hidratamos desde state, si el lead aceptó una sugerencia antes y vuelve
   // al step, mantenemos la elección.
   acceptedSuggestion: onboarding.state.business.subdomainOverride || '',
 })
@@ -264,7 +264,7 @@ watch(
 )
 
 // ── Subdomain availability check ────────────────────────────────────────
-// Lista hardcoded de slugs ya "tomados" — en producción esto sería una API.
+// Lista hardcoded de slugs ya "tomados", en producción esto sería una API.
 const TAKEN_SUBDOMAINS = new Set([
   'palta', 'hatsu', 'coquitos', 'monti', 'glorias', 'quem',
   'demo', 'admin', 'app', 'api', 'test', 'staging',
@@ -316,7 +316,7 @@ const effectiveSubdomain = computed(() => {
 
 function acceptSuggestion() {
   if (!domainSuggestion.value) return
-  // Persistimos como override del subdomain en el STATE GLOBAL — así Welcome,
+  // Persistimos como override del subdomain en el STATE GLOBAL, así Welcome,
   // Trial y todos los preview/email mocks usan el slug correcto. Antes el
   // override vivía solo en form local y se perdía al salir del step (P0 bug).
   form.acceptedSuggestion = domainSuggestion.value
@@ -447,7 +447,7 @@ function onSubmit() {
 input[type='range'] {
   touch-action: none;
 }
-/* Animación del input "Otro POS" — slide+fade al aparecer. */
+/* Animación del input "Otro POS", slide+fade al aparecer. */
 .other-pos-enter-active,
 .other-pos-leave-active {
   transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);

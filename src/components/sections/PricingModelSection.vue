@@ -1,6 +1,6 @@
 <template>
   <!--
-    Pricing Model 2026 — Bundle único escalonado.
+    Pricing Model 2026, Bundle único escalonado.
 
     Antes este componente mostraba 4 componentes separados (Presencial,
     Pedidos, Loyalty, Suite) + una opción "sin pago mensual / solo comisión".
@@ -33,7 +33,7 @@
         </p>
       </div>
 
-      <!-- Hero del Bundle inicial — punto de entrada ───────────────── -->
+      <!-- Hero del Bundle inicial, punto de entrada ───────────────── -->
       <div class="relative rounded-3xl bg-slate-900 text-white p-7 sm:p-10 mb-8 overflow-hidden">
         <!-- Glow circular -->
         <div class="absolute -right-20 -top-20 w-72 h-72 rounded-full bg-primary/30 blur-3xl pointer-events-none"></div>
@@ -60,7 +60,7 @@
             </ul>
           </div>
 
-          <!-- Tarjeta del precio inicial — limpia, sin calc inline.
+          <!-- Tarjeta del precio inicial, limpia, sin calc inline.
                El cálculo detallado está en la sección "calculadora-deenex"
                más abajo, vinculada con el anchor secundario. -->
           <div class="rounded-2xl bg-white text-slate-900 p-6 shadow-2xl shadow-slate-900/40">
@@ -242,7 +242,7 @@
                   </div>
                 </div>
 
-                <!-- Mix de canales — agrupador visual con 2 sliders separados.
+                <!-- Mix de canales, agrupador visual con 2 sliders separados.
                      Modelo nuevo: comisión Deenex aplica SOLO a delivery propio,
                      y el lead controla el % de Rappi por separado (con su % de
                      comisión editable, porque varía 25-40% según país/segmento).
@@ -453,7 +453,7 @@
               </div>
 
               <!-- Comparativa: Deenex vs apps de terceros.
-                   La row de "apps" se oculta si pctViaApps === 0 — sino genera
+                   La row de "apps" se oculta si pctViaApps === 0, sino genera
                    ruido visual (USD 0 tachado no aporta nada al lead). -->
               <div class="space-y-2.5 mb-5">
                 <div class="flex items-baseline justify-between gap-3 pb-2.5 border-b border-slate-200">
@@ -463,7 +463,7 @@
                       USD {{ calcTier.fee }} bundle + {{ fmtUsd(commissionCost) }} comisión <span class="font-medium">({{ calcTier.commissionLabel }} sobre {{ calc.pctDeliveryPropio }}% delivery)</span>
                     </p>
                     <p v-else class="text-[11px] text-slate-400 leading-snug">
-                      Volumen Enterprise — acuerdo dedicado
+                      Volumen Enterprise, acuerdo dedicado
                     </p>
                   </div>
                   <span class="text-xl font-extrabold text-slate-900 tabular-nums whitespace-nowrap">
@@ -575,7 +575,7 @@
                       <Cpu class="w-3 h-3 shrink-0 text-slate-400" />
                       POS integrado a paridad de mercado (sin descuento en tier Inicio)
                     </span>
-                    <span class="tabular-nums whitespace-nowrap">—</span>
+                    <span class="tabular-nums whitespace-nowrap">USD 0</span>
                   </div>
                 </div>
 
@@ -664,7 +664,7 @@
           </p>
         </div>
 
-        <!-- Escalera de tiers — cards stacked con el MISMO estilo que StepPlan.
+        <!-- Escalera de tiers, cards stacked con el MISMO estilo que StepPlan.
              Cada tier es una card con border-2 + padding generoso. La row
              highlighted (`tier.highlight = true` desde el content) marca el
              tier "Más común" en violeta. "Estás acá" siempre apunta al primer
@@ -733,20 +733,38 @@
                   <template v-else>A medida</template>
                 </p>
               </div>
-              <!-- Comisión -->
+              <!-- Comisión delivery -->
               <div class="min-w-0">
                 <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-0.5">
-                  Comisión
+                  Comisión delivery
                 </p>
-                <p class="text-sm font-bold tabular-nums" :class="i === 0 ? 'text-primary' : 'text-slate-700'">
-                  {{ tier.commissionLabel }} por venta
+                <p class="text-sm font-bold tabular-nums whitespace-nowrap" :class="i === 0 ? 'text-primary' : 'text-slate-700'">
+                  {{ tier.commissionLabel }} en delivery
+                </p>
+              </div>
+              <!-- Marketing AI (opcional, add-on % sobre ventas atribuidas) -->
+              <div v-if="tier.marketingAiPct" class="min-w-0">
+                <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-0.5">
+                  Marketing AI
+                </p>
+                <p class="text-sm font-bold text-slate-700 tabular-nums whitespace-nowrap">
+                  {{ tier.marketingAiPct }}% atribución
+                </p>
+              </div>
+              <!-- POS por local (opcional, baja con tier) -->
+              <div v-if="tier.posPerLocation" class="min-w-0">
+                <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-0.5">
+                  POS / local
+                </p>
+                <p class="text-sm font-bold text-slate-700 tabular-nums whitespace-nowrap">
+                  USD {{ tier.posPerLocation }}/mes
                 </p>
               </div>
             </div>
           </div>
         </div>
 
-        <!-- Footer con disclaimer — fuera de las cards, mismo tratamiento que
+        <!-- Footer con disclaimer, fuera de las cards, mismo tratamiento que
              la nota informativa del StepPlan. -->
         <p class="text-[11px] text-slate-500 leading-relaxed mt-4 flex items-start gap-2">
           <Info class="w-3.5 h-3.5 text-slate-400 shrink-0 mt-0.5" />
@@ -754,7 +772,7 @@
         </p>
       </div>
 
-      <!-- "Cómo crecemos juntos" — narrativa ───────────────────────── -->
+      <!-- "Cómo crecemos juntos", narrativa ───────────────────────── -->
       <div class="grid lg:grid-cols-3 gap-4 mb-8">
         <div
           v-for="(promise, i) in content.growthPromises"

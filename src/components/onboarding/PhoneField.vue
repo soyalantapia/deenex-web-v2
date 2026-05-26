@@ -74,7 +74,7 @@ const props = defineProps({
 })
 
 // `country-change` lo emitimos cada vez que el lead cambia de país. El parent
-// (StepIdentity) escucha y re-valida — antes podía cambiar AR→MX con un número
+// (StepIdentity) escucha y re-valida, antes podía cambiar AR→MX con un número
 // AR inválido para MX y el botón Continuar quedaba habilitado (P0 bug).
 const emit = defineEmits(['update:modelValue', 'blur', 'country-change'])
 

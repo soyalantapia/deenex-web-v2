@@ -28,7 +28,7 @@
           <div class="absolute inset-x-0 bottom-0 h-[160px] lg:h-[100px] bg-gradient-to-t from-white via-white/80 to-transparent z-20 pointer-events-none"></div>
         </div>
 
-        <!-- Carrusel — estructura original intacta, solo se agrega ref y eventos -->
+        <!-- Carrusel, estructura original intacta, solo se agrega ref y eventos -->
         <div
           ref="carouselRef"
           class="flex flex-row lg:flex-col gap-4 lg:gap-3 order-2 overflow-x-auto lg:overflow-visible snap-x snap-mandatory scrollbar-hide pb-6 lg:pb-0 pt-4 lg:pt-0 -mx-6 px-6 lg:mx-0 lg:px-0 -mt-14 lg:mt-0 relative z-30"
@@ -52,7 +52,7 @@
 
       </div>
 
-      <!-- Dots indicadores — solo mobile, fuera del grid para no romper el layout -->
+      <!-- Dots indicadores, solo mobile, fuera del grid para no romper el layout -->
       <div class="flex lg:hidden items-center justify-center gap-2 mt-4">
         <button
           v-for="(_, i) in marketingFeatures"

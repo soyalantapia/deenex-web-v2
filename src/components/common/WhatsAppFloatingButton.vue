@@ -25,6 +25,6 @@ const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(mess
 
 
 <style scoped>
-/* No styles needed — using utility classes */
+/* No styles needed, using utility classes */
 </style>
 

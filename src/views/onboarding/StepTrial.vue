@@ -60,7 +60,7 @@
           </span>
         </div>
 
-        <!-- Fidelización Dinámica removida como línea separada — ahora viene
+        <!-- Fidelización Dinámica removida como línea separada, ahora viene
              incluida en el Bundle de entrada (no es add-on opcional). -->
 
         <div class="flex justify-between items-baseline">
@@ -106,7 +106,7 @@
             </div>
             <div class="flex-1 min-w-0">
               <div class="flex items-center gap-2">
-                <p class="text-sm font-bold text-slate-900">MercadoPago — Recomendado</p>
+                <p class="text-sm font-bold text-slate-900">MercadoPago, Recomendado</p>
                 <span class="text-[9px] font-black text-emerald-600 bg-emerald-100 px-2 py-0.5 rounded-full uppercase tracking-wider whitespace-nowrap">
                   Sin interrupciones
                 </span>
@@ -128,12 +128,12 @@
         </button>
 
         <!-- Opción "Activar sin tarjeta" removida: forzamos MercadoPago como
-             único método para tener cobranza garantizada al día 16 sin
+             único método para tener cobranza garantizada al día 15 sin
              fricción adicional. -->
       </div>
     </div>
 
-    <!-- Trust badges inline — antes solo en sidebar desktop, ahora también
+    <!-- Trust badges inline, antes solo en sidebar desktop, ahora también
          visibles en mobile donde el sidebar no aparece. -->
     <div class="lg:hidden grid grid-cols-2 gap-2 mb-6">
       <div
@@ -149,7 +149,7 @@
       </div>
     </div>
 
-    <!-- Garantías inline (ambos viewports) — corregido CUIT/RFC para no
+    <!-- Garantías inline (ambos viewports), corregido CUIT/RFC para no
          prometer algo que no preguntamos. Lo capturamos opcional en el
          primer billing cycle. -->
     <ul class="space-y-2 mb-8">
@@ -179,11 +179,11 @@
       </template>
     </button>
 
-    <!-- "Cambiar de plan" removido — el plan se asigna automáticamente
+    <!-- "Cambiar de plan" removido, el plan se asigna automáticamente
          según volumen (no hay opción de elegir). -->
 
     <p class="mt-6 text-[11px] text-slate-400 leading-relaxed text-center">
-      Al activar tu cuenta aceptás el cobro recurrente desde el día 16.
+      Al activar tu cuenta aceptás el cobro recurrente desde el día 15.
       Te avisamos por email 48h antes del primer cargo.
     </p>
   </div>
@@ -202,13 +202,13 @@ const loading = ref(false)
 // Controla el modal full-screen de simulación de provisioning post-activación.
 const showActivationOverlay = ref(false)
 
-// MercadoPago como único método. El "email_only" fue removido — necesitamos
-// método de pago al activar para garantizar cobranza al día 16 sin fricción.
+// MercadoPago como único método. El "email_only" fue removido, necesitamos
+// método de pago al activar para garantizar cobranza al día 15 sin fricción.
 const paymentChoice = ref('mercadopago')
 
 const activateButtonLabel = computed(() => 'Activar mi cuenta con MercadoPago')
 
-// Trust badges mobile — la versión inline que llena el gap del sidebar
+// Trust badges mobile, la versión inline que llena el gap del sidebar
 // desktop-only. Versión compacta para 390px.
 const mobileTrustBadges = [
   { title: 'MercadoPago oficial', desc: 'Partner certificado.', icon: Shield, color: 'text-sky-500' },
@@ -235,7 +235,7 @@ const planSummary = computed(() => {
   return tier
 })
 
-// Loyalty viene incluida en el Bundle de entrada — sin costo extra.
+// Loyalty viene incluida en el Bundle de entrada, sin costo extra.
 const totalMonthly = computed(() => planSummary.value.monthlyFee || 0)
 
 async function onActivate() {

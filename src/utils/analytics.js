@@ -1,5 +1,5 @@
 /**
- * Analytics utility — Google Analytics 4 + UTM capture + user identity.
+ * Analytics utility, Google Analytics 4 + UTM capture + user identity.
  *
  * Mejoras sobre la versión anterior:
  *  - Captura UTMs en el primer landing y los persiste por sesión (sessionStorage).
@@ -82,7 +82,7 @@ export function captureUtmsFromUrl() {
  */
 export function identify(email) {
   if (!email || typeof window === 'undefined') return
-  // user_id estable derivado del email (hash simple — no usamos PII directa).
+  // user_id estable derivado del email (hash simple, no usamos PII directa).
   const userId = simpleHash(email.toLowerCase().trim())
   cachedUserId = userId
   const ls = safeLocal()
@@ -119,7 +119,7 @@ export function getStoredUserId() {
   } catch { return null }
 }
 
-// Hash simple FNV-1a — suficiente para user_id estable, no es PII directa.
+// Hash simple FNV-1a, suficiente para user_id estable, no es PII directa.
 function simpleHash(s) {
   let h = 0x811c9dc5
   for (let i = 0; i < s.length; i++) {

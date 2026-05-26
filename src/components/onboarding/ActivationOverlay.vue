@@ -1,13 +1,13 @@
 <template>
   <!--
-    ActivationOverlay — modal full-screen que aparece después de "Activar
+    ActivationOverlay, modal full-screen que aparece después de "Activar
     cuenta". Muestra los pasos de creación con animación tipo "estamos
     trabajando en tu cuenta": procesando pago, generando subdomain,
     armando branding, etc.
 
     En producción cada paso corresponde a un webhook real del backend
     (account.created, subdomain.provisioned, branding.generated, etc).
-    Acá usamos setTimeout para simular la latencia natural — la sensación
+    Acá usamos setTimeout para simular la latencia natural, la sensación
     de "se está haciendo en vivo" es key para que el lead crea que el
     sistema está laburando, no que es una pantalla estática.
   -->
@@ -150,7 +150,7 @@ const steps = ref([
     key: 'payment',
     title: 'Procesando pago con MercadoPago',
     description: 'Validando método de pago y reservando tu cuenta…',
-    doneText: 'MercadoPago vinculado. Primer cargo: día 16.',
+    doneText: 'MercadoPago vinculado. Primer cargo: día 15.',
     estimatedSec: 4,
     delayMs: 2200,
     status: 'doing',
@@ -255,7 +255,7 @@ function runProvisioning() {
         if (next) {
           next.status = 'doing'
         } else {
-          // Todos done — esperá un beat para que el usuario vea el 100%
+          // Todos done, esperá un beat para que el usuario vea el 100%
           // antes de continuar al welcome.
           timers.push(setTimeout(() => emit('complete'), 800))
         }

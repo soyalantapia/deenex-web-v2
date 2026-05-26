@@ -14,17 +14,17 @@
       </template>
     </h1>
     <!-- Mensaje clave: TODOS arrancan acá independiente del tamaño actual.
-         No hay decisión de "qué plan" — es un único bundle de entrada que
+         No hay decisión de "qué plan", es un único bundle de entrada que
          crece automáticamente cuando el VOLUMEN REAL lo justifica. -->
     <p class="text-base text-slate-500 leading-relaxed mb-6 max-w-md">
-      Todas las marcas arrancan con el mismo plan de entrada — pagás solo
+      Todas las marcas arrancan con el mismo plan de entrada, pagás solo
       <span class="font-bold text-slate-900">USD 29 hasta 300 pedidos/mes</span>
       + <span class="font-bold text-slate-900">3% solo en delivery</span>.
       Cuando tu volumen real supere ese límite, escalás automáticamente al
       siguiente tier. Sin renegociar nada.
     </p>
 
-    <!-- Toggle mensual/anual — anual 20% off. Cobranza estándar SaaS para
+    <!-- Toggle mensual/anual, anual 20% off. Cobranza estándar SaaS para
          mejorar cash flow + reducir churn. -->
     <div v-if="!isEnterprise" class="mb-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
       <div class="inline-flex items-center bg-slate-100 rounded-full p-1 relative">
@@ -79,7 +79,7 @@
             </h2>
           </div>
           <span class="bg-emerald-400 text-emerald-950 text-[10px] font-black uppercase tracking-wider px-2.5 py-1 rounded-full whitespace-nowrap">
-            15 días gratis
+            14 días gratis
           </span>
         </div>
 
@@ -94,7 +94,7 @@
           </span>
         </div>
 
-        <!-- "Incluye hasta X pedidos/mes" — el corazón del mensaje:
+        <!-- "Incluye hasta X pedidos/mes", el corazón del mensaje:
              todos arrancan acá, el escalado lo dispara el VOLUMEN REAL. -->
         <div class="rounded-xl bg-white/10 border border-white/15 p-3 mb-4 flex items-center gap-3">
           <div class="w-10 h-10 rounded-lg bg-emerald-400 flex items-center justify-center shrink-0 text-emerald-950">
@@ -131,7 +131,7 @@
           Antes no te cobramos nada.
         </p>
 
-        <!-- Toggle de Fidelización Dinámica removido — ya viene incluida en
+        <!-- Toggle de Fidelización Dinámica removido, ya viene incluida en
              el Bundle de entrada (USD 29), no es add-on opcional. -->
       </div>
     </div>
@@ -171,7 +171,7 @@
       </blockquote>
       <figcaption class="mt-3 pl-3 flex items-center justify-between gap-2">
         <span class="text-[11px] font-bold text-slate-500 tracking-wide uppercase">
-          — Marcos Aldazábal, Socio y Fundador
+         , Marcos Aldazábal, Socio y Fundador
         </span>
         <span class="text-[10px] font-black text-primary/60 tracking-wider uppercase">
           Palta
@@ -179,7 +179,7 @@
       </figcaption>
     </figure>
 
-    <!-- Escalera de crecimiento — INFORMATIVA, no seleccionable.
+    <!-- Escalera de crecimiento, INFORMATIVA, no seleccionable.
          "Estás acá" siempre marca Inicio (USD 69). Si declaró volumen alto,
          "Próxima parada" señala el projectedTier como roadmap. Layout más
          respirado que la versión anterior (grid colapsado): cards stacked
@@ -295,7 +295,7 @@
       <p v-else class="text-[11px] text-slate-500 leading-relaxed mt-3 flex items-start gap-1.5">
         <Check class="w-3 h-3 text-emerald-500 shrink-0 mt-0.5" stroke-width="3" />
         <span>
-          Pasás al siguiente tier <strong class="text-slate-700">automáticamente</strong> cuando superás el volumen del actual. Sin renegociar nada — el sistema lo hace al cierre del mes y tu data te sigue.
+          Pasás al siguiente tier <strong class="text-slate-700">automáticamente</strong> cuando superás el volumen del actual. Sin renegociar nada, el sistema lo hace al cierre del mes y tu data te sigue.
         </span>
       </p>
     </div>
@@ -319,7 +319,7 @@ import { useOnboarding } from '@/composables/useOnboarding'
 const router = useRouter()
 const onboarding = useOnboarding()
 
-// Form local sync con state global. `planKey` ya no se setea acá — el plan
+// Form local sync con state global. `planKey` ya no se setea acá, el plan
 // se asigna automáticamente desde recommendedPlan. `addLoyalty` se removió
 // porque ahora Fidelización Dinámica viene incluida en el Bundle de entrada,
 // no es add-on opcional. Solo queda billingCycle.
@@ -357,7 +357,7 @@ const totalMonthlyOrders = computed(() => {
 
 // Antes el lead podía elegir cualquier tier manualmente. Ahora el modelo
 // es Bundle único escalonado: el tier se calcula automáticamente desde el
-// volumen de pedidos del lead. No hay selección — `effectivePlanKey` siempre
+// volumen de pedidos del lead. No hay selección, `effectivePlanKey` siempre
 // apunta al recomendado.
 const effectivePlanKey = computed(() => recommendedPlan.value.key)
 
@@ -367,7 +367,7 @@ const selectablePlans = computed(() => onboarding.PLAN_TIERS)
 
 // Label de volumen ahora muestra el rango de PEDIDOS (la métrica de pricing
 // real) en lugar de "X-Y locales". Resuelve la pregunta clave del lead:
-// "¿en cuál caigo yo?" — porque los locales son ambiguos, los pedidos no.
+// "¿en cuál caigo yo?", porque los locales son ambiguos, los pedidos no.
 function planVolumeLabel(tier) {
   if (tier.key === 'enterprise') return '25.000+ pedidos/mes'
   if (tier.minOrders === 0) return `Hasta ${tier.maxOrders.toLocaleString('es-AR')} pedidos/mes`
@@ -376,7 +376,7 @@ function planVolumeLabel(tier) {
 
 // Formatea % con coma decimal estilo es-AR. Ej: 2.75 → "2,75%"; 3 → "3%".
 function formatPct(n) {
-  if (n == null) return '—'
+  if (n == null) return '0%'
   const rounded = Math.round(n * 100) / 100
   return rounded.toLocaleString('es-AR', { maximumFractionDigits: 2 }) + '%'
 }
@@ -385,7 +385,7 @@ function onSubmit() {
   onboarding.setPlan({
     key: effectivePlanKey.value,
     product: 'comercio',
-    // Loyalty viene incluida en el Bundle de entrada — no es add-on opcional.
+    // Loyalty viene incluida en el Bundle de entrada, no es add-on opcional.
     addLoyalty: true,
     billingCycle: form.billingCycle,
   })

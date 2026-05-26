@@ -1,5 +1,5 @@
 /**
- * v-autofocus — pone foco en el primer input/textarea/select del bloque al montar.
+ * v-autofocus, pone foco en el primer input/textarea/select del bloque al montar.
  *
  * Uso:
  *   <form v-autofocus>

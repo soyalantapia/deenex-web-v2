@@ -31,7 +31,7 @@
             <span class="font-semibold">Ventas</span>,
             <span class="font-semibold">Clientes</span>,
             <span class="font-semibold">Campañas</span> y
-            <span class="font-semibold">Fidelización</span> — recorrelos en 30 seg.
+            <span class="font-semibold">Fidelización</span>, recorrelos en 30 seg.
           </p>
         </div>
         <button
@@ -282,7 +282,7 @@
       </div>
     </div>
 
-    <!-- Persuasion CTA — más prominente (bg gradient + size mayor) que el
+    <!-- Persuasion CTA, más prominente (bg gradient + size mayor) que el
          versionado anterior, que se confundía con un disclaimer. -->
     <div class="rounded-2xl p-5 sm:p-6 mb-8 relative overflow-hidden border-2 border-emerald-200 bg-gradient-to-br from-emerald-50 to-white">
       <div class="absolute right-4 top-4 w-12 h-12 rounded-xl bg-emerald-500 flex items-center justify-center text-white">
@@ -342,7 +342,7 @@ watch(activeTab, () => {
   if (showTour.value) dismissTour({ reason: 'tab_change' })
 })
 
-// Datos demo seedeados — los KPIs ahora son reactivos para reflejar el
+// Datos demo seedeados, los KPIs ahora son reactivos para reflejar el
 // "pedido en vivo" que simula el lead. Cada KPI tiene un `flashing` que
 // se enciende brevemente cuando entra un pedido nuevo.
 const salesKpis = ref([
@@ -356,7 +356,7 @@ const salesKpis = ref([
 const latestOrder = ref(null)
 const simulating = ref(false)
 
-// Demo orders se obtienen del industry resolver — adaptados al rubro real
+// Demo orders se obtienen del industry resolver, adaptados al rubro real
 // del lead (empanadas → empanadas, sushi → sushi, etc).
 const DEMO_ORDERS = computed(() => industry.industry.value.sampleOrders)
 
@@ -393,7 +393,7 @@ async function simulateOrder() {
 }
 
 // Sales by channel filtrado por los canales reales que eligió el lead en
-// Step Business. Antes era una lista hardcoded — una marca delivery-only
+// Step Business. Antes era una lista hardcoded, una marca delivery-only
 // veía "Salón 85%" sin sentido. Ahora el demo respeta la realidad operativa
 // del lead, lo que aumenta la credibilidad del dashboard.
 const CHANNEL_DEMO_DATA = {
@@ -425,7 +425,7 @@ const topCustomers = [
   { name: 'Pablo Giménez', emoji: '🧑‍🍳', orders: 28, last: '3d', ltv: 968, color: 'bg-emerald-100' },
 ]
 
-// Campaigns también vienen del industry resolver — adaptadas al rubro.
+// Campaigns también vienen del industry resolver, adaptadas al rubro.
 const ICON_BY_INDEX = [Send, MessageCircle, Sparkles]
 const campaigns = computed(() =>
   industry.industry.value.sampleCampaigns.map((c, i) => ({
@@ -443,7 +443,7 @@ const loyaltyTiers = [
 
 // Tour callout: solo aparece la primera vez. Lo persistimos en localStorage
 // para que el lead que vuelve no lo vea de nuevo. Auto-dismiss después de
-// 12s o si cambia de tab — antes ocupaba espacio si quedaba abierto.
+// 12s o si cambia de tab, antes ocupaba espacio si quedaba abierto.
 const TOUR_KEY = 'deenex_sandbox_tour_seen'
 const showTour = ref(false)
 let tourAutoDismissTimer = null
@@ -451,7 +451,7 @@ let tourAutoDismissTimer = null
 onMounted(() => {
   if (typeof window !== 'undefined' && !localStorage.getItem(TOUR_KEY)) {
     showTour.value = true
-    // Auto-dismiss después de 12s — el lead ya tuvo tiempo de leer.
+    // Auto-dismiss después de 12s, el lead ya tuvo tiempo de leer.
     tourAutoDismissTimer = setTimeout(() => {
       if (showTour.value) {
         dismissTour({ reason: 'auto_timeout' })

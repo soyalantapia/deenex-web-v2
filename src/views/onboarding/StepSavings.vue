@@ -1,6 +1,6 @@
 <template>
   <!--
-    Paso 3/5 — Ahorro proyectado.
+    Paso 3/5, Ahorro proyectado.
 
     Antes este contenido vivía en la primera mitad de StepPlan. Lo separamos
     para reducir cognitive load: el lead primero ENTIENDE cuánto ahorra,
@@ -10,7 +10,7 @@
     <p class="text-[11px] font-black text-primary uppercase tracking-[0.2em] mb-3">
       Paso 3 de 5
     </p>
-    <!-- Sin <br /> entre el greeting y "cuánto ahorrás" — el lead lee la
+    <!-- Sin <br /> entre el greeting y "cuánto ahorrás", el lead lee la
          frase como una sola idea ("Alan, mirá cuánto ahorrás."). El span
          italic primary sigue dando el énfasis visual sin partir la línea. -->
     <h1 class="text-[clamp(1.8rem,4vw,2.6rem)] font-extrabold tracking-tighter leading-[1.05] text-slate-900 mb-4">
@@ -132,7 +132,7 @@
     />
 
     <p class="mt-6 text-[11px] text-slate-400 leading-relaxed">
-      Sin cargo durante 15 días. Cancelás en 1 click. Si no convence, te exportamos los datos y bajamos la cuenta sin preguntas.
+      Sin cargo durante 14 días. Cancelás en 1 click. Si no convence, te exportamos los datos y bajamos la cuenta sin preguntas.
     </p>
   </form>
 </template>

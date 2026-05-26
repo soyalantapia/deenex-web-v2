@@ -180,7 +180,7 @@
           <span class="text-primary italic font-light">Activá tu cuenta con tus datos reales.</span>
         </h2>
         <p class="text-sm text-slate-500 mb-6 max-w-md mx-auto">
-          15 días gratis con MercadoPago. Cancelás en 1 click hasta el día 16,
+          14 días gratis con MercadoPago. Cancelás en 1 click hasta el día 15,
           sin cargos ni preguntas.
         </p>
         <RouterLink
@@ -188,7 +188,7 @@
           @click="trackActivateClick('hero_block')"
           class="group inline-flex items-center gap-2 bg-primary hover:bg-[#3c1fc9] text-white font-bold rounded-xl px-7 py-4 text-sm transition-all shadow-md shadow-primary/25 hover:shadow-primary/40 hover:-translate-y-0.5"
         >
-          Empezar mi trial de 15 días
+          Empezar mi trial de 14 días
           <ArrowRight class="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
         </RouterLink>
         <p class="text-[11px] text-slate-400 mt-4">
