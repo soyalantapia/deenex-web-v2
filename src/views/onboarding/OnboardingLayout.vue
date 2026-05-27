@@ -235,10 +235,10 @@
               Antes de irte, una cosa.
             </h3>
             <p class="text-sm text-slate-500 leading-relaxed mb-5">
-              Ya completaste {{ onboarding.state.meta.completedSteps.length }}/{{ steps.length - 1 }} pasos.
+              Ya completaste {{ onboarding.state.meta.completedSteps.length }}/{{ steps.length }} pasos.
               Si volvés en las próximas 48 horas y activás tu trial, te regalamos
               <span class="font-bold text-emerald-600">los primeros 30 días gratis</span>
-              en vez de 15.
+              en vez de 14.
             </p>
             <div class="rounded-2xl bg-slate-50 border border-slate-200 p-3 mb-5 flex items-center gap-3">
               <Gift class="w-5 h-5 text-amber-500 shrink-0" />

@@ -88,19 +88,19 @@
             <ul class="space-y-2.5 text-sm text-slate-700">
               <li class="flex items-center justify-between gap-2 pb-2 border-b border-emerald-100">
                 <span>PedidosYa</span>
-                <span class="font-bold text-rose-500">-25%</span>
+                <span class="font-bold text-rose-500 tabular-nums">28%</span>
               </li>
               <li class="flex items-center justify-between gap-2 pb-2 border-b border-emerald-100">
                 <span>Rappi</span>
-                <span class="font-bold text-rose-500">-30%</span>
+                <span class="font-bold text-rose-500 tabular-nums">30%</span>
               </li>
               <li class="flex items-center justify-between gap-2 pb-2 border-b border-emerald-100">
                 <span>Uber Eats</span>
-                <span class="font-bold text-rose-500">-28%</span>
+                <span class="font-bold text-rose-500 tabular-nums">30%</span>
               </li>
               <li class="flex items-center justify-between gap-2 pt-1">
                 <span class="font-bold">Deenex</span>
-                <span class="font-bold text-emerald-600">{{ deenexFeeLabel }}</span>
+                <span class="font-bold text-emerald-600 tabular-nums">{{ deenexFeeLabel }} solo delivery</span>
               </li>
             </ul>
           </div>
@@ -244,7 +244,7 @@ const brandLogos = [
   { name: 'Qüem', src: quemLogo },
 ]
 
-const deenexFeeLabel = computed(() => `+${props.recommendedPlanCommission}`)
+const deenexFeeLabel = computed(() => `${props.recommendedPlanCommission}`)
 
 const trustBadges = [
   { title: 'MercadoPago oficial', desc: 'Partner certificado. Nunca vemos tu tarjeta.', icon: ShieldCheck, color: 'text-sky-500' },

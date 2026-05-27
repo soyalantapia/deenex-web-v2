@@ -53,11 +53,23 @@ import { ref, onMounted } from 'vue'
 const emit = defineEmits(['done'])
 const hidden = ref(false)
 
+// Solo mostramos el loading completo (2.2s) la primera vez por sesión.
+// Returning visitors lo ven en 600ms para no frustrarlos con un splash
+// largo en cada navegación. Antes era siempre 2200ms — UX cansador.
+const SESSION_KEY = 'deenex_loading_shown_v1'
+let shownBefore = false
+try {
+  shownBefore = sessionStorage.getItem(SESSION_KEY) === '1'
+} catch { /* sessionStorage bloqueado */ }
+
+const duration = shownBefore ? 600 : 2200
+
 onMounted(() => {
   setTimeout(() => {
     hidden.value = true
     emit('done')
-  }, 2200)
+    try { sessionStorage.setItem(SESSION_KEY, '1') } catch { /* */ }
+  }, duration)
 })
 </script>
 

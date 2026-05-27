@@ -115,7 +115,7 @@
         </p>
         <p class="text-white/80 text-sm leading-relaxed mb-1 flex items-center gap-1.5 flex-wrap">
           + <span class="font-bold tabular-nums">{{ recommendedPlan.commissionPct }}%</span>
-          comisión <span class="text-white/60">solo en delivery</span>.
+          comisión <span class="text-white/60">solo en delivery</span>
           <Tooltip variant="light" placement="top" align="left" label="Sobre qué se aplica la comisión">
             <strong class="block mb-1">¿Sobre qué se aplica?</strong>
             Solo sobre el GMV de delivery (los pedidos que despacha tu canal Deenex). NO aplica a mesa, takeaway ni a las ventas que entran por Rappi/PedidosYa. Tampoco sobre propinas ni impuestos.
