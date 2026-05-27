@@ -15,7 +15,11 @@
  *  - sendBeacon en pagehide/abandoned events para no perderlos.
  */
 
-export const GA_MEASUREMENT_ID = 'G-E7GPE100LK'
+// Mantener el ID en .env (VITE_GA_MEASUREMENT_ID); el fallback cubre dev y
+// builds sin env config (GH Pages local). El ID es semi-público pero la práctica
+// correcta es leerlo de env para poder rotar sin commits.
+export const GA_MEASUREMENT_ID =
+  import.meta.env.VITE_GA_MEASUREMENT_ID || 'G-E7GPE100LK'
 
 const UTM_KEY = 'deenex_utm_v1'
 const USER_ID_KEY = 'deenex_user_id_v1'

@@ -6,12 +6,12 @@
       <div class="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-6 mb-12">
         <div>
           <h2 class="text-[clamp(1.8rem,4vw,2.8rem)] font-extrabold tracking-tighter leading-[1.05] text-slate-900">
-            Elegí el día y hora<br/>
-            <span class="text-primary italic font-light">que mejor te quede.</span>
+            {{ headlineLine1 }}<br/>
+            <span class="text-primary italic font-light">{{ headlineLine2 }}</span>
           </h2>
         </div>
         <p class="text-slate-500 text-sm leading-relaxed max-w-xs lg:text-right font-medium">
-          Reunión de 30 minutos con el equipo de Deenex. Sin compromiso de contratación.
+          {{ subtitle }}
         </p>
       </div>
 
@@ -34,8 +34,18 @@
 </template>
 
 <script setup>
-import { onMounted, onUnmounted } from 'vue'
+import { computed, onMounted, onUnmounted } from 'vue'
 import { trackEvent } from '@/utils/analytics'
+
+const props = defineProps({
+  content: { type: Object, default: () => ({}) },
+})
+
+const headlineLine1 = computed(() => props.content.headlineLine1 ?? 'Elegí el día y hora')
+const headlineLine2 = computed(() => props.content.headlineLine2 ?? 'que mejor te quede.')
+const subtitle = computed(
+  () => props.content.subtitle ?? 'Reunión de 30 minutos con el equipo de Deenex. Sin compromiso de contratación.',
+)
 
 const calendarUrl = import.meta.env.VITE_CALENDAR_URL
 

@@ -145,12 +145,18 @@
           v-if="showSaveModal"
           class="fixed inset-0 z-[9998] flex items-center justify-center p-4 pointer-events-none"
         >
-          <div class="bg-white rounded-3xl shadow-2xl max-w-md w-full p-7 pointer-events-auto">
+          <div
+            ref="saveModalRef"
+            role="dialog"
+            aria-modal="true"
+            :aria-labelledby="saveSent ? 'save-modal-success-title' : 'save-modal-title'"
+            class="bg-white rounded-3xl shadow-2xl max-w-md w-full p-7 pointer-events-auto"
+          >
             <div v-if="!saveSent">
               <div class="w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center mb-5">
                 <Save class="w-6 h-6 text-primary" />
               </div>
-              <h3 class="text-xl font-extrabold tracking-tight text-slate-900 mb-2">
+              <h3 id="save-modal-title" class="text-xl font-extrabold tracking-tight text-slate-900 mb-2">
                 Guardá tu progreso
               </h3>
               <p class="text-sm text-slate-500 leading-relaxed mb-5">
@@ -189,7 +195,7 @@
               <div class="w-12 h-12 rounded-2xl bg-emerald-500 flex items-center justify-center mb-5">
                 <Check class="w-6 h-6 text-white" stroke-width="3" />
               </div>
-              <h3 class="text-xl font-extrabold tracking-tight text-slate-900 mb-2">
+              <h3 id="save-modal-success-title" class="text-xl font-extrabold tracking-tight text-slate-900 mb-2">
                 ¡Guardado!
               </h3>
               <p class="text-sm text-slate-500 leading-relaxed mb-5">
@@ -325,7 +331,7 @@
 </template>
 
 <script setup>
-import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
+import { computed, nextTick, onMounted, onUnmounted, ref, watch } from 'vue'
 import { useRoute, useRouter, RouterLink, RouterView } from 'vue-router'
 import { Gift, Save, Check } from 'lucide-vue-next'
 // `Check` ya está importado, se usa en el modal Save & exit Y ahora también
@@ -444,9 +450,24 @@ const canSaveAndExit = computed(() => {
 })
 
 const showSaveModal = ref(false)
+const saveModalRef = ref(null)
 const saveEmail = ref(onboarding.state.identity.email || '')
 const saveSent = ref(false)
 const validSaveEmail = computed(() => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(saveEmail.value.trim()))
+
+// a11y: mover el foco al modal cuando se abre, restaurarlo al disparador al cerrar.
+let preFocusEl = null
+watch(showSaveModal, async (open) => {
+  if (open) {
+    preFocusEl = document.activeElement
+    await nextTick()
+    const focusTarget = saveModalRef.value?.querySelector('input, button')
+    focusTarget?.focus()
+  } else {
+    preFocusEl?.focus()
+    preFocusEl = null
+  }
+})
 
 async function sendSaveLink() {
   if (!validSaveEmail.value) return

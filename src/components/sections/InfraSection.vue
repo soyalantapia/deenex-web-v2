@@ -4,13 +4,13 @@
 
       <div class="flex flex-col lg:flex-row lg:items-end justify-between gap-8 mb-16">
         <h2 class="text-[clamp(1.8rem,4vw,2.8rem)] font-extrabold tracking-tighter leading-[1.05] text-slate-900">
-          Un solo sistema para vender <br />
-          <span class="text-primary italic font-light">en todos tus locales y canales.</span>
+          {{ headlineLine1 }} <br />
+          <span class="text-primary italic font-light">{{ headlineLine2 }}</span>
         </h2>
         <div class="hidden lg:block max-w-[320px] text-right relative lg:ml-auto">
           <div class="absolute -left-10 top-0 bottom-0 w-px bg-slate-200/60"></div>
           <p class="text-slate-400 text-sm leading-relaxed pr-2">
-            "Tus clientes piden desde tu propia app. Vos operás todo desde un solo panel."
+            {{ sidequote }}
           </p>
         </div>
       </div>
@@ -43,10 +43,20 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted } from 'vue'
+import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { Layers, ShoppingBag, Users } from 'lucide-vue-next'
 
-const features = [
+const props = defineProps({
+  content: { type: Object, default: () => ({}) },
+})
+
+const headlineLine1 = computed(() => props.content.headlineLine1 ?? 'Un solo sistema para vender')
+const headlineLine2 = computed(() => props.content.headlineLine2 ?? 'en todos tus locales y canales.')
+const sidequote = computed(
+  () => props.content.sidequote ?? '"Tus clientes piden desde tu propia app. Vos operás todo desde un solo panel."',
+)
+
+const DEFAULT_FEATURES = [
   {
     title: 'App Web & Stores',
     desc: 'Publicamos tu propia web y apps oficiales en App Store y Play Store bajo tu marca. Con total soberanía sobre tus clientes.',
@@ -63,6 +73,7 @@ const features = [
     icon: Users,
   },
 ]
+const features = computed(() => props.content.features ?? DEFAULT_FEATURES)
 
 const carouselRef = ref(null)
 const activeIndex = ref(0)
@@ -72,13 +83,13 @@ let isPaused = false
 function onScroll() {
   const el = carouselRef.value
   if (!el) return
-  activeIndex.value = Math.round(el.scrollLeft / (el.scrollWidth / features.length))
+  activeIndex.value = Math.round(el.scrollLeft / (el.scrollWidth / features.value.length))
 }
 
 function scrollToCard(i) {
   const el = carouselRef.value
   if (!el) return
-  el.scrollTo({ left: (el.scrollWidth / features.length) * i, behavior: 'smooth' })
+  el.scrollTo({ left: (el.scrollWidth / features.value.length) * i, behavior: 'smooth' })
   activeIndex.value = i
 }
 
@@ -88,7 +99,7 @@ function resumeAuto() {
 
 function tick() {
   if (isPaused) return
-  scrollToCard((activeIndex.value + 1) % features.length)
+  scrollToCard((activeIndex.value + 1) % features.value.length)
 }
 
 onMounted(() => { autoTimer = setInterval(tick, 3000) })

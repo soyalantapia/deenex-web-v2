@@ -4,13 +4,13 @@
 
       <div class="flex flex-col lg:flex-row lg:items-end justify-between gap-8 mb-16">
         <h2 class="text-[clamp(1.8rem,4vw,2.8rem)] font-extrabold tracking-tighter leading-[1.05] text-slate-900">
-          Tus campañas segmentadas <br/>
-          <span class="text-primary italic font-light">en un solo lugar.</span>
+          {{ headlineLine1 }} <br/>
+          <span class="text-primary italic font-light">{{ headlineLine2 }}</span>
         </h2>
         <div class="hidden lg:block max-w-[320px] text-right relative lg:ml-auto">
           <div class="absolute -left-10 top-0 bottom-0 w-px bg-slate-200/60"></div>
           <p class="text-slate-400 text-sm leading-relaxed pr-2">
-            "Tus clientes reciben mensajes personalizados mientras vos operás todo desde un solo panel."
+            {{ sidequote }}
           </p>
         </div>
       </div>
@@ -68,10 +68,22 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted } from 'vue'
+import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { Sparkles, Send, Bell } from 'lucide-vue-next'
 
-const marketingFeatures = [
+const props = defineProps({
+  content: { type: Object, default: () => ({}) },
+})
+
+const headlineLine1 = computed(() => props.content.headlineLine1 ?? 'Tus campañas segmentadas')
+const headlineLine2 = computed(() => props.content.headlineLine2 ?? 'en un solo lugar.')
+const sidequote = computed(
+  () =>
+    props.content.sidequote ??
+    '"Tus clientes reciben mensajes personalizados mientras vos operás todo desde un solo panel."',
+)
+
+const DEFAULT_FEATURES = [
   {
     title: 'Segmentación con IA',
     desc: 'Generá audiencias inteligentes de forma simple basándose en el comportamiento real de tus clientes.',
@@ -88,6 +100,7 @@ const marketingFeatures = [
     icon: Bell,
   },
 ]
+const marketingFeatures = computed(() => props.content.features ?? DEFAULT_FEATURES)
 
 const carouselRef = ref(null)
 const activeIndex = ref(0)
@@ -98,13 +111,13 @@ function onScroll() {
   const el = carouselRef.value
   if (!el) return
   // Detecta el card visible por posición de scroll relativa al ancho total
-  activeIndex.value = Math.round((el.scrollLeft) / (el.scrollWidth / marketingFeatures.length))
+  activeIndex.value = Math.round((el.scrollLeft) / (el.scrollWidth / marketingFeatures.value.length))
 }
 
 function scrollToCard(i) {
   const el = carouselRef.value
   if (!el) return
-  const cardWidth = el.scrollWidth / marketingFeatures.length
+  const cardWidth = el.scrollWidth / marketingFeatures.value.length
   el.scrollTo({ left: cardWidth * i, behavior: 'smooth' })
   activeIndex.value = i
 }
@@ -115,7 +128,7 @@ function resumeAuto() {
 
 function tick() {
   if (isPaused) return
-  const next = (activeIndex.value + 1) % marketingFeatures.length
+  const next = (activeIndex.value + 1) % marketingFeatures.value.length
   scrollToCard(next)
 }
 

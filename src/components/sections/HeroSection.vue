@@ -19,7 +19,7 @@
         style="animation-delay:0.05s">
         <span
           class="inline-flex items-center gap-2 border border-primary/20 bg-primary/5 text-primary rounded-full px-4 py-1.5 text-xs font-semibold tracking-wide">
-          Ventas · Fidelización · Marketing
+          {{ eyebrow }}
         </span>
       </div>
 
@@ -27,10 +27,10 @@
       <h1 :class="{ 'animate-rise': ready, 'opacity-0': !ready }"
         class="font-heading text-[clamp(2.4rem,5.8vw,4.2rem)] leading-[1.05] tracking-tighter text-slate-900"
         style="animation-delay:0.15s">
-        <span class="block font-extrabold">Lanzá tu canal propio</span>
+        <span class="block font-extrabold">{{ headlinePre }}</span>
         <span
           class="relative flex items-center justify-center font-extrabold flex-wrap gap-x-[0.25em] sm:gap-x-[0.3em] mt-1">
-          <span class="text-slate-900">sin</span>
+          <span class="text-slate-900">{{ headlineMid }}</span>
           <!-- Container del wheel — aria-hidden porque la animación CSS
                muestra todas las palabras al SR. La palabra "viva" se anuncia
                por separado con <span aria-live> abajo. -->
@@ -52,8 +52,7 @@
       <p :class="{ 'animate-rise': ready, 'opacity-0': !ready }"
         class="mx-auto mt-8 max-w-[540px] text-[1.05rem] font-medium leading-[1.7] text-slate-500"
         style="animation-delay:0.28s">
-        Tus clientes se registran en tu propia app y vos los reactivás
-        con campañas por <span class="font-semibold text-slate-800">WhatsApp y Push Notifications</span>.
+        {{ subtitle.prefix }}<span class="font-semibold text-slate-800">{{ subtitle.highlight }}</span>{{ subtitle.suffix }}
       </p>
 
       <!-- CTAs, primary: self-serve trial · secondary: scroll to product details.
@@ -75,9 +74,9 @@
           </span>
         </RouterLink>
 
-        <a href="#infraestructura"
+        <a :href="ctaSecondaryHref"
           class="group inline-flex items-center gap-2 px-3 py-2.5 sm:px-4 sm:py-3.5 text-[0.82rem] sm:text-[0.9rem] font-semibold text-slate-600 hover:text-primary transition-colors">
-          Ver cómo funciona
+          {{ ctaSecondaryLabel }}
           <svg width="12" height="12" viewBox="0 0 13 13" fill="none"
             class="transition-transform duration-300 group-hover:translate-x-0.5">
             <path d="M2 6.5h9M7.5 3l3.5 3.5L7.5 10" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"
@@ -103,7 +102,7 @@
           </div>
         </div>
         <span class="text-[0.82rem] sm:text-[0.88rem] text-slate-500 font-medium">
-          <span class="font-bold text-slate-900">+500 sucursales</span> ya operan con Deenex
+          <span class="font-bold text-slate-900">{{ socialProofText }}</span> {{ socialProofTextSuffix }}
         </span>
       </div>
 
@@ -161,6 +160,10 @@ import { RouterLink } from 'vue-router'
 import { trackEvent } from '@/utils/analytics'
 import { useExperiment } from '@/composables/useExperiment'
 
+const props = defineProps({
+  content: { type: Object, default: () => ({}) },
+})
+
 // A/B/C test del CTA primario del Hero. Cada variante mantiene la misma
 // promesa pero con framing distinto. La conversión se mide cuando el lead
 // completa el step 4 (StepTrial), ahí firamos experiment_conversion.
@@ -202,17 +205,31 @@ onMounted(() => {
 })
 
 
-const words = ['intermediarios', 'complicaciones', 'interferencias']
-const displayWords = [...words, words[0]]
+// Content-driven hero copy — falls back to home defaults when no content prop is passed.
+const eyebrow = computed(() => props.content.eyebrow ?? 'Ventas · Fidelización · Marketing')
+const headlinePre = computed(() => props.content.headlinePre ?? 'Lanzá tu canal propio')
+const headlineMid = computed(() => props.content.headlineMid ?? 'sin')
+const subtitle = computed(() => props.content.subtitle ?? {
+  prefix: 'Tus clientes se registran en tu propia app y vos los reactivás con campañas por ',
+  highlight: 'WhatsApp y Push Notifications',
+  suffix: '.',
+})
+const ctaSecondaryLabel = computed(() => props.content.ctaSecondary?.label ?? 'Ver cómo funciona')
+const ctaSecondaryHref = computed(() => props.content.ctaSecondary?.href ?? '#infraestructura')
+const socialProofText = computed(() => props.content.socialProof?.text ?? '+500 sucursales')
+const socialProofTextSuffix = computed(() => props.content.socialProof?.textSuffix ?? 'ya operan con Deenex')
+
+const words = computed(() => props.content.rotatingWords ?? ['intermediarios', 'complicaciones', 'interferencias'])
+const displayWords = computed(() => [...words.value, words.value[0]])
 
 // Iniciales basadas en clientes reales (Palta, Hatsu, Glorias, Monti) — más
 // social proof que iniciales abstractas. Coordina con los logos de Clients.vue.
-const badges = [
+const badges = computed(() => props.content.socialProof?.badges ?? [
   { tag: 'PA', label: 'Palta', color: 'bg-emerald-100 text-emerald-700' },
   { tag: 'HA', label: 'Hatsu', color: 'bg-rose-100 text-rose-600' },
   { tag: 'GL', label: 'Glorias', color: 'bg-amber-100 text-amber-700' },
   { tag: 'MO', label: 'Monti', color: 'bg-violet-100 text-violet-600' },
-]
+])
 
 const floatPositions = [
   { class: 'left-[2%] top-[5%] sm:w-[22vw] sm:max-w-[240px] lg:left-[5%] lg:w-[18vw] lg:max-w-[220px] anim-f1' },

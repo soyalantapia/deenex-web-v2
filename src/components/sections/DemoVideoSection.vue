@@ -5,13 +5,13 @@
       <!-- Header, mismo patrón editorial de las otras secciones -->
       <div class="flex flex-col lg:flex-row lg:items-end justify-between gap-8 mb-16">
         <h2 class="text-[clamp(1.8rem,4vw,2.8rem)] font-extrabold tracking-tighter leading-[1.05] text-slate-900">
-          La plataforma completa,<br />
-          <span class="text-primary italic font-light">en seis minutos.</span>
+          {{ headlineLine1 }}<br />
+          <span class="text-primary italic font-light">{{ headlineLine2 }}</span>
         </h2>
         <div class="hidden lg:block max-w-[300px] text-right relative lg:ml-auto">
           <div class="absolute -left-10 top-0 bottom-0 w-px bg-slate-200/60"></div>
           <p class="text-slate-400 text-sm leading-relaxed pr-2">
-            "Así se ve la experiencia para tu cliente y el control que tenés desde el dashboard."
+            {{ sidequote }}
           </p>
         </div>
       </div>
@@ -21,7 +21,7 @@
         <div class="demo-video">
           <div class="demo-ratio">
             <iframe
-              :src="`https://player.vimeo.com/video/${VIMEO_ID}?badge=0&autopause=0&player_id=0&app_id=58479&title=0&byline=0&portrait=0&color=4f26db`"
+              :src="vimeoSrc"
               frameborder="0" allow="autoplay; fullscreen; picture-in-picture; clipboard-write; encrypted-media"
               allowfullscreen class="demo-iframe" title="Deenex Platform Demo"></iframe>
           </div>
@@ -31,12 +31,12 @@
       <!-- CTA, trial self-serve. RouterLink para evitar full reload al navegar
            al onboarding (era #agendar anchor hardcoded). -->
       <div class="mt-12 flex flex-col sm:flex-row items-start sm:items-center gap-5">
-        <RouterLink :to="{ path: '/comenzar', query: { from: 'demo_video' } }"
+        <RouterLink :to="ctaPrimaryTo"
           @click="trackEvent('click_trial_start', { source: 'demo_video' })"
           class="demo-link-primary">
-          Empezar 14 días gratis
+          {{ ctaPrimaryLabel }}
         </RouterLink>
-        <a href="#infraestructura" class="demo-link-ghost">Ver toda la infraestructura</a>
+        <a :href="ctaSecondaryHref" class="demo-link-ghost">{{ ctaSecondaryLabel }}</a>
       </div>
 
     </div>
@@ -44,12 +44,33 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted } from 'vue'
+import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { RouterLink } from 'vue-router'
 import { trackEvent } from '@/utils/analytics'
 
-// ← reemplazá con tu ID de Vimeo real
-const VIMEO_ID = '1183253994'
+const props = defineProps({
+  content: { type: Object, default: () => ({}) },
+})
+
+const headlineLine1 = computed(() => props.content.headlineLine1 ?? 'La plataforma completa,')
+const headlineLine2 = computed(() => props.content.headlineLine2 ?? 'en seis minutos.')
+const sidequote = computed(
+  () =>
+    props.content.sidequote ??
+    '"Así se ve la experiencia para tu cliente y el control que tenés desde el dashboard."',
+)
+const VIMEO_ID = computed(() => props.content.vimeoId ?? '1183253994')
+const vimeoSrc = computed(
+  () =>
+    `https://player.vimeo.com/video/${VIMEO_ID.value}?badge=0&autopause=0&player_id=0&app_id=58479&title=0&byline=0&portrait=0&color=4f26db`,
+)
+const ctaPrimaryLabel = computed(() => props.content.ctaPrimary?.label ?? 'Empezar 14 días gratis')
+const ctaPrimaryTo = computed(() => ({
+  path: props.content.ctaPrimary?.href?.split('?')[0] ?? '/comenzar',
+  query: { from: props.content.ctaPrimary?.href?.includes('from=') ? props.content.ctaPrimary.href.split('from=')[1] : 'demo_video' },
+}))
+const ctaSecondaryLabel = computed(() => props.content.ctaSecondary?.label ?? 'Ver toda la infraestructura')
+const ctaSecondaryHref = computed(() => props.content.ctaSecondary?.href ?? '#infraestructura')
 
 const sectionRef = ref(null)
 const visible = ref(false)

@@ -249,7 +249,7 @@ const deenexFeeLabel = computed(() => `${props.recommendedPlanCommission}`)
 const trustBadges = [
   { title: 'MercadoPago oficial', desc: 'Partner certificado. Nunca vemos tu tarjeta.', icon: ShieldCheck, color: 'text-sky-500' },
   { title: 'Cifrado AES-256', desc: 'Tus datos en tránsito y en reposo, encriptados.', icon: Lock, color: 'text-emerald-500' },
-  { title: 'Garantía 30 días', desc: 'Si no convence, te devolvemos el primer cargo.', icon: FileCheck, color: 'text-amber-500' },
+  { title: 'Sin permanencia', desc: 'Cancelás en 1 click desde tu panel, cuando quieras.', icon: FileCheck, color: 'text-amber-500' },
   { title: 'Factura legal', desc: 'Factura B/C automática a tu CUIT/RFC cada mes.', icon: Receipt, color: 'text-violet-500' },
 ]
 </script>

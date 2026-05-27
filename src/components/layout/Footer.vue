@@ -7,22 +7,29 @@
     <div class="max-w-6xl mx-auto px-6 py-10">
       
       <div class="flex flex-col sm:flex-row items-center justify-between gap-6">
-        
+
         <!-- Logo + tagline -->
         <div class="flex items-center gap-4">
-          <img 
-            src="@/assets/images/nav-logo.webp" 
-            alt="Deenex" 
+          <img
+            src="@/assets/images/nav-logo.webp"
+            alt="Deenex"
             class="h-5 w-auto brightness-0 invert opacity-90"
           />
 
           <div class="hidden sm:block h-4 w-px bg-white/10"></div>
         </div>
 
-        <!-- Copyright -->
-        <p class="text-[11px] text-white/40 tracking-wider">
-          © {{ currentYear }} Deenex - Todos los derechos reservados
-        </p>
+        <!-- Legal links + Copyright. Compliance: las páginas públicas necesitan
+             enlaces visibles a Términos y Privacidad desde toda la red. -->
+        <div class="flex flex-col sm:flex-row items-center gap-3 sm:gap-6">
+          <div class="flex items-center gap-4 text-[11px] text-white/70 tracking-wider">
+            <RouterLink to="/terminos" class="hover:text-white transition-colors">Términos</RouterLink>
+            <RouterLink to="/privacidad" class="hover:text-white transition-colors">Privacidad</RouterLink>
+          </div>
+          <p class="text-[11px] text-white/40 tracking-wider">
+            © {{ currentYear }} Deenex - Todos los derechos reservados
+          </p>
+        </div>
 
       </div>
 
@@ -34,5 +41,7 @@
 </template>
 
 <script setup>
+import { RouterLink } from 'vue-router'
+
 const currentYear = new Date().getFullYear()
 </script>

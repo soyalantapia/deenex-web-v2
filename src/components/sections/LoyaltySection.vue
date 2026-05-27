@@ -4,8 +4,8 @@
       
       <div class="text-left mb-16 lg:mb-24">
         <h2 class="text-[clamp(1.8rem,4vw,2.8rem)] font-extrabold tracking-tighter leading-[1.05] text-slate-900">
-          Tu propia máquina de <br/>
-          <span class="text-primary italic font-light">recurrencia y lealtad.</span>
+          {{ headlineLine1 }} <br/>
+          <span class="text-primary italic font-light">{{ headlineLine2 }}</span>
         </h2>
       </div>
 
@@ -80,42 +80,38 @@
 </template>
 
 <script setup>
-const leftFeatures = [
-  { 
-    label: 'Ecosistema', 
-    title: 'Puntos y Cupones', 
-    desc: 'Sistema de beneficios 100% parametrizable por productos y por usuarios. Sistema tipo Starbucks.' 
+import { computed } from 'vue'
+
+const props = defineProps({
+  content: { type: Object, default: () => ({}) },
+})
+
+const DEFAULT_LEFT_FEATURES = [
+  {
+    label: 'Ecosistema',
+    title: 'Puntos y Cupones',
+    desc: 'Sistema de beneficios 100% parametrizable por productos y por usuarios. Sistema tipo Starbucks.',
   },
-  { 
-    label: 'Soberanía', 
-    title: 'CRM y DATOS', 
-    desc: 'Accedé a perfiles únicos de cada cliente: valor de vida, historial de pedidos, actividad y categorías segmentadas de forma automática.' 
+  {
+    label: 'Soberanía',
+    title: 'CRM y DATOS',
+    desc: 'Accedé a perfiles únicos de cada cliente: valor de vida, historial de pedidos, actividad y categorías segmentadas de forma automática.',
   },
-  { 
-    label: 'Red Unificada', 
-    title: 'CLEARING UNIFICADO', 
-    desc: 'Sistema de liquidación de saldos entre locales por beneficios dados en un Punto de Venta y usados en otro.' 
-  }
+  {
+    label: 'Red Unificada',
+    title: 'CLEARING UNIFICADO',
+    desc: 'Sistema de liquidación de saldos entre locales por beneficios dados en un Punto de Venta y usados en otro.',
+  },
 ]
 
-const rightMetrics = [
-  { 
-    label: 'Impacto en ROI', 
-    title: 'Frecuencia Real', 
-    value: '4.2x', 
-    sub: 'MÁS RECOMPRA DETECTADA' 
-  },
-  { 
-    label: 'Growth', 
-    title: 'Crecimiento Red', 
-    value: '+300k', 
-    sub: 'REGISTROS GENERADOS' 
-  },
-  { 
-    label: 'Retention', 
-    title: 'Retención Real', 
-    value: '+28%', 
-    sub: 'DE BASE' 
-  }
+const DEFAULT_RIGHT_METRICS = [
+  { label: 'Impacto en ROI', title: 'Frecuencia Real', value: '4.2x', sub: 'MÁS RECOMPRA DETECTADA' },
+  { label: 'Growth', title: 'Crecimiento Red', value: '+300k', sub: 'REGISTROS GENERADOS' },
+  { label: 'Retention', title: 'Retención Real', value: '+28%', sub: 'DE BASE' },
 ]
+
+const headlineLine1 = computed(() => props.content.headlineLine1 ?? 'Tu propia máquina de')
+const headlineLine2 = computed(() => props.content.headlineLine2 ?? 'recurrencia y lealtad.')
+const leftFeatures = computed(() => props.content.leftFeatures ?? DEFAULT_LEFT_FEATURES)
+const rightMetrics = computed(() => props.content.rightMetrics ?? DEFAULT_RIGHT_METRICS)
 </script>

@@ -4,8 +4,8 @@
 
       <div class="text-left mb-10">
         <h2 class="text-[clamp(1.8rem,4vw,2.8rem)] font-extrabold tracking-tighter leading-[1.05] text-slate-900">
-          Tu delivery, <br />
-          <span class="text-primary italic font-light">sin intermediarios.</span>
+          {{ headlineLine1 }} <br />
+          <span class="text-primary italic font-light">{{ headlineLine2 }}</span>
         </h2>
       </div>
 
@@ -60,10 +60,18 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted } from 'vue'
+import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { ShieldCheck, Truck, CircleDollarSign, BarChart3 } from 'lucide-vue-next'
 import Partners from '@/components/sections/Partners.vue'
-const logisticsFeatures = [
+
+const props = defineProps({
+  content: { type: Object, default: () => ({}) },
+})
+
+const headlineLine1 = computed(() => props.content.headlineLine1 ?? 'Tu delivery,')
+const headlineLine2 = computed(() => props.content.headlineLine2 ?? 'sin intermediarios.')
+
+const DEFAULT_FEATURES = [
   {
     title: 'Marca Blanca',
     desc: 'Experiencia 100% bajo tu marca. Tus clientes acceden a tu club de beneficios desde su casa.',
@@ -85,6 +93,7 @@ const logisticsFeatures = [
     icon: BarChart3,
   },
 ]
+const logisticsFeatures = computed(() => props.content.features ?? DEFAULT_FEATURES)
 
 const partnerLogos = [
   {
@@ -127,13 +136,13 @@ let isPaused = false
 function onScroll() {
   const el = carouselRef.value
   if (!el) return
-  activeIndex.value = Math.round(el.scrollLeft / (el.scrollWidth / logisticsFeatures.length))
+  activeIndex.value = Math.round(el.scrollLeft / (el.scrollWidth / logisticsFeatures.value.length))
 }
 
 function scrollToCard(i) {
   const el = carouselRef.value
   if (!el) return
-  el.scrollTo({ left: (el.scrollWidth / logisticsFeatures.length) * i, behavior: 'smooth' })
+  el.scrollTo({ left: (el.scrollWidth / logisticsFeatures.value.length) * i, behavior: 'smooth' })
   activeIndex.value = i
 }
 
@@ -143,7 +152,7 @@ function resumeAuto() {
 
 function tick() {
   if (isPaused) return
-  scrollToCard((activeIndex.value + 1) % logisticsFeatures.length)
+  scrollToCard((activeIndex.value + 1) % logisticsFeatures.value.length)
 }
 
 onMounted(() => { autoTimer = setInterval(tick, 3400) })

@@ -12,23 +12,32 @@
           <span class="stat-sub">{{ stat.sub }}</span>
         </div>
       </div>
+      <!-- Disclaimer: los números reflejan promedios de clientes activos -->
+      <p class="mt-4 text-center text-[10px] text-slate-400 leading-relaxed">
+        * Promedios observados en clientes Deenex con 6+ meses de operación. Los resultados individuales varían según el negocio.
+      </p>
     </div>
   </section>
 </template>
 
 <script setup>
-import { ref, reactive, onMounted, onUnmounted } from 'vue'
+import { ref, reactive, computed, onMounted, onUnmounted } from 'vue'
+
+const props = defineProps({
+  content: { type: Array, default: null },
+})
 
 const sectionRef = ref(null)
 const hasAnimated = ref(false)
 const displayValues = reactive([0, 0, 0, 0])
 
-const stats = [
+const DEFAULT_STATS = [
   { prefix: '+', value: 500, suffix: '', label: 'Sucursales activas', sub: 'En toda la red Deenex' },
   { prefix: '+', value: 25, suffix: '%', label: 'Ticket promedio', sub: 'Mayor rentabilidad por pedido' },
   { prefix: '', value: 2, suffix: 'X', label: 'Más fidelización', sub: 'Vs. apps de terceros' },
   { prefix: '+', value: 40, suffix: '%', label: 'Clientes recuperados', sub: 'De Rappi y PedidosYa' },
 ]
+const stats = computed(() => props.content ?? DEFAULT_STATS)
 
 function animateCounter(index, target, duration = 1800) {
   const startTime = performance.now()
@@ -54,7 +63,7 @@ function animateCounter(index, target, duration = 1800) {
 function startAnimation() {
   if (hasAnimated.value) return
   hasAnimated.value = true
-  stats.forEach((stat, i) => {
+  stats.value.forEach((stat, i) => {
     const delay = i * 120
     setTimeout(() => animateCounter(i, stat.value), delay)
   })

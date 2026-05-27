@@ -356,7 +356,7 @@ export const faq = {
     },
     {
       q: '¿Qué pasa si quiero cancelar?',
-      a: 'No hay contratos de largo plazo ni penalidades. Podés dar de baja tu plan cuando quieras con 30 días de aviso. Tus datos son 100% tuyos y te los entregamos exportados.',
+      a: 'No hay contratos de largo plazo ni penalidades. Cancelás en 1 click desde tu panel, sin permanencia. Tus datos son 100% tuyos y te los entregamos exportados.',
     },
     {
       q: '¿Funciona con Mercado Pago?',

@@ -6,11 +6,12 @@
 
       <div class="flex items-center justify-between h-13">
 
-        <!-- Logo -->
-        <a href="#" @click="scrollToTop" class="shrink-0">
+        <!-- Logo: RouterLink al home + scrollToTop si el usuario ya está en /
+             (mejor que href="#" que ensucia la URL). -->
+        <RouterLink to="/" @click="scrollToTop" class="shrink-0" aria-label="Deenex inicio">
           <img src="../../assets/images/nav-logo.webp" alt="Deenex" class="h-[22px] w-auto transition-all duration-500"
             :class="scrolled ? 'brightness-0 invert' : ''" />
-        </a>
+        </RouterLink>
 
         <!-- Desktop links -->
         <div class="hidden md:flex items-center gap-1">
@@ -107,8 +108,10 @@ function onScroll() {
   scrolled.value = window.scrollY > 60
 }
 
-function scrollToTop(e) {
-  e.preventDefault()
+function scrollToTop() {
+  // El RouterLink navega a "/"; si el usuario ya estaba ahí, vue-router no
+  // remonta y queremos scroll arriba igual. Si veníamos de otra ruta, el
+  // scrollBehavior global ya nos puso en top:0.
   window.scrollTo({ top: 0, behavior: 'smooth' })
 }
 

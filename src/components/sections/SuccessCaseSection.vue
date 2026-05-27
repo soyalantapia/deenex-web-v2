@@ -5,13 +5,13 @@
       <!-- Header, mismo patrón que la sección marketing -->
       <div class="flex flex-col lg:flex-row lg:items-end justify-between gap-8 mb-16">
         <h2 class="text-[clamp(1.8rem,4vw,2.8rem)] font-extrabold tracking-tighter leading-[1.05] text-slate-900">
-          El impacto real <br />
-          <span class="text-primary italic font-light">de una gran entrega.</span>
+          {{ headlineLine1 }} <br />
+          <span class="text-primary italic font-light">{{ headlineLine2 }}</span>
         </h2>
         <div class="hidden lg:block max-w-[280px] text-right relative lg:ml-auto">
           <div class="absolute -left-10 top-0 bottom-0 w-px bg-slate-200/60"></div>
           <p class="text-slate-400 text-sm leading-relaxed pr-2">
-            "Cuando los números hablan solos, no hace falta convencer a nadie."
+            {{ sidequote }}
           </p>
         </div>
       </div>
@@ -47,13 +47,14 @@
 
           <!-- Métricas -->
           <div class="flex border border-slate-200 rounded-2xl overflow-hidden shadow-sm">
-            <div class="flex-1 px-5 py-4 bg-white hover:bg-slate-50 transition-colors">
-              <p class="text-2xl font-extrabold tracking-tighter text-slate-900 uppercase">2X</p>
-              <p class="text-[9px] font-bold text-slate-400 uppercase tracking-widest mt-1">Fidelización</p>
-            </div>
-            <div class="flex-1 px-5 py-4 bg-white border-l border-slate-200 hover:bg-slate-50 transition-colors">
-              <p class="text-2xl font-extrabold tracking-tighter text-slate-900">+40%</p>
-              <p class="text-[9px] font-bold text-slate-400 uppercase tracking-widest mt-1">Clientes Recuperados</p>
+            <div
+              v-for="(metric, mi) in metrics"
+              :key="metric.label"
+              class="flex-1 px-5 py-4 bg-white hover:bg-slate-50 transition-colors"
+              :class="mi > 0 ? 'border-l border-slate-200' : ''"
+            >
+              <p class="text-2xl font-extrabold tracking-tighter text-slate-900 uppercase">{{ metric.value }}</p>
+              <p class="text-[9px] font-bold text-slate-400 uppercase tracking-widest mt-1">{{ metric.label }}</p>
             </div>
           </div>
 
@@ -101,13 +102,23 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { MessageSquare, Heart, Repeat, Play } from 'lucide-vue-next'
+
+const props = defineProps({
+  content: { type: Object, default: () => ({}) },
+})
+
+const headlineLine1 = computed(() => props.content.headlineLine1 ?? 'El impacto real')
+const headlineLine2 = computed(() => props.content.headlineLine2 ?? 'de una gran entrega.')
+const sidequote = computed(
+  () => props.content.sidequote ?? '"Cuando los números hablan solos, no hace falta convencer a nadie."',
+)
 
 const videoRef = ref(null)
 const isPlaying = ref(false)
 
-const testimonials = [
+const DEFAULT_TESTIMONIALS = [
   {
     quote: '"Deenex superó nuestras expectativas. Estamos recuperando clientes que compraban por apps de terceros y volviendo a fidelizarlos en nuestro propio ámbito."',
     author: 'Marcos Aldazábal, Socio y Fundador',
@@ -115,7 +126,7 @@ const testimonials = [
   },
 ]
 
-const successFeatures = [
+const DEFAULT_FEATURES = [
   {
     title: 'Menú digital empático',
     desc: 'Una interfaz amena y fácil para que el cliente haga sus pedidos diariamente colaborando con la gestión.',
@@ -132,6 +143,15 @@ const successFeatures = [
     icon: Repeat,
   },
 ]
+
+const DEFAULT_METRICS = [
+  { value: '2X', label: 'Fidelización' },
+  { value: '+40%', label: 'Clientes Recuperados' },
+]
+
+const testimonials = computed(() => props.content.testimonials ?? DEFAULT_TESTIMONIALS)
+const successFeatures = computed(() => props.content.features ?? DEFAULT_FEATURES)
+const metrics = computed(() => props.content.metrics ?? DEFAULT_METRICS)
 
 function togglePlay() {
   if (!videoRef.value) return
