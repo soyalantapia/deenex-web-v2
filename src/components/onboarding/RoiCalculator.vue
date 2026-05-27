@@ -98,7 +98,10 @@ function onInputBlur(field) {
   if (field === 'ticket') {
     form.ticket = Math.max(3, Math.min(200, Number(form.ticket) || onboarding.defaultAvgTicketUsd))
   } else if (field === 'ordersPerLocation') {
-    form.ordersPerLocation = Math.max(20, Math.min(10000, Math.round(Number(form.ordersPerLocation) || 280)))
+    // Default debe coincidir con computeDefaultOrders() del composable (300).
+    // Antes era hardcoded a 280: input basura caía a 280 mientras el "default
+    // oficial" era 300, inconsistencia silenciosa entre fallback y reset.
+    form.ordersPerLocation = Math.max(20, Math.min(10000, Math.round(Number(form.ordersPerLocation) || onboarding.computeDefaultOrders())))
   }
   onboarding.track('roi_calculator_edited', { field, value: form[field] })
 }

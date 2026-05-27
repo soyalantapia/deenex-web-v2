@@ -228,12 +228,16 @@ import { RouterLink } from 'vue-router'
 import { Check, CalendarDays, Calculator, ArrowRight } from 'lucide-vue-next'
 import { useOnboarding } from '@/composables/useOnboarding'
 import { trackEvent } from '@/utils/analytics'
+import { SALES_EMAIL } from '@/utils/contact'
 
 const onboarding = useOnboarding()
 const cycle = ref('monthly')
 const showFaq = ref(false)
 
-const calendarUrl = import.meta.env.VITE_CALENDAR_URL || 'mailto:ventas@deenex.tech'
+// Fallback al mailto cuando el env del calendar no está configurado (dev local,
+// builds sin .env). SALES_EMAIL viene de utils/contact.js para no esparcir
+// hardcodes del email de ventas por el repo.
+const calendarUrl = import.meta.env.VITE_CALENDAR_URL || `mailto:${SALES_EMAIL}`
 
 // Primeros 4 tiers (Starter/Growth/Scale/Pro) en el grid principal.
 // Enterprise se renderiza aparte porque tiene un layout distinto.

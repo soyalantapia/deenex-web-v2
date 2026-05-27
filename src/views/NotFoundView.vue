@@ -39,7 +39,7 @@
 
       <p class="mt-8 text-[11px] text-slate-400 leading-relaxed">
         Si llegaste por un link de email roto, escribinos a
-        <a href="mailto:hola@deenex.tech" class="underline hover:text-slate-600">hola@deenex.tech</a>.
+        <a :href="`mailto:${CONTACT_EMAIL}`" class="underline hover:text-slate-600">{{ CONTACT_EMAIL }}</a>.
       </p>
     </div>
   </div>
@@ -47,6 +47,7 @@
 
 <script setup>
 import { useRouter } from 'vue-router'
+import { CONTACT_EMAIL } from '@/utils/contact'
 
 const router = useRouter()
 const goHome = () => router.push({ name: 'home' })

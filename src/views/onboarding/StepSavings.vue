@@ -103,8 +103,12 @@
       </div>
     </div>
 
-    <!-- Comparison Sin Deenex vs Con Deenex ──────────────────────────── -->
-    <div class="grid grid-cols-2 gap-3 mb-8">
+    <!-- Comparison Sin Deenex vs Con Deenex ────────────────────────────
+         Solo lo mostramos si el ahorro es positivo. Si Deenex sale más caro
+         que las apps (caso borde: marca chica con volumen bajo), enseñar la
+         comparison rompe la narrativa, mostramos un mensaje alternativo
+         enfocado en VALOR (clientes propios) en lugar de costo. -->
+    <div v-if="onboarding.savingsVsThirdParty.value > 0" class="grid grid-cols-2 gap-3 mb-8">
       <div class="rounded-2xl border border-slate-200 p-4 bg-slate-50/40">
         <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">
           Sin Deenex
@@ -129,6 +133,34 @@
       </div>
     </div>
 
+    <!-- Fallback honesto: cuando el volumen declarado es tan bajo que Deenex
+         sale más caro que apps (marca arrancando, 1 local, pocos pedidos),
+         pivoteamos el pitch del "ahorro $" al "ahorro estratégico": tu data,
+         tu marca, recurrencia. El lead todavía gana algo aunque el ROI puro
+         no esté del lado de la calculadora. -->
+    <div
+      v-else
+      class="rounded-2xl border-2 border-slate-200 bg-slate-50/40 p-5 mb-8 flex items-start gap-4"
+    >
+      <div class="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
+        <Sparkles class="w-5 h-5 text-primary" />
+      </div>
+      <div class="min-w-0">
+        <p class="text-sm font-bold text-slate-900 leading-tight mb-1.5">
+          Con tu volumen actual, Deenex no compite contra apps por costo.
+        </p>
+        <p class="text-xs text-slate-600 leading-relaxed mb-2">
+          Te conviene por otro lado: cuando tus clientes piden a tu marca (no a Rappi),
+          quedan en tu base. Recompran, los podés activar con campañas y el
+          ticket promedio sube en 2-3 meses. El ahorro de comisiones aparece
+          después, cuando crezca el volumen.
+        </p>
+        <p class="text-[11px] text-slate-400 italic leading-snug">
+          Probalo 14 días sin cargo y vé el comportamiento real.
+        </p>
+      </div>
+    </div>
+
     <StepActions
       next-label="Ver mi plan recomendado"
       :disabled="false"
@@ -144,7 +176,7 @@
 <script setup>
 import { computed } from 'vue'
 import { useRouter } from 'vue-router'
-import { TrendingDown, Zap } from 'lucide-vue-next'
+import { TrendingDown, Zap, Sparkles } from 'lucide-vue-next'
 import AnimatedNumber from '@/components/onboarding/AnimatedNumber.vue'
 import RoiCalculator from '@/components/onboarding/RoiCalculator.vue'
 import StepActions from '@/components/onboarding/StepActions.vue'

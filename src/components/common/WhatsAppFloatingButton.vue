@@ -17,10 +17,12 @@
 
 <script setup>
 import { MessageCircle } from 'lucide-vue-next'
+import { whatsappLink } from '@/utils/contact'
 
-const phoneNumber = import.meta.env.VITE_WHATSAPP_NUMBER
-const message = '¡Hola! Me gustaría saber más sobre Deenex.'
-const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`
+// Single-source-of-truth: lee el número desde utils/contact.js (que ya combina
+// env + fallback hardcoded). Antes leíamos VITE_WHATSAPP_NUMBER directo y
+// podía divergir del número expuesto en FAQSection y otros lugares.
+const whatsappUrl = whatsappLink('¡Hola! Me gustaría saber más sobre Deenex.')
 </script>
 
 

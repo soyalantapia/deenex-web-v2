@@ -73,7 +73,7 @@
           <h2>7. Contacto</h2>
           <p>
             Cualquier duda, escribinos a
-            <a href="mailto:legal@deenex.tech" class="text-primary underline">legal@deenex.tech</a>.
+            <a :href="`mailto:${LEGAL_EMAIL}`" class="text-primary underline">{{ LEGAL_EMAIL }}</a>.
           </p>
 
         </template>
@@ -115,7 +115,7 @@
           </ul>
           <p>
             Escribinos a
-            <a href="mailto:privacidad@deenex.tech" class="text-primary underline">privacidad@deenex.tech</a>
+            <a :href="`mailto:${PRIVACY_EMAIL}`" class="text-primary underline">{{ PRIVACY_EMAIL }}</a>
             y te respondemos en menos de 7 días hábiles.
           </p>
 
@@ -150,6 +150,7 @@
 <script setup>
 import { computed, onMounted, onUnmounted } from 'vue'
 import { useRoute, RouterLink } from 'vue-router'
+import { LEGAL_EMAIL, PRIVACY_EMAIL } from '@/utils/contact'
 
 const route = useRoute()
 

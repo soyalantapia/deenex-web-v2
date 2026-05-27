@@ -29,7 +29,10 @@ const props = defineProps({
 
 const sectionRef = ref(null)
 const hasAnimated = ref(false)
-const displayValues = reactive([0, 0, 0, 0])
+// displayValues se inicializa dinámicamente al tamaño del array `stats` para
+// soportar variantes que definan más o menos métricas. Antes era hardcoded a
+// 4 slots; una variante con 3 o 5 stats rompía el counter silenciosamente.
+const displayValues = reactive([])
 
 const DEFAULT_STATS = [
   { prefix: '+', value: 500, suffix: '', label: 'Sucursales activas', sub: 'En toda la red Deenex' },
@@ -63,6 +66,9 @@ function animateCounter(index, target, duration = 1800) {
 function startAnimation() {
   if (hasAnimated.value) return
   hasAnimated.value = true
+  // Asegurar que displayValues tenga el mismo length que stats antes de iterar,
+  // por si la variante define ≠ 4 métricas.
+  while (displayValues.length < stats.value.length) displayValues.push(0)
   stats.value.forEach((stat, i) => {
     const delay = i * 120
     setTimeout(() => animateCounter(i, stat.value), delay)
@@ -72,6 +78,11 @@ function startAnimation() {
 let observer = null
 
 onMounted(() => {
+  // Pre-llenar displayValues con 0 para que el template no muestre `undefined`
+  // antes de que arranque la animación (la sección puede no ser intersecting
+  // todavía cuando se monta).
+  while (displayValues.length < stats.value.length) displayValues.push(0)
+
   observer = new IntersectionObserver(
     (entries) => {
       if (entries[0].isIntersecting) {

@@ -227,7 +227,7 @@
               <div class="w-5 h-5 rounded-md bg-primary flex items-center justify-center text-white text-[8px] font-black">D</div>
               <div class="flex-1 min-w-0">
                 <p class="text-[10px] font-bold text-slate-900 truncate">Tu cuenta de Deenex está lista</p>
-                <p class="text-[9px] text-slate-500 truncate">de Deenex &lt;hola@deenex.tech&gt; a {{ onboarding.state.identity.email }}</p>
+                <p class="text-[9px] text-slate-500 truncate">de Deenex &lt;{{ CONTACT_EMAIL }}&gt; a {{ onboarding.state.identity.email }}</p>
               </div>
             </div>
             <div class="p-4 text-[11px] text-slate-700 leading-relaxed">
@@ -343,16 +343,31 @@
       </div>
     </div>
 
-    <!-- Enterprise CTA -->
-    <div v-else>
+    <!-- Enterprise CTA: ofrecemos DOS canales (calendar + WhatsApp) porque
+         el lead high-value puede preferir agendar O chatear ahora. Antes solo
+         estaba el calendar; si el lead no le gusta agendar, se nos iba.
+         WhatsApp pre-rellena con marca/locales/email para que el AE arranque
+         con contexto en lugar de "hola, ¿quién sos?". -->
+    <div v-else class="flex flex-col sm:flex-row gap-3">
       <a
         :href="calendarUrl"
         target="_blank"
         rel="noopener"
-        class="group w-full inline-flex items-center justify-center gap-2 bg-primary hover:bg-[#3c1fc9] text-white font-bold rounded-xl px-6 py-4 text-sm transition-all shadow-md shadow-primary/25 hover:shadow-primary/40 hover:-translate-y-0.5"
+        @click="trackEnterpriseCta('calendar')"
+        class="group flex-1 inline-flex items-center justify-center gap-2 bg-primary hover:bg-[#3c1fc9] text-white font-bold rounded-xl px-6 py-4 text-sm transition-all shadow-md shadow-primary/25 hover:shadow-primary/40 hover:-translate-y-0.5"
       >
         <CalendarDays class="w-3.5 h-3.5" />
         Agendar reunión ahora
+      </a>
+      <a
+        :href="enterpriseWhatsappUrl"
+        target="_blank"
+        rel="noopener"
+        @click="trackEnterpriseCta('whatsapp')"
+        class="group flex-1 inline-flex items-center justify-center gap-2 bg-emerald-500 hover:bg-emerald-600 text-white font-bold rounded-xl px-6 py-4 text-sm transition-all shadow-md shadow-emerald-500/25 hover:shadow-emerald-500/40 hover:-translate-y-0.5"
+      >
+        <MessageCircle class="w-3.5 h-3.5" />
+        Chatear por WhatsApp
       </a>
     </div>
 
@@ -365,6 +380,7 @@ import { useRoute } from 'vue-router'
 import { Check, CalendarDays, ArrowRight, MessageCircle, Mail, Clock, Gift, Eye } from 'lucide-vue-next'
 import ConfettiCanvas from '@/components/onboarding/ConfettiCanvas.vue'
 import { useOnboarding } from '@/composables/useOnboarding'
+import { CONTACT_EMAIL, whatsappLink } from '@/utils/contact'
 
 const route = useRoute()
 const onboarding = useOnboarding()
@@ -375,7 +391,34 @@ const isEnterprise = computed(() => {
 
 // URLs del entorno
 const DASHBOARD_BASE = import.meta.env.VITE_APP_DASHBOARD_URL || 'https://app.deenex.tech'
-const calendarUrl = import.meta.env.VITE_CALENDAR_URL || '#'
+// Fallback: si no hay calendar URL configurado (dev local sin .env), caemos a
+// WhatsApp en vez de a "#" (anchor vacío que dejaba al lead bailando).
+const calendarUrl = import.meta.env.VITE_CALENDAR_URL || whatsappLink(
+  'Hola! Vengo del onboarding y quería agendar una reunión con el equipo de Deenex.',
+)
+
+// WhatsApp pre-rellenado para Enterprise: incluye marca + locales + email para
+// que el AE arranque la conversación con contexto, no preguntando datos básicos.
+const enterpriseWhatsappUrl = computed(() => {
+  const brand = onboarding.state.business.brand || 'mi marca'
+  const locations = onboarding.state.business.locations || '?'
+  const email = onboarding.state.identity.email || ''
+  const lines = [
+    `Hola! Soy ${onboarding.greeting.value || 'lead Enterprise'} de ${brand}.`,
+    `Acabo de completar el onboarding y mi solicitud es para Enterprise (${locations} locales).`,
+    email ? `Mi email: ${email}` : null,
+    `Me gustaría avanzar con la implementación, ¿podemos hablar?`,
+  ].filter(Boolean)
+  return whatsappLink(lines.join('\n'))
+})
+
+function trackEnterpriseCta(channel) {
+  onboarding.track('enterprise_cta_click', {
+    channel,
+    locations: onboarding.state.business.locations,
+    brand: onboarding.state.business.brand,
+  })
+}
 
 // Session handoff: el dashboard espera un magic-link token en query para
 // loguear al lead automáticamente. En producción este token lo emite el

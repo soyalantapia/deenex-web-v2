@@ -233,11 +233,17 @@
           v-if="showExitIntent"
           class="fixed inset-0 z-[9998] flex items-center justify-center p-4 pointer-events-none"
         >
-          <div class="bg-white rounded-3xl shadow-2xl max-w-md w-full p-7 pointer-events-auto">
+          <div
+            ref="exitIntentRef"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="exit-intent-title"
+            class="bg-white rounded-3xl shadow-2xl max-w-md w-full p-7 pointer-events-auto"
+          >
             <div class="w-12 h-12 rounded-2xl bg-amber-400 flex items-center justify-center text-2xl mb-5">
               👋
             </div>
-            <h3 class="text-xl font-extrabold tracking-tight text-slate-900 mb-2">
+            <h3 id="exit-intent-title" class="text-xl font-extrabold tracking-tight text-slate-900 mb-2">
               Antes de irte, una cosa.
             </h3>
             <p class="text-sm text-slate-500 leading-relaxed mb-5">
@@ -291,11 +297,17 @@
           <!-- Copy persuasivo + botones invertidos: izquierda apagado ("No quiero")
                para no fomentar la salida, derecha verde primary ("Aprovechar")
                como CTA principal para seguir en el flow. -->
-          <div class="bg-white rounded-3xl shadow-2xl max-w-md w-full p-7 pointer-events-auto">
+          <div
+            ref="exitConfirmRef"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="exit-confirm-title"
+            class="bg-white rounded-3xl shadow-2xl max-w-md w-full p-7 pointer-events-auto"
+          >
             <div class="w-12 h-12 rounded-2xl bg-amber-100 flex items-center justify-center text-2xl mb-5">
               ⏳
             </div>
-            <h3 class="text-xl sm:text-2xl font-extrabold tracking-tight text-slate-900 mb-2 leading-tight">
+            <h3 id="exit-confirm-title" class="text-xl sm:text-2xl font-extrabold tracking-tight text-slate-900 mb-2 leading-tight">
               ¿Seguro que querés perderte los <span class="text-emerald-600">14 días gratis</span>?
             </h3>
             <p class="text-sm text-slate-600 leading-relaxed mb-6">
@@ -451,23 +463,33 @@ const canSaveAndExit = computed(() => {
 
 const showSaveModal = ref(false)
 const saveModalRef = ref(null)
+const exitIntentRef = ref(null)
+const exitConfirmRef = ref(null)
 const saveEmail = ref(onboarding.state.identity.email || '')
 const saveSent = ref(false)
 const validSaveEmail = computed(() => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(saveEmail.value.trim()))
 
-// a11y: mover el foco al modal cuando se abre, restaurarlo al disparador al cerrar.
-let preFocusEl = null
-watch(showSaveModal, async (open) => {
-  if (open) {
-    preFocusEl = document.activeElement
-    await nextTick()
-    const focusTarget = saveModalRef.value?.querySelector('input, button')
-    focusTarget?.focus()
-  } else {
-    preFocusEl?.focus()
-    preFocusEl = null
-  }
-})
+// a11y: gestor de foco compartido para los 3 modales (save, exit intent, exit
+// confirm). Cuando un modal se abre guardamos document.activeElement, movemos
+// foco al primer focusable del modal, y al cerrar restauramos al disparador.
+// Esto cumple el patrón WAI-ARIA Modal Dialog mínimo. Falta focus trap real
+// (Tab/Shift+Tab cycling dentro del modal) — pendiente como deuda menor.
+const preFocusByModal = new Map()
+function watchModalFocus(flagRef, elRef, key) {
+  watch(flagRef, async (open) => {
+    if (open) {
+      preFocusByModal.set(key, document.activeElement)
+      await nextTick()
+      const focusTarget = elRef.value?.querySelector('input, button, a[href]')
+      focusTarget?.focus()
+    } else {
+      const prev = preFocusByModal.get(key)
+      prev?.focus?.()
+      preFocusByModal.delete(key)
+    }
+  })
+}
+watchModalFocus(showSaveModal, saveModalRef, 'save')
 
 async function sendSaveLink() {
   if (!validSaveEmail.value) return
@@ -489,6 +511,11 @@ async function sendSaveLink() {
 }
 
 const showExitModal = ref(false)
+// Aplicar el gestor de foco a los 2 modales que se declaran más arriba en el
+// template pero cuyo ref vive en la misma sección que su flag. (showExitIntent
+// se declara en la línea 416; aplicamos el watcher acá por orden de lectura.)
+watchModalFocus(showExitIntent, exitIntentRef, 'exit-intent')
+watchModalFocus(showExitModal, exitConfirmRef, 'exit-confirm')
 function onExit() {
   // Si está en Welcome (último paso), no abrimos modal, solo navegamos.
   if (route.path === '/comenzar/listo') {

@@ -302,7 +302,7 @@
         </div>
         <!-- Botón Marketing WhatsApp -->
         <div class="px-7 py-8 bg-white border-t border-slate-100 flex justify-center">
-          <a :href="`https://wa.me/${whatsappNumber}?text=${marketingWhatsappMessage}`" target="_blank"
+          <a :href="marketingWhatsappUrl" target="_blank"
             class="group inline-flex items-center gap-2 bg-primary hover:bg-[#3c1fc9] text-white px-6 py-2.5 rounded-xl font-bold text-sm transition-all shadow-md shadow-primary/25 hover:shadow-primary/40 hover:-translate-y-0.5 relative overflow-hidden uppercase">
             <MessageCircle class="w-4 h-4 flex-shrink-0" />
             <span>ACTIVAR MARKETING AHORA</span>
@@ -659,7 +659,7 @@
                       ¿Listo para avanzar? Hablemos sobre tu negocio.
                     </p>
 
-                    <a :href="`https://wa.me/${whatsappNumber}?text=${whatsappMessage}`" target="_blank" rel="noopener"
+                    <a :href="cotizadorWhatsappUrl" target="_blank" rel="noopener"
                       class="w-full bg-emerald-500 hover:bg-emerald-600 text-white py-3.5 rounded-xl font-bold text-sm transition-colors flex items-center justify-center gap-2 shadow-sm shadow-emerald-500/20">
                       <MessageCircle class="w-4 h-4" />
                       Contactar por WhatsApp
@@ -686,6 +686,7 @@
 <script setup>
 import { ref, computed, nextTick, onMounted, onUnmounted } from 'vue'
 import { trackEvent } from '@/utils/analytics'
+import { whatsappLink } from '@/utils/contact'
 import {
   Check,
   Sparkles,
@@ -771,14 +772,15 @@ const ahorroEscala = computed(() => subtotalMensual.value * descuentoInfo.value.
 const totalFinal = computed(() => subtotalMensual.value - ahorroEscala.value)
 
 const calendarUrl = import.meta.env.VITE_CALENDAR_URL
-const whatsappNumber = import.meta.env.VITE_WHATSAPP_NUMBER
 
-const marketingWhatsappMessage = computed(() => {
-  const text = `Hola! Me gustaría activar el módulo de "Marketing Suite" en mi plan de Deenex. ¿Podrían asesorarme?`
-  return encodeURIComponent(text)
-})
+// URLs WhatsApp via utils/contact.js (single source of truth). Antes leíamos
+// VITE_WHATSAPP_NUMBER directo y el número podía divergir del expuesto en otros
+// componentes. Ahora todo pasa por whatsappLink().
+const marketingWhatsappUrl = computed(() =>
+  whatsappLink(`Hola! Me gustaría activar el módulo de "Marketing Suite" en mi plan de Deenex. ¿Podrían asesorarme?`),
+)
 
-const whatsappMessage = computed(() => {
+const cotizadorWhatsappUrl = computed(() => {
   let text = `Hola! Estuve usando el cotizador de Deenex y me gustaría hablar con ventas.\n\n`
   text += `*Configuración:* \n`
   text += `- Locales: ${locales.value}\n`
@@ -801,7 +803,7 @@ const whatsappMessage = computed(() => {
   }
 
   text += `A la espera de su contacto. Gracias!`
-  return encodeURIComponent(text)
+  return whatsappLink(text)
 })
 
 // ── Carrusel de planes (mobile) ──
