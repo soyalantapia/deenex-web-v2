@@ -152,8 +152,8 @@
         </div>
 
         <div class="rounded-3xl border border-slate-200 bg-white p-5 sm:p-8 lg:p-10 shadow-sm">
-          <!-- ═══ INPUTS — 3 preguntas simples ════════════════════════════ -->
-          <div class="grid sm:grid-cols-3 gap-5 sm:gap-8 mb-8 pb-8 border-b border-slate-200">
+          <!-- ═══ INPUTS — 4 preguntas simples ════════════════════════════ -->
+          <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-5 sm:gap-6 mb-8 pb-8 border-b border-slate-200">
             <!-- Input 1: Locales (chips clickeables + custom) -->
             <div>
               <label class="text-[11px] font-black text-slate-500 uppercase tracking-widest mb-2 flex items-center gap-1.5">
@@ -250,6 +250,42 @@
                 <span>0%</span>
                 <span>50%</span>
                 <span>100%</span>
+              </div>
+            </div>
+
+            <!-- Input 4: Ticket promedio (visible — critical para estimar pedidos
+                 y tier correcto en negocios premium con ticket alto). -->
+            <div>
+              <label for="calc-ticket" class="text-[11px] font-black text-slate-500 uppercase tracking-widest mb-2 flex items-center gap-1.5">
+                <Ticket class="w-3 h-3 text-primary" />
+                Ticket promedio
+              </label>
+              <div class="flex items-center gap-2 mb-2">
+                <span class="text-xs text-slate-500 font-semibold">USD</span>
+                <input
+                  id="calc-ticket"
+                  v-model.number="calc.avgTicket"
+                  type="number"
+                  min="1"
+                  max="500"
+                  step="1"
+                  class="flex-1 px-3 py-2 border border-slate-300 rounded-lg text-base font-bold tabular-nums focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary"
+                  aria-label="Ticket promedio"
+                />
+              </div>
+              <input
+                v-model.number="calc.avgTicket"
+                type="range"
+                min="5"
+                max="100"
+                step="1"
+                class="w-full h-2 bg-slate-200 rounded-full appearance-none cursor-pointer accent-primary"
+                aria-label="Ticket promedio slider"
+              />
+              <div class="flex justify-between text-[10px] text-slate-400 mt-1 font-semibold tabular-nums">
+                <span>USD 5</span>
+                <span>USD 50</span>
+                <span>USD 100+</span>
               </div>
             </div>
           </div>
@@ -393,7 +429,12 @@
             </div>
           </div>
 
-          <!-- ═══ HERO: Tu inversión se paga sola ════════════════════════ -->
+          <!-- ═══ HERO: Tu inversión se paga sola ════════════════════════
+               Adaptativo según si hay ahorro DIRECTO o no:
+               · hasDirectSavings = true → "Ganás X netos · Payback día 1"
+               · hasDirectSavings = false (negocio chico sin apps) → marco
+                 honestamente "Es una INVERSIÓN en crecimiento" y muestro
+                 payback estimado en meses según el uplift proyectado. -->
           <div
             v-if="conDeenexTotal !== null"
             class="rounded-3xl bg-gradient-to-br from-emerald-500 via-emerald-600 to-emerald-700 text-white p-6 sm:p-8 relative overflow-hidden mb-6"
@@ -405,53 +446,70 @@
               <div>
                 <p class="text-[10px] font-black text-white/70 uppercase tracking-widest mb-2 flex items-center gap-1.5">
                   <TrendingUp class="w-3 h-3" />
-                  Tu inversión se paga sola
+                  <template v-if="hasDirectSavings">Tu inversión se paga sola</template>
+                  <template v-else>Tu inversión en crecimiento</template>
                 </p>
                 <h3 class="text-3xl sm:text-4xl font-extrabold tracking-tighter leading-tight mb-2">
-                  Ganás <span class="tabular-nums">{{ fmtUsd(totalMonthlyBenefit) }}</span> netos / mes
+                  <template v-if="hasDirectSavings">
+                    Ganás <span class="tabular-nums">{{ fmtUsd(totalMonthlyBenefit) }}</span> netos / mes
+                  </template>
+                  <template v-else>
+                    Potencial: <span class="tabular-nums">{{ fmtUsd(totalMonthlyBenefit) }}</span> / mes
+                  </template>
                 </h3>
                 <p class="text-base text-white/90 leading-relaxed mb-4">
-                  <span class="font-bold tabular-nums">{{ fmtUsd(totalAnnualBenefit) }}</span> al año en tu bolsillo entre ahorro de costos y crecimiento adicional.
+                  <template v-if="hasDirectSavings">
+                    <span class="font-bold tabular-nums">{{ fmtUsd(totalAnnualBenefit) }}</span> al año en tu bolsillo entre ahorro de costos y crecimiento adicional.
+                  </template>
+                  <template v-else>
+                    <span class="font-bold tabular-nums">{{ fmtUsd(totalAnnualBenefit) }}</span> al año proyectado por
+                    <span class="font-bold">recompras + ticket extra</span>. Hoy tu costo sube
+                    <span class="font-bold tabular-nums">{{ fmtUsd(Math.abs((conDeenexTotal ?? 0) - sinDeenexTotal)) }}</span>/mes
+                    porque casi no usás apps de delivery. El retorno viene del crecimiento.
+                  </template>
                 </p>
 
                 <ul class="space-y-1.5 text-sm">
-                  <li class="flex items-baseline justify-between gap-2">
+                  <li v-if="monthlyCostSavings > 0" class="flex items-baseline justify-between gap-2">
                     <span class="text-white/85 flex items-center gap-1.5">
                       <PiggyBank class="w-3.5 h-3.5 shrink-0" />
-                      Ahorro vs costos actuales
+                      Ahorro real vs costos actuales
                     </span>
                     <span class="font-bold tabular-nums whitespace-nowrap">{{ fmtUsd(monthlyCostSavings) }}</span>
                   </li>
                   <li class="flex items-baseline justify-between gap-2">
                     <span class="text-white/85 flex items-center gap-1.5">
                       <Repeat class="w-3.5 h-3.5 shrink-0" />
-                      Recompras por Loyalty (neto MAI)
+                      Recompras Loyalty (proyectado, neto MAI)
                     </span>
                     <span class="font-bold tabular-nums whitespace-nowrap">{{ fmtUsd(loyaltyGainNet) }}</span>
                   </li>
                   <li class="flex items-baseline justify-between gap-2">
                     <span class="text-white/85 flex items-center gap-1.5">
                       <Ticket class="w-3.5 h-3.5 shrink-0" />
-                      Ticket promedio extra (+15%)
+                      Ticket promedio extra (proyectado, +15%)
                     </span>
                     <span class="font-bold tabular-nums whitespace-nowrap">{{ fmtUsd(ticketUplift) }}</span>
                   </li>
                 </ul>
               </div>
 
-              <!-- ROI sidebox -->
+              <!-- ROI sidebox, copy adaptativa -->
               <div class="bg-white/10 border border-white/20 rounded-2xl p-5 text-center backdrop-blur-sm min-w-[180px]">
                 <p class="text-[10px] font-black text-white/70 uppercase tracking-widest mb-1">
-                  Cada USD que invertís
+                  Cada USD invertido
                 </p>
                 <p class="text-5xl sm:text-6xl font-black tabular-nums tracking-tighter leading-none mb-1">
                   {{ roiMultiple }}x
                 </p>
                 <p class="text-[11px] text-white/80 leading-snug">
-                  Te vuelve en ganancia
+                  <template v-if="hasDirectSavings">Te vuelve en ganancia</template>
+                  <template v-else>Vuelve potencial</template>
                 </p>
                 <p class="text-[10px] text-emerald-200 mt-3 pt-3 border-t border-white/20 font-bold uppercase tracking-wider">
-                  Payback: día 1
+                  <template v-if="hasDirectSavings">Payback: día 1</template>
+                  <template v-else-if="paybackMonths">Payback: {{ paybackMonths }} {{ paybackMonths === 1 ? 'mes' : 'meses' }}</template>
+                  <template v-else>Payback: crecimiento</template>
                 </p>
               </div>
             </div>
@@ -500,22 +558,7 @@
               <ChevronDown class="w-3.5 h-3.5 transition-transform" />
               Ajustar supuestos (avanzado)
             </summary>
-            <div class="px-4 pb-4 pt-2 grid sm:grid-cols-3 gap-4 border-t border-slate-200">
-              <div>
-                <label class="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1.5 block">
-                  Ticket promedio (USD)
-                </label>
-                <input
-                  v-model.number="calc.avgTicket"
-                  type="number"
-                  min="1"
-                  max="500"
-                  class="w-full px-2 py-1.5 border border-slate-300 rounded-lg text-sm font-bold tabular-nums focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary"
-                />
-                <p class="text-[10px] text-slate-400 mt-1 leading-snug">
-                  Para estimar pedidos = facturación / ticket
-                </p>
-              </div>
+            <div class="px-4 pb-4 pt-2 grid sm:grid-cols-2 gap-4 border-t border-slate-200">
               <div>
                 <label class="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1.5 block">
                   % comisión que cobran las apps
@@ -949,10 +992,29 @@ const totalAnnualBenefit = computed(() => Math.round(totalMonthlyBenefit.value) 
 // ROI multiple = cada USD invertido en Deenex te vuelve Xx en ganancia neta.
 // Useful frame para que el lead vea el ratio inversión/retorno.
 const roiMultiple = computed(() => {
-  if (conDeenexTotal.value === null || conDeenexTotal.value <= 0) return '—'
+  if (conDeenexTotal.value === null || conDeenexTotal.value <= 0) return '0'
   const ratio = totalMonthlyBenefit.value / conDeenexTotal.value
-  if (!isFinite(ratio) || ratio <= 0) return '—'
+  if (!isFinite(ratio) || ratio <= 0) return '0'
   return ratio.toFixed(1)
+})
+
+// ¿Hay ahorro DIRECTO de costos (no proyección)? Es true cuando el costo
+// actual del lead es MAYOR al costo Deenex. Para negocios chicos sin apps,
+// puede ser false — en ese caso el ROI viene del uplift de loyalty/ticket
+// (proyección), y eso lo comunicamos distinto para no engañar.
+const hasDirectSavings = computed(() => monthlyCostSavings.value > 0)
+
+// Payback en meses si NO hay ahorro directo (lead recupera la inversión
+// con el uplift proyectado). Si hay ahorro directo, el payback es día 1.
+const paybackMonths = computed(() => {
+  if (hasDirectSavings.value) return null // día 1
+  if (totalMonthlyBenefit.value <= 0 || conDeenexTotal.value === null) return null
+  // (inversión mensual neta - ahorro) / uplift estimado mensual
+  const netCost = (conDeenexTotal.value ?? 0) - sinDeenexTotal.value
+  if (netCost <= 0) return null
+  const uplift = loyaltyGainNet.value + ticketUplift.value
+  if (uplift <= 0) return null
+  return Math.max(1, Math.round(netCost / uplift * 10) / 10)
 })
 
 // ── Formatters ──────────────────────────────────────────────────────

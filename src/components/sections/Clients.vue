@@ -1,7 +1,7 @@
 <template>
   <section id="partners" class="py-12 overflow-hidden">
     <div class="max-w-6xl mx-auto">
-      <Vue3Marquee :duration="15" gradient="true" clone="true">
+      <Vue3Marquee :duration="15" :gradient="true" :clone="true">
         <div v-for="img in imgArray" :key="img" class="mx-8 sm:mx-16 flex items-center justify-center">
           <img :src="img" :alt="img"
             class="h-14 sm:h-16 w-auto object-contain opacity-70 hover:opacity-100 transition-opacity" />

@@ -19,8 +19,9 @@
           <span class="text-primary italic font-light">tamaño de operación.</span>
         </h2>
         <p class="text-base text-slate-500 max-w-xl mx-auto leading-relaxed mb-8">
-          Fee fijo según volumen de locales + comisión por venta procesada.
-          Sin costos ocultos, sin permanencia, cancelás cuando quieras.
+          Bundle mensual + comisión <span class="font-bold text-slate-700">solo en delivery</span>
+          + Marketing AI <span class="font-bold text-slate-700">performance</span> (cobramos solo
+          si generamos recompras). Sin costos ocultos, sin permanencia.
         </p>
 
         <!-- Toggle mensual/anual con descuento 20% en anual -->
@@ -80,21 +81,28 @@
           <!-- Precio + ciclo -->
           <div class="mb-1 flex items-baseline gap-2 flex-wrap">
             <span class="text-4xl font-black tabular-nums tracking-tighter text-slate-900">
-              USD {{ effectiveFee(tier) }}
+              USD {{ fmtFee(effectiveFee(tier)) }}
             </span>
             <span class="text-sm text-slate-400">/ mes</span>
           </div>
-          <p class="text-[11px] text-slate-500 mb-5">
+          <p class="text-[11px] text-slate-500 mb-1">
             <template v-if="cycle === 'annual'">
-              <span class="line-through tabular-nums">USD {{ tier.monthlyFee }}</span>
-              mensual · cobrado anual
+              <span class="line-through tabular-nums">USD {{ fmtFee(tier.monthlyFee) }}</span>
+              mensual, cobrado anual
             </template>
             <template v-else>
-              + <span class="font-bold text-primary">{{ tier.commissionPct }}%</span> por venta
+              + <span class="font-bold text-primary">{{ formatPct(tier.commissionPct) }}</span>
+              <span class="text-slate-400">solo en delivery</span>
             </template>
           </p>
-          <p v-if="cycle === 'annual'" class="text-[11px] text-slate-500 mb-5">
-            + <span class="font-bold text-primary">{{ tier.commissionPct }}%</span> por venta procesada
+          <p v-if="cycle === 'annual'" class="text-[11px] text-slate-500 mb-1">
+            + <span class="font-bold text-primary">{{ formatPct(tier.commissionPct) }}</span>
+            <span class="text-slate-400">solo en delivery</span>
+          </p>
+          <p v-if="tier.marketingAiPct" class="text-[11px] text-slate-500 mb-5 flex items-center gap-1">
+            + <span class="font-bold text-emerald-700 tabular-nums">{{ tier.marketingAiPct }}%</span>
+            <span class="text-slate-400">Marketing AI</span>
+            <span class="text-[9px] font-black text-emerald-700 bg-emerald-100 px-1.5 py-0.5 rounded-full uppercase tracking-wider">performance</span>
           </p>
 
           <!-- Features clave -->
@@ -109,7 +117,7 @@
             </li>
           </ul>
 
-          <!-- CTA -->
+          <!-- CTA, unificado a "Empezar 14 días gratis" en todos los tiers -->
           <RouterLink
             :to="{ path: '/comenzar', query: { from: 'pricing', plan: tier.key } }"
             @click="trackPlanCta(tier.key)"
@@ -118,7 +126,7 @@
               ? 'bg-primary text-white hover:bg-[#3c1fc9] shadow-md shadow-primary/20'
               : 'bg-slate-100 text-slate-900 hover:bg-slate-200'"
           >
-            {{ tier.key === 'growth' ? 'Empezar 14 días gratis' : 'Empezar gratis' }}
+            Empezar 14 días gratis
           </RouterLink>
         </div>
       </div>
@@ -146,7 +154,11 @@
               </li>
               <li class="flex items-start gap-2">
                 <Check class="w-3.5 h-3.5 text-primary shrink-0 mt-0.5" stroke-width="3" />
-                <span>Comisión por venta desde <span class="font-bold">{{ enterpriseTier.commissionPct }}%</span></span>
+                <span>Comisión en delivery desde <span class="font-bold tabular-nums">{{ formatPct(enterpriseTier.commissionPct) }}</span></span>
+              </li>
+              <li class="flex items-start gap-2">
+                <Check class="w-3.5 h-3.5 text-primary shrink-0 mt-0.5" stroke-width="3" />
+                <span>Marketing AI performance desde <span class="font-bold tabular-nums">{{ enterpriseTier.marketingAiPct }}%</span></span>
               </li>
             </ul>
           </div>
@@ -167,14 +179,28 @@
         </div>
       </div>
 
-      <!-- Disclaimer + trust line -->
+      <!-- Disclaimer + trust line + link a calculadora -->
       <p class="mt-8 text-center text-xs text-slate-400 leading-relaxed max-w-xl mx-auto">
-        Sin permanencia · Cancelás en 1 click · Comisión solo sobre ventas procesadas
-        por Deenex (no salón cash, no propinas, no impuestos).
+        Sin permanencia · Cancelás en 1 click · Comisión solo en delivery (no aplica a mesa,
+        takeaway ni a las ventas que entran por Rappi/PedidosYa).
         <button type="button" @click="showFaq = !showFaq" class="underline hover:text-slate-600 font-semibold">
           {{ showFaq ? 'Ocultar preguntas' : 'Ver preguntas frecuentes' }}
         </button>
       </p>
+
+      <!-- CTA a la calculadora interactiva (vive en /cadenas-gastronomicas).
+           El lead que llega por la home puede querer ver su número antes de
+           empezar — no le escondemos la herramienta. -->
+      <div class="mt-8 text-center">
+        <RouterLink
+          to="/cadenas-gastronomicas#calculadora-deenex"
+          class="inline-flex items-center gap-2 text-sm font-bold text-slate-700 hover:text-primary transition-colors"
+        >
+          <Calculator class="w-4 h-4" />
+          Calcular tu ROI con tus números reales
+          <ArrowRight class="w-3.5 h-3.5" />
+        </RouterLink>
+      </div>
 
       <!-- FAQ inline simple -->
       <Transition name="faq">
@@ -199,7 +225,7 @@
 <script setup>
 import { ref, computed } from 'vue'
 import { RouterLink } from 'vue-router'
-import { Check, CalendarDays } from 'lucide-vue-next'
+import { Check, CalendarDays, Calculator, ArrowRight } from 'lucide-vue-next'
 import { useOnboarding } from '@/composables/useOnboarding'
 import { trackEvent } from '@/utils/analytics'
 
@@ -225,10 +251,24 @@ function volumeLabel(tier) {
 }
 
 function effectiveFee(tier) {
-  if (tier.monthlyFee === null) return 'A medida'
+  if (tier.monthlyFee === null) return null
   return cycle.value === 'annual'
     ? Math.round(tier.monthlyFee * 0.8)
     : tier.monthlyFee
+}
+
+// Formatea fees con separador de miles es-AR (USD 1.199 no USD 1199).
+function fmtFee(n) {
+  if (n == null) return 'A medida'
+  return Number(n).toLocaleString('es-AR')
+}
+
+// Formatea % con coma decimal es-AR (2,75% no 2.75%). Misma lógica que
+// StepPlan.formatPct y la calculadora para mantener coherencia visual.
+function formatPct(n) {
+  if (n == null) return '0%'
+  const rounded = Math.round(n * 100) / 100
+  return rounded.toLocaleString('es-AR', { maximumFractionDigits: 2 }) + '%'
 }
 
 function trackPlanCta(planKey) {
@@ -241,11 +281,15 @@ function trackEnterpriseClick() {
 
 const faqs = [
   {
-    q: '¿Cómo se calcula la comisión por venta?',
-    a: 'Es un porcentaje sobre el GMV (Gross Merchandise Value), el monto total de ventas que pasen por Deenex. No se aplica sobre propinas, impuestos, ni operaciones cash del salón que no toquen el sistema.',
+    q: '¿Sobre qué se aplica la comisión?',
+    a: 'Solo sobre el GMV de delivery propio que despacha Deenex. NO aplica a ventas en mesa, takeaway, ni a las que entran por Rappi/PedidosYa. Tampoco se aplica sobre propinas ni impuestos.',
   },
   {
-    q: '¿Qué pasa si crezco y supero el rango de locales del plan?',
+    q: '¿Cómo funciona Marketing AI?',
+    a: 'Es performance: Deenex corre las campañas (WhatsApp, push, email) para reactivar clientes inactivos y generar recompras. Solo cobramos el % de tu tier sobre las ventas EXTRAS que esas campañas generan. Si no hay uplift, no hay fee. Cero riesgo upfront.',
+  },
+  {
+    q: '¿Qué pasa si crezco y supero el rango de pedidos del plan?',
     a: 'Te movemos al plan siguiente al mes siguiente sin cargos extra. Tu comisión también baja automáticamente con el nuevo tier.',
   },
   {

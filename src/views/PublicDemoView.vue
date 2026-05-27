@@ -192,7 +192,7 @@
           <ArrowRight class="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
         </RouterLink>
         <p class="text-[11px] text-slate-400 mt-4">
-          Sin tarjeta hoy · Setup en menos de 30 min · Acceso al CSM
+          14 días gratis · Setup en menos de 30 min · Acceso al CSM
         </p>
       </div>
     </main>
@@ -247,7 +247,7 @@ const salesKpis = [
 const salesByChannel = [
   { name: 'Salón', pct: 85, amount: 1342, color: 'bg-primary' },
   { name: 'Take Away', pct: 62, amount: 985, color: 'bg-violet-400' },
-  { name: 'Delivery propio', pct: 45, amount: 712, color: 'bg-emerald-500' },
+  { name: 'Delivery', pct: 45, amount: 712, color: 'bg-emerald-500' },
   { name: 'Mostrador', pct: 8, amount: 126, color: 'bg-amber-400' },
 ]
 

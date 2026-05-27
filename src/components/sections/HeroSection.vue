@@ -31,13 +31,20 @@
         <span
           class="relative flex items-center justify-center font-extrabold flex-wrap gap-x-[0.25em] sm:gap-x-[0.3em] mt-1">
           <span class="text-slate-900">sin</span>
+          <!-- Container del wheel — aria-hidden porque la animación CSS
+               muestra todas las palabras al SR. La palabra "viva" se anuncia
+               por separado con <span aria-live> abajo. -->
           <span
-            class="relative block h-[1.3em] overflow-hidden italic text-primary text-left min-w-[200px] sm:min-w-[340px]">
+            class="relative block h-[1.3em] overflow-hidden italic text-primary text-left min-w-[200px] sm:min-w-[340px]"
+            aria-hidden="true">
             <div class="wheel-container">
               <div v-for="(word, i) in displayWords" :key="i" class="wheel-word h-[1.3em] flex items-center">{{ word }}.
               </div>
             </div>
           </span>
+          <!-- Fallback accesible: lee solo la primera palabra como representativa
+               (es lo más limpio para SR — no leer las 4 palabras seguidas). -->
+          <span class="sr-only">{{ words[0] }}.</span>
         </span>
       </h1>
 
@@ -49,9 +56,10 @@
         con campañas por <span class="font-semibold text-slate-800">WhatsApp y Push Notifications</span>.
       </p>
 
-      <!-- CTAs, primary: self-serve trial · secondary: scroll to product details -->
+      <!-- CTAs, primary: self-serve trial · secondary: scroll to product details.
+           Mobile: stack vertical (cabe holgado, no aprieta). Desktop: side-by-side. -->
       <div :class="{ 'animate-rise': ready, 'opacity-0': !ready }"
-        class="mt-9 mb-5 sm:mb-0 flex items-center justify-center gap-3 sm:gap-4" style="animation-delay:0.4s">
+        class="mt-9 mb-5 sm:mb-0 flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4" style="animation-delay:0.4s">
         <RouterLink :to="ctaTarget"
           @click="onCtaClick"
           :data-experiment="heroCta.variant.value.id"
@@ -89,7 +97,7 @@
       <div :class="{ 'animate-rise': ready, 'opacity-0': !ready }"
         class="mt-3 sm:mt-10 flex items-center justify-center gap-3" style="animation-delay:0.5s">
         <div class="flex -space-x-2">
-          <div v-for="badge in badges" :key="badge.tag"
+          <div v-for="badge in badges" :key="badge.tag" :title="badge.label || badge.tag"
             :class="['w-7 h-7 sm:w-8 sm:h-8 rounded-full border-2 border-white flex items-center justify-center text-[0.62rem] sm:text-[0.68rem] font-bold shadow-sm', badge.color]">
             {{ badge.tag }}
           </div>
@@ -197,11 +205,13 @@ onMounted(() => {
 const words = ['intermediarios', 'complicaciones', 'interferencias']
 const displayWords = [...words, words[0]]
 
+// Iniciales basadas en clientes reales (Palta, Hatsu, Glorias, Monti) — más
+// social proof que iniciales abstractas. Coordina con los logos de Clients.vue.
 const badges = [
-  { tag: 'MB', color: 'bg-rose-100 text-rose-600' },
-  { tag: 'LS', color: 'bg-violet-100 text-violet-600' },
-  { tag: 'AR', color: 'bg-sky-100 text-sky-600' },
-  { tag: 'PG', color: 'bg-emerald-100 text-emerald-600' },
+  { tag: 'PA', label: 'Palta', color: 'bg-emerald-100 text-emerald-700' },
+  { tag: 'HA', label: 'Hatsu', color: 'bg-rose-100 text-rose-600' },
+  { tag: 'GL', label: 'Glorias', color: 'bg-amber-100 text-amber-700' },
+  { tag: 'MO', label: 'Monti', color: 'bg-violet-100 text-violet-600' },
 ]
 
 const floatPositions = [
