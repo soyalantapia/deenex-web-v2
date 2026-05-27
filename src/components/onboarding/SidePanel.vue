@@ -27,7 +27,7 @@
               <span class="w-5 h-5 rounded-full bg-primary/10 flex items-center justify-center shrink-0 mt-0.5">
                 <Check class="w-3 h-3 text-primary" />
               </span>
-              Cobramos con MercadoPago recién al día 15. Antes no pagás nada.
+              Recién al día 15 del trial te cobramos con MercadoPago. Antes no pagás nada.
             </li>
             <li class="flex items-start gap-2.5">
               <span class="w-5 h-5 rounded-full bg-primary/10 flex items-center justify-center shrink-0 mt-0.5">

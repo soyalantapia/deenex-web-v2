@@ -396,13 +396,28 @@ const isFormValid = computed(() => {
   )
 })
 
-function onSubmit() {
+// Validación completa antes del submit. Antes hacíamos validate('brand') y
+// chequeábamos channels acá pero el resto dependía del blur del input —
+// si el lead tipeaba y clickeaba Continuar sin blur, el primer click solo
+// disparaba el blur (cambiaba foco) y el segundo era el submit real.
+// Ahora validamos todo de una vez y procesamos en un solo handler.
+function validateAll() {
   validate('brand')
+  clampLocations()
+  if (!form.pos) {
+    errors.pos = 'Elegí tu POS actual.'
+  } else {
+    errors.pos = ''
+  }
   if (form.channels.length === 0) {
     errors.channels = 'Elegí al menos un canal.'
   } else {
     errors.channels = ''
   }
+}
+
+function onSubmit() {
+  validateAll()
   if (!isFormValid.value) return
   onboarding.setBusiness({
     brand: form.brand.trim(),

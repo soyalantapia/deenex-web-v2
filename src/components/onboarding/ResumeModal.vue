@@ -28,7 +28,7 @@
             </div>
             <p class="text-slate-700 font-semibold">
               {{ progressSummary.brand || 'Tu marca' }}
-              <span class="text-slate-400 font-normal">·</span>
+              <span class="text-slate-400 font-normal mx-1">·</span>
               <span class="text-slate-500 font-normal">
                 {{ progressSummary.locations }} {{ progressSummary.locations === 1 ? 'local' : 'locales' }}
               </span>
@@ -75,7 +75,7 @@ const props = defineProps({
       lastActivity: '',
     }),
   },
-  totalSteps: { type: Number, default: 5 },
+  totalSteps: { type: Number, default: 6 },
 })
 
 const emit = defineEmits(['resume', 'startOver', 'decline'])

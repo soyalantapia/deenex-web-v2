@@ -5,7 +5,7 @@
     <ResumeModal
       :show="showResumeModal"
       :progress-summary="progressSummary"
-      :total-steps="5"
+      :total-steps="6"
       @resume="onResume"
       @start-over="onStartOver"
       @decline="showResumeModal = false"
@@ -109,22 +109,31 @@ const errors = reactive({ fullName: '', email: '', whatsapp: '' })
 // ── Resume detection ─────────────────────────────────────────────────────
 const showResumeModal = ref(false)
 
+// Formatea "última actividad" eligiendo la mejor unidad (minuto/hora/día).
+// Antes mostraba siempre minutos (ej. "hace 1.440 minutos" en lugar de
+// "ayer" / "hace 1 día"), poco legible.
+function formatLastActivity(startedAt) {
+  if (!startedAt) return 'hace un momento'
+  const rtf = new Intl.RelativeTimeFormat('es-AR', { numeric: 'auto' })
+  const deltaMs = Date.now() - startedAt.getTime()
+  const minutes = Math.round(deltaMs / 1000 / 60)
+  if (minutes < 60) return rtf.format(-minutes, 'minute')
+  const hours = Math.round(minutes / 60)
+  if (hours < 24) return rtf.format(-hours, 'hour')
+  const days = Math.round(hours / 24)
+  return rtf.format(-days, 'day')
+}
+
 const progressSummary = computed(() => {
   const state = onboarding.state
   const completed = state.meta.completedSteps.length
   const startedAt = state.meta.startedAt ? new Date(state.meta.startedAt) : null
-  const lastActivity = startedAt
-    ? new Intl.RelativeTimeFormat('es-AR', { numeric: 'auto' }).format(
-        Math.round((Date.now() - startedAt.getTime()) / 1000 / 60 / -1),
-        'minute'
-      )
-    : 'hace un momento'
   return {
     email: state.identity.email,
     brand: state.business.brand,
     locations: state.business.locations,
     completedSteps: completed,
-    lastActivity,
+    lastActivity: formatLastActivity(startedAt),
   }
 })
 
