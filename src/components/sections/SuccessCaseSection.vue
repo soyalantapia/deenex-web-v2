@@ -102,7 +102,7 @@
 
 <script setup>
 import { ref, onMounted } from 'vue'
-import { MessageSquare, Heart, Repeat, Play, Volume2 } from 'lucide-vue-next'
+import { MessageSquare, Heart, Repeat, Play } from 'lucide-vue-next'
 
 const videoRef = ref(null)
 const isPlaying = ref(false)

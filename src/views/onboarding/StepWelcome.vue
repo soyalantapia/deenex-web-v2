@@ -28,8 +28,17 @@
 
       <p v-if="isEnterprise" class="text-base text-slate-500 leading-relaxed max-w-md">
         Un Account Executive de Deenex te va a contactar en menos de 24 horas
-        por WhatsApp al
-        <span class="font-semibold text-slate-900">{{ onboarding.state.identity.whatsapp }}</span>.
+        <template v-if="onboarding.state.identity.whatsapp">
+          por WhatsApp al
+          <span class="font-semibold text-slate-900">{{ onboarding.state.identity.whatsapp }}</span>.
+        </template>
+        <template v-else-if="onboarding.state.identity.email">
+          por email a
+          <span class="font-semibold text-slate-900">{{ onboarding.state.identity.email }}</span>.
+        </template>
+        <template v-else>
+          para coordinar la implementación.
+        </template>
       </p>
       <p v-else class="text-base text-slate-500 leading-relaxed max-w-md">
         Te mandamos las credenciales por email a
@@ -352,13 +361,12 @@
 
 <script setup>
 import { ref, computed, onMounted } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
+import { useRoute } from 'vue-router'
 import { Check, CalendarDays, ArrowRight, MessageCircle, Mail, Clock, Gift, Eye } from 'lucide-vue-next'
 import ConfettiCanvas from '@/components/onboarding/ConfettiCanvas.vue'
 import { useOnboarding } from '@/composables/useOnboarding'
 
 const route = useRoute()
-const router = useRouter()
 const onboarding = useOnboarding()
 
 const isEnterprise = computed(() => {
@@ -448,7 +456,7 @@ function getOrCreateNonce() {
   let n = localStorage.getItem(REFERRAL_NONCE_KEY)
   if (!n) {
     n = Math.random().toString(36).slice(2, 7)
-    try { localStorage.setItem(REFERRAL_NONCE_KEY, n) } catch {}
+    try { localStorage.setItem(REFERRAL_NONCE_KEY, n) } catch { /* private browsing — ignorado */ }
   }
   return n
 }

@@ -109,7 +109,7 @@ const show = computed(() => hasActivated.value && !dismissed.value)
 
 function dismiss() {
   dismissed.value = true
-  try { sessionStorage.setItem(DISMISS_KEY, '1') } catch {}
+  try { sessionStorage.setItem(DISMISS_KEY, '1') } catch { /* private browsing — ignorado */ }
   onboarding.track('trial_banner_dismissed', { days_left: daysLeft.value })
 }
 

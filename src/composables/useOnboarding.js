@@ -598,6 +598,7 @@ export function useOnboarding() {
     bonusCode,
     hasBonus,
     markBonusApplied,
+    markStepComplete,
     recommendedPlan,
     projectedTier,
     monthlyEstimateUsd,

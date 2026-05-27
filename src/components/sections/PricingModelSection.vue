@@ -179,6 +179,7 @@
                 type="number"
                 min="1"
                 max="500"
+                @blur="clampCalcField('locations', 1)"
                 class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm font-bold tabular-nums focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary"
                 aria-label="Cantidad de locales custom"
               />
@@ -199,6 +200,7 @@
                   min="1000"
                   max="10000000"
                   step="1000"
+                  @blur="clampCalcField('monthlyRevenueUsd', 0)"
                   class="flex-1 px-3 py-2 border border-slate-300 rounded-lg text-base font-bold tabular-nums focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary"
                   aria-label="Facturación mensual"
                 />
@@ -233,6 +235,7 @@
                   min="0"
                   max="100"
                   step="5"
+                  @blur="clampCalcField('pctDelivery', 0)"
                   class="w-16 px-2 py-2 border border-slate-300 rounded-lg text-base font-bold tabular-nums text-right focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary"
                 />
                 <span class="text-xs text-slate-500 font-semibold">% del total</span>
@@ -269,6 +272,7 @@
                   min="1"
                   max="500"
                   step="1"
+                  @blur="clampCalcField('avgTicket', 1)"
                   class="flex-1 px-3 py-2 border border-slate-300 rounded-lg text-base font-bold tabular-nums focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary"
                   aria-label="Ticket promedio"
                 />
@@ -436,7 +440,7 @@
                  honestamente "Es una INVERSIÓN en crecimiento" y muestro
                  payback estimado en meses según el uplift proyectado. -->
           <div
-            v-if="conDeenexTotal !== null"
+            v-if="conDeenexTotal !== null && gmvUsd > 0"
             class="rounded-3xl bg-gradient-to-br from-emerald-500 via-emerald-600 to-emerald-700 text-white p-6 sm:p-8 relative overflow-hidden mb-6"
           >
             <div class="absolute -right-10 -top-10 w-48 h-48 rounded-full bg-white/10 blur-3xl pointer-events-none"></div>
@@ -513,6 +517,16 @@
                 </p>
               </div>
             </div>
+          </div>
+
+          <!-- Cero GMV: placeholder neutral hasta que el lead cargue sus números -->
+          <div
+            v-else-if="gmvUsd === 0"
+            class="rounded-3xl border-2 border-dashed border-slate-200 bg-slate-50/60 p-7 mb-6 flex flex-col items-center justify-center text-center gap-3 min-h-[140px]"
+          >
+            <Calculator class="w-8 h-8 text-slate-300" />
+            <p class="text-base font-bold text-slate-400">Cargá tu facturación para ver tu ROI real</p>
+            <p class="text-sm text-slate-400">Ajustá los sliders de arriba y el cálculo aparece acá.</p>
           </div>
 
           <!-- Caso Enterprise: bloque distinto -->
@@ -845,7 +859,7 @@
 <script setup>
 import { reactive, computed } from 'vue'
 import { RouterLink } from 'vue-router'
-import { Sparkles, Rocket, Check, Info, ArrowRight, ShieldCheck, Calculator, TrendingUp, Zap, PiggyBank, Repeat, Ticket, Cpu, Store, CircleDollarSign, Bike, X, ChevronDown } from 'lucide-vue-next'
+import { Sparkles, Rocket, Check, Info, ArrowRight, ShieldCheck, Calculator, TrendingUp, PiggyBank, Repeat, Ticket, Store, CircleDollarSign, Bike, X, ChevronDown } from 'lucide-vue-next'
 
 const props = defineProps({
   content: {
@@ -876,6 +890,11 @@ const props = defineProps({
 //   pctDeliveryViaApps (qué % del delivery actualmente va por apps).
 //   Output: dos cards comparativas con desglose + hero de ganancia neta.
 const locationsPresets = [1, 3, 5, 10, 25, 50]
+
+function clampCalcField(field, min = 0) {
+  const v = Number(calc[field])
+  if (Number.isNaN(v) || v < min) calc[field] = min
+}
 
 const calc = reactive({
   locations: props.content.calculatorDefaults?.locations ?? 5,

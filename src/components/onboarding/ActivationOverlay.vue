@@ -131,7 +131,6 @@
 
 <script setup>
 import { ref, computed, watch, onUnmounted } from 'vue'
-import { Teleport } from 'vue'
 import { Check } from 'lucide-vue-next'
 
 const props = defineProps({

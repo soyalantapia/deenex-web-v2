@@ -76,10 +76,6 @@
             <a href="mailto:legal@deenex.tech" class="text-primary underline">legal@deenex.tech</a>.
           </p>
 
-          <p class="text-xs text-slate-400 italic mt-10">
-            Este es un borrador placeholder. El equipo legal va a publicar el documento
-            definitivo antes del go-live público.
-          </p>
         </template>
 
         <template v-else>
@@ -135,10 +131,6 @@
             anticipación. Vos podés bajar la cuenta antes si no aceptás los cambios.
           </p>
 
-          <p class="text-xs text-slate-400 italic mt-10">
-            Este es un borrador placeholder. El equipo legal va a publicar el documento
-            definitivo antes del go-live público.
-          </p>
         </template>
       </article>
     </main>
@@ -164,8 +156,12 @@ const route = useRoute()
 const kind = computed(() => (route.path === '/terminos' ? 'terms' : 'privacy'))
 
 const year = new Date().getFullYear()
+// Fecha fija del último update legal. Actualizar manualmente cada vez que
+// se publique una nueva versión del documento — no usar new Date() para
+// que no cambie sola en cada build.
+const LEGAL_LAST_UPDATED = new Date(2026, 4, 27) // 27 mayo 2026 — constructor local para evitar offset UTC
 const formattedDate = computed(() =>
-  new Intl.DateTimeFormat('es-AR', { day: 'numeric', month: 'long', year: 'numeric' }).format(new Date())
+  new Intl.DateTimeFormat('es-AR', { day: 'numeric', month: 'long', year: 'numeric' }).format(LEGAL_LAST_UPDATED)
 )
 
 let previousTitle = ''

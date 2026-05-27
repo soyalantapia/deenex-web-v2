@@ -169,12 +169,13 @@ const usesThirdPartyApps = computed(() => {
 })
 
 function onContinue() {
-  // Marcamos un sub-paso "savings" como visto para tracking. El gate real
-  // para llegar a Trial sigue siendo 'plan'.
   onboarding.track('savings_viewed', {
     estimated_savings: onboarding.savingsVsThirdParty.value,
     has_custom_inputs: onboarding.hasCustomRoiInputs.value,
   })
+  // Marcamos savings como completado para que el resume modal y el magic link
+  // ofrezcan volver desde el paso correcto (plan, no business).
+  onboarding.markStepComplete('savings')
   router.push('/comenzar/plan')
 }
 </script>

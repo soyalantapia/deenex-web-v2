@@ -38,7 +38,7 @@
           Bonus <code class="font-mono text-amber-700">{{ onboarding.bonusCode.value }}</code> aplicado
         </p>
         <p class="text-xs text-slate-600 mt-0.5 leading-snug">
-          Tu trial es de <span class="font-bold text-amber-700">30 días</span> en vez de 15.
+          Tu trial es de <span class="font-bold text-amber-700">30 días</span> en vez de 14.
           Primer cargo recién el {{ onboarding.firstChargeDateShort.value }}.
         </p>
       </div>

@@ -55,7 +55,7 @@
       <!-- Grid de planes, 4 columnas en desktop, 1 en mobile con snap horizontal -->
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-10">
         <div
-          v-for="(tier, i) in mainTiers"
+          v-for="tier in mainTiers"
           :key="tier.key"
           class="relative rounded-3xl border-2 p-6 flex flex-col transition-all"
           :class="tier.key === 'growth'

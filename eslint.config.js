@@ -21,8 +21,28 @@ export default defineConfig([
     },
   },
 
+  // vite.config.js corre en Node, no en el browser: `process` es global válido.
+  // ESLint 10 ya no soporta /* eslint-env node */ inline, así que lo declaramos acá.
+  {
+    files: ['vite.config.js', '*.config.js', '*.config.ts'],
+    languageOptions: {
+      globals: {
+        ...globals.node,
+      },
+    },
+  },
+
   js.configs.recommended,
   ...pluginVue.configs['flat/essential'],
+
+  // Los componentes helper internos (Field, Button, Tooltip, etc.) tienen nombres
+  // de una sola palabra por diseño — son primitivos del sistema, no hay riesgo de
+  // colisión con elementos HTML nativos.
+  {
+    rules: {
+      'vue/multi-word-component-names': 'off',
+    },
+  },
 
   ...pluginOxlint.buildFromOxlintConfigFile('.oxlintrc.json'),
 

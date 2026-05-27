@@ -392,6 +392,9 @@ const isFormValid = computed(() => {
     form.brand.trim().length >= 2 &&
     form.locations >= 1 &&
     !!form.pos &&
+    // Si eligieron "Otro POS", requerimos que especifiquen cuál para que el
+    // CSM tenga contexto real de integración.
+    (form.pos !== 'other' || form.posOther.trim().length > 0) &&
     form.channels.length >= 1
   )
 })

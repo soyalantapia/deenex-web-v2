@@ -689,20 +689,15 @@ import { trackEvent } from '@/utils/analytics'
 import {
   Check,
   Sparkles,
-  Monitor,
   Calculator,
   Settings2,
   TrendingDown,
   Layers,
-  ArrowLeft,
   ArrowRight,
   X,
   CalendarDays,
   Store,
   Bike,
-  LayoutGrid,
-  ShoppingBag,
-  Truck,
   MessageCircle,
 } from 'lucide-vue-next'
 

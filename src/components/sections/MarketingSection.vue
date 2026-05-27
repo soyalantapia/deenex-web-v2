@@ -97,8 +97,7 @@ let isPaused = false
 function onScroll() {
   const el = carouselRef.value
   if (!el) return
-  // Detecta el card visible calculando desde el paddingLeft (24px = px-6)
-  const paddingLeft = 24
+  // Detecta el card visible por posición de scroll relativa al ancho total
   activeIndex.value = Math.round((el.scrollLeft) / (el.scrollWidth / marketingFeatures.length))
 }
 

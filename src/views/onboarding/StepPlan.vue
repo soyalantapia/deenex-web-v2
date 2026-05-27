@@ -157,7 +157,7 @@
           Te asignamos un CSM que arma tu plan en menos de 24h.
         </p>
         <p class="text-xs text-white/50">
-          Comisión desde 0,5% · onboarding white-glove · API privada.
+          Comisión desde 1,75% · onboarding white-glove · API privada.
         </p>
       </div>
     </div>

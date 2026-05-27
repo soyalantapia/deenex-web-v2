@@ -86,9 +86,7 @@
             <Save class="w-3 h-3" />
             Guardar y seguir después
           </button>
-          <div class="text-[11px] font-bold text-slate-500 tracking-wider uppercase flex items-center gap-2">
-            <span>{{ completionPct }}%</span>
-            <span class="inline-block w-px h-3 bg-slate-200"></span>
+          <div class="text-[11px] font-bold text-slate-500 tracking-wider uppercase flex items-center gap-1">
             <span class="text-slate-900">{{ activeStepIndex + 1 }}</span>
             <span class="text-slate-400">/{{ steps.length }}</span>
           </div>
@@ -153,49 +151,51 @@
                 <Save class="w-6 h-6 text-primary" />
               </div>
               <h3 class="text-xl font-extrabold tracking-tight text-slate-900 mb-2">
-                Te mandamos un link para retomar
+                Guardá tu progreso
               </h3>
               <p class="text-sm text-slate-500 leading-relaxed mb-5">
-                Te enviamos un link único a tu email. Lo abrís cuando quieras y
-                volvés exactamente donde lo dejaste, desde cualquier dispositivo.
+                Tu avance se guarda automáticamente en este dispositivo. Ingresá tu email
+                para recibir el link de retoma (disponible próximamente).
               </p>
-              <input
-                v-model="saveEmail"
-                type="email"
-                inputmode="email"
-                autocomplete="email"
-                placeholder="tu@email.com"
-                class="w-full px-4 py-3 rounded-xl bg-white border-2 border-slate-200 focus:border-primary text-base text-slate-900 placeholder-slate-300 mb-4 focus:outline-none"
-              />
-              <div class="flex flex-col-reverse sm:flex-row sm:items-center sm:justify-end gap-2">
-                <button
-                  type="button"
-                  @click="showSaveModal = false"
-                  class="px-5 py-2.5 rounded-xl text-sm font-semibold text-slate-500 hover:bg-slate-50 transition-colors"
-                >
-                  Cancelar
-                </button>
-                <button
-                  type="button"
-                  @click="sendSaveLink"
-                  :disabled="!validSaveEmail"
-                  class="px-5 py-2.5 rounded-xl text-sm font-bold bg-primary text-white hover:bg-[#3c1fc9] transition-colors disabled:bg-slate-300 disabled:cursor-not-allowed"
-                >
-                  Mandarme el link →
-                </button>
-              </div>
+              <!-- form wrapper para que Enter en el input dispare el envío -->
+              <form @submit.prevent="sendSaveLink">
+                <input
+                  v-model="saveEmail"
+                  type="email"
+                  inputmode="email"
+                  autocomplete="email"
+                  placeholder="tu@email.com"
+                  class="w-full px-4 py-3 rounded-xl bg-white border-2 border-slate-200 focus:border-primary text-base text-slate-900 placeholder-slate-300 mb-4 focus:outline-none"
+                />
+                <div class="flex flex-col-reverse sm:flex-row sm:items-center sm:justify-end gap-2">
+                  <button
+                    type="button"
+                    @click="showSaveModal = false"
+                    class="px-5 py-2.5 rounded-xl text-sm font-semibold text-slate-500 hover:bg-slate-50 transition-colors"
+                  >
+                    Cancelar
+                  </button>
+                  <button
+                    type="submit"
+                    :disabled="!validSaveEmail"
+                    class="px-5 py-2.5 rounded-xl text-sm font-bold bg-primary text-white hover:bg-[#3c1fc9] transition-colors disabled:bg-slate-300 disabled:cursor-not-allowed"
+                  >
+                    Guardar email →
+                  </button>
+                </div>
+              </form>
             </div>
             <div v-else>
               <div class="w-12 h-12 rounded-2xl bg-emerald-500 flex items-center justify-center mb-5">
                 <Check class="w-6 h-6 text-white" stroke-width="3" />
               </div>
               <h3 class="text-xl font-extrabold tracking-tight text-slate-900 mb-2">
-                ¡Listo!
+                ¡Guardado!
               </h3>
               <p class="text-sm text-slate-500 leading-relaxed mb-5">
-                Te mandamos el link a
-                <span class="font-bold text-slate-900">{{ saveEmail }}</span>.
-                Si no lo ves en 5 minutos, revisá spam.
+                Tu avance quedó guardado en este dispositivo. Volvé desde este mismo
+                navegador cuando quieras para retomar exactamente donde lo dejaste.
+                Pronto también podrás recibir el link por email.
               </p>
               <RouterLink
                 to="/"
@@ -326,7 +326,7 @@
 
 <script setup>
 import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
-import { useRoute, RouterLink, RouterView } from 'vue-router'
+import { useRoute, useRouter, RouterLink, RouterView } from 'vue-router'
 import { Gift, Save, Check } from 'lucide-vue-next'
 // `Check` ya está importado, se usa en el modal Save & exit Y ahora también
 // en el auto-save indicator (success state).
@@ -336,6 +336,7 @@ import CrossDeviceQR from '@/components/onboarding/CrossDeviceQR.vue'
 import { useOnboarding } from '@/composables/useOnboarding'
 
 const route = useRoute()
+const router = useRouter()
 const onboarding = useOnboarding()
 
 // Flow: identity → business → savings → plan → trial → welcome (6 steps).
@@ -353,10 +354,6 @@ const steps = [
 const activeStepIndex = computed(() => {
   const i = steps.findIndex((s) => s.path === route.path)
   return i === -1 ? 0 : i
-})
-
-const completionPct = computed(() => {
-  return Math.round(((activeStepIndex.value + 1) / steps.length) * 100)
 })
 
 const hasProgress = computed(() => onboarding.state.meta.completedSteps.length > 0)
@@ -411,7 +408,7 @@ function onMouseLeave(e) {
   if (route.path === '/comenzar/listo') return
 
   showExitIntent.value = true
-  try { sessionStorage.setItem('deenex_exit_intent_shown', '1') } catch {}
+  try { sessionStorage.setItem('deenex_exit_intent_shown', '1') } catch { /* private browsing — ignorado */ }
   onboarding.track('exit_intent_shown', { last_step: steps[activeStepIndex.value]?.key })
 }
 
@@ -474,7 +471,7 @@ const showExitModal = ref(false)
 function onExit() {
   // Si está en Welcome (último paso), no abrimos modal, solo navegamos.
   if (route.path === '/comenzar/listo') {
-    window.location.href = '/'
+    router.push({ name: 'home' })
     return
   }
   showExitModal.value = true

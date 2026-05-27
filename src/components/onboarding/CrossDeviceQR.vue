@@ -90,7 +90,6 @@
 
 <script setup>
 import { ref, computed } from 'vue'
-import { Teleport } from 'vue'
 import { Smartphone } from 'lucide-vue-next'
 import { useOnboarding } from '@/composables/useOnboarding'
 import { generateQrSvg } from '@/utils/qrcode'

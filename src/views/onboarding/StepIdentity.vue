@@ -69,9 +69,9 @@
 
     <p class="mt-6 text-[11px] text-slate-400 leading-relaxed">
       Al continuar aceptás nuestros
-      <a href="/terminos" class="underline hover:text-slate-600">términos</a>
+      <a href="/terminos" target="_blank" rel="noopener" class="underline hover:text-slate-600">términos</a>
       y la
-      <a href="/privacidad" class="underline hover:text-slate-600">política de privacidad</a>.
+      <a href="/privacidad" target="_blank" rel="noopener" class="underline hover:text-slate-600">política de privacidad</a>.
       Nunca compartimos tus datos.
     </p>
     </form>
@@ -151,11 +151,12 @@ onMounted(() => {
       token: String(resumeToken).slice(0, 8) + '…',
       completed_count: completed.length,
     })
-    const pending = ['business', 'plan', 'trial'].find(
+    const pending = ['business', 'savings', 'plan', 'trial'].find(
       (s) => !completed.includes(s)
     )
     const map = {
       business: '/comenzar/negocio',
+      savings: '/comenzar/ahorro',
       plan: '/comenzar/plan',
       trial: '/comenzar/activar',
     }
@@ -176,11 +177,12 @@ function onResume() {
   showResumeModal.value = false
   onboarding.track('resume_accepted', { completed_count: onboarding.state.meta.completedSteps.length })
   // Saltar al primer step incompleto
-  const pending = ['business', 'plan', 'trial'].find(
+  const pending = ['business', 'savings', 'plan', 'trial'].find(
     (s) => !onboarding.state.meta.completedSteps.includes(s)
   )
   const map = {
     business: '/comenzar/negocio',
+    savings: '/comenzar/ahorro',
     plan: '/comenzar/plan',
     trial: '/comenzar/activar',
   }

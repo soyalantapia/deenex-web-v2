@@ -60,7 +60,7 @@
 </template>
 
 <script setup>
-import { Teleport, watch, onMounted, onUnmounted } from 'vue'
+import { onMounted, onUnmounted } from 'vue'
 import { Sparkles } from 'lucide-vue-next'
 
 const props = defineProps({
