@@ -116,7 +116,7 @@
           ready ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8']"
           :style="{ transitionDelay: (1.2 + i * 0.2) + 's' }">
           <div class="glass-morph float-card-inner rounded-2xl shadow-xl overflow-hidden">
-            <img :src="floatImages[i]" class="w-full" />
+            <img :src="floatImages[i]" alt="" class="w-full" />
           </div>
         </div>
 
