@@ -32,6 +32,27 @@ export default defineConfig([
     },
   },
 
+  // Tests: vitest expone describe/it/expect/beforeEach/afterEach/vi como
+  // globals (config `test.globals: true`). Sin esto ESLint los marca como
+  // undefined.
+  {
+    files: ['tests/**/*.js', '**/*.test.js'],
+    languageOptions: {
+      globals: {
+        ...globals.node,
+        describe: 'readonly',
+        it: 'readonly',
+        expect: 'readonly',
+        beforeEach: 'readonly',
+        afterEach: 'readonly',
+        beforeAll: 'readonly',
+        afterAll: 'readonly',
+        vi: 'readonly',
+        test: 'readonly',
+      },
+    },
+  },
+
   js.configs.recommended,
   ...pluginVue.configs['flat/essential'],
 

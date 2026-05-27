@@ -343,9 +343,10 @@
 </template>
 
 <script setup>
-import { computed, nextTick, onMounted, onUnmounted, ref, watch } from 'vue'
+import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
 import { useRoute, useRouter, RouterLink, RouterView } from 'vue-router'
 import { Gift, Save, Check } from 'lucide-vue-next'
+import { useFocusTrap } from '@/composables/useFocusTrap'
 // `Check` ya está importado, se usa en el modal Save & exit Y ahora también
 // en el auto-save indicator (success state).
 import SidePanel from '@/components/onboarding/SidePanel.vue'
@@ -469,27 +470,12 @@ const saveEmail = ref(onboarding.state.identity.email || '')
 const saveSent = ref(false)
 const validSaveEmail = computed(() => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(saveEmail.value.trim()))
 
-// a11y: gestor de foco compartido para los 3 modales (save, exit intent, exit
-// confirm). Cuando un modal se abre guardamos document.activeElement, movemos
-// foco al primer focusable del modal, y al cerrar restauramos al disparador.
-// Esto cumple el patrón WAI-ARIA Modal Dialog mínimo. Falta focus trap real
-// (Tab/Shift+Tab cycling dentro del modal) — pendiente como deuda menor.
-const preFocusByModal = new Map()
-function watchModalFocus(flagRef, elRef, key) {
-  watch(flagRef, async (open) => {
-    if (open) {
-      preFocusByModal.set(key, document.activeElement)
-      await nextTick()
-      const focusTarget = elRef.value?.querySelector('input, button, a[href]')
-      focusTarget?.focus()
-    } else {
-      const prev = preFocusByModal.get(key)
-      prev?.focus?.()
-      preFocusByModal.delete(key)
-    }
-  })
-}
-watchModalFocus(showSaveModal, saveModalRef, 'save')
+// a11y: focus trap WAI-ARIA Modal Dialog para el save modal (guarda foco
+// previo, lo mueve al modal al abrir, atrapa Tab/Shift+Tab para ciclar
+// dentro del modal, y restaura el foco al disparador al cerrar). El
+// composable vive en src/composables/useFocusTrap.js para que los otros
+// modales lo reusen también.
+useFocusTrap(showSaveModal, saveModalRef)
 
 async function sendSaveLink() {
   if (!validSaveEmail.value) return
@@ -511,11 +497,11 @@ async function sendSaveLink() {
 }
 
 const showExitModal = ref(false)
-// Aplicar el gestor de foco a los 2 modales que se declaran más arriba en el
-// template pero cuyo ref vive en la misma sección que su flag. (showExitIntent
-// se declara en la línea 416; aplicamos el watcher acá por orden de lectura.)
-watchModalFocus(showExitIntent, exitIntentRef, 'exit-intent')
-watchModalFocus(showExitModal, exitConfirmRef, 'exit-confirm')
+// Focus trap a los 2 modales restantes (exit intent + exit confirm). El
+// composable se encarga del foco inicial, del trap de Tab y de restaurar al
+// disparador en el cierre.
+useFocusTrap(showExitIntent, exitIntentRef)
+useFocusTrap(showExitModal, exitConfirmRef)
 function onExit() {
   // Si está en Welcome (último paso), no abrimos modal, solo navegamos.
   if (route.path === '/comenzar/listo') {
