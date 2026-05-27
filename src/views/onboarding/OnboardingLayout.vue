@@ -383,10 +383,15 @@ function initSocialProof() {
   liveActivations.value = Math.max(8, dayBase + jitter)
   activationWindow.value = 'esta semana'
 
-  // Cada 25-40s sumamos 1 activación para que parezca vivo si la sesión es larga.
+  // Cada 25-40s ajustamos ±1 con baja probabilidad, parece vivo sin ser
+  // monotónico creciente (antes se notaba que subía en cada step, fake).
   if (socialProofTimer) clearInterval(socialProofTimer)
+  const seedBase = liveActivations.value
   socialProofTimer = setInterval(() => {
-    if (Math.random() < 0.55) liveActivations.value += 1
+    const roll = Math.random()
+    if (roll < 0.25) liveActivations.value = Math.max(seedBase - 2, liveActivations.value - 1)
+    else if (roll < 0.55) liveActivations.value = Math.min(seedBase + 3, liveActivations.value + 1)
+    // else: queda igual
   }, 32_000)
 }
 

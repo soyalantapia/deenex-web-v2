@@ -64,8 +64,25 @@
              incluida en el Bundle de entrada (no es add-on opcional). -->
 
         <div class="flex justify-between items-baseline">
-          <span class="text-sm text-slate-600">Comisión por venta</span>
+          <span class="text-sm text-slate-600">Comisión <span class="text-xs text-slate-400">solo en delivery</span></span>
           <span class="text-sm font-bold text-primary tabular-nums">{{ planSummary.commissionPct }}%</span>
+        </div>
+        <div v-if="planSummary.marketingAiPct" class="flex justify-between items-baseline">
+          <span class="text-sm text-slate-600">
+            Marketing AI
+            <span class="text-xs text-slate-400">performance, solo si genera</span>
+          </span>
+          <span class="text-sm font-bold text-emerald-700 tabular-nums">{{ planSummary.marketingAiPct }}%</span>
+        </div>
+        <div v-if="planSummary.posPerLocation" class="flex justify-between items-baseline">
+          <span class="text-sm text-slate-600">
+            POS integrado
+            <span class="text-xs text-slate-400">USD {{ planSummary.posPerLocation }}/local</span>
+          </span>
+          <span class="text-sm font-bold text-slate-700 tabular-nums">
+            USD {{ (planSummary.posPerLocation * (onboarding.state.business.locations || 1)).toLocaleString('es-AR') }}
+            <span class="text-xs font-normal text-slate-400">/ mes</span>
+          </span>
         </div>
       </div>
 

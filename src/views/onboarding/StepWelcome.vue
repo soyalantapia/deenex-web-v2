@@ -61,11 +61,11 @@
             Primer cargo
           </p>
           <p class="text-sm text-slate-700">
-            <span class="font-bold tabular-nums">USD {{ planSummary.monthlyFee }}</span>
-            <span class="text-slate-400">/ mes</span>
-            <span class="text-slate-300 mx-1">·</span>
+            <span class="font-bold tabular-nums">USD {{ Number(planSummary.monthlyFee).toLocaleString('es-AR') }}</span>
+            <span class="text-slate-400"> / mes</span>
+            <span class="text-slate-300 mx-1.5">·</span>
             <span class="font-semibold tabular-nums">{{ planSummary.commissionPct }}%</span>
-            <span class="text-slate-400"> por venta</span>
+            <span class="text-slate-400"> en delivery</span>
           </p>
         </div>
         <span class="text-[10px] font-bold text-emerald-600 uppercase tracking-widest whitespace-nowrap">

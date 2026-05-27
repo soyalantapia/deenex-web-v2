@@ -327,13 +327,33 @@ const monthlyGmvLead = computed(() => {
   return locations * effectiveOrders.value * effectiveTicket.value
 })
 
-const thirdPartyMonthlyFee = computed(() => Math.round(monthlyGmvLead.value * 0.25))
+// Asumimos 30% típico de comisión Rappi/PedidosYa AR (consistente con la
+// calc del Área A). Antes era 25% — desactualizado.
+const APPS_COMMISSION_PCT = 30
+
+// Asumimos 40% del GMV es delivery (split típico: 60% mesa+takeaway, 40% delivery).
+// Si la marca declara distinto en business.channels podríamos refinarlo pero
+// como default conservador 40% funciona para no inflar la comisión Deenex.
+const DEFAULT_DELIVERY_SHARE = 0.4
+
+const thirdPartyMonthlyFee = computed(() => {
+  // Apps cost = (GMV de delivery × % de delivery via apps) × comisión apps.
+  // Default: 100% del delivery va por apps (caso típico marca sin canal propio).
+  return Math.round(monthlyGmvLead.value * DEFAULT_DELIVERY_SHARE * (APPS_COMMISSION_PCT / 100))
+})
 
 const deenexMonthlyCost = computed(() => {
   const tier = recommendedPlan.value
   const fee = tier.monthlyFee || 0
-  const commission = monthlyGmvLead.value * (tier.commissionPct / 100)
-  return Math.round(fee + commission)
+  // Comisión Deenex SOLO en delivery (no sobre todo el GMV).
+  const commission = monthlyGmvLead.value * DEFAULT_DELIVERY_SHARE * (tier.commissionPct / 100)
+  // Marketing AI fee (performance, asumimos +20% recurrencia → uplift × MAI%).
+  const mai = tier.marketingAiPct
+    ? monthlyGmvLead.value * 0.20 * (tier.marketingAiPct / 100)
+    : 0
+  // POS integrado por local (default true: el lead típico tiene POS hoy).
+  const pos = (tier.posPerLocation || 0) * (Math.max(1, Number(state.business.locations) || 1))
+  return Math.round(fee + commission + mai + pos)
 })
 
 const savingsVsThirdParty = computed(() => {
@@ -359,7 +379,7 @@ const breakEvenDays = computed(() => {
 // ── Fecha del primer cargo (today + trial length) ────────────────────────
 // Trial base de 14 días. Si el lead aceptó el bonus del exit intent
 // (DEENEX30), se extiende a 30 días.
-const TRIAL_DAYS_BASE = 15
+const TRIAL_DAYS_BASE = 14
 const TRIAL_DAYS_WITH_BONUS = 30
 
 // Lee el código de bonus persistido por OnboardingLayout (exit intent flow).

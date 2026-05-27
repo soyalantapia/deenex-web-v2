@@ -1,7 +1,7 @@
 <template>
   <form @submit.prevent="onSubmit" novalidate>
     <p class="text-[11px] font-black text-primary uppercase tracking-[0.2em] mb-3">
-      Paso 4 de 5
+      Paso 4 de 6
     </p>
     <h1 class="text-[clamp(1.8rem,4vw,2.6rem)] font-extrabold tracking-tighter leading-[1.05] text-slate-900 mb-4">
       <template v-if="onboarding.greeting.value">
@@ -124,8 +124,9 @@
         <p v-if="recommendedPlan.marketingAiPct" class="text-white/85 text-xs leading-relaxed mb-1 flex items-start gap-1.5 flex-wrap">
           <Sparkles class="w-3 h-3 mt-0.5 shrink-0 text-emerald-300" />
           <span>
-            Marketing AI <span class="font-bold">incluido</span>: cobramos <span class="font-bold tabular-nums">{{ recommendedPlan.marketingAiPct }}%</span>
-            <span class="text-white/65">solo sobre las recompras extras que generamos</span>
+            Marketing AI <span class="font-bold">incluido</span>: cobramos
+            <span class="font-bold tabular-nums">{{ recommendedPlan.marketingAiPct }}%</span>
+            <span class="text-white/65"> solo sobre las recompras extras que generamos</span>
           </span>
         </p>
         <p class="text-white/60 text-xs leading-relaxed mt-1">
@@ -173,7 +174,7 @@
       </blockquote>
       <figcaption class="mt-3 pl-3 flex items-center justify-between gap-2">
         <span class="text-[11px] font-bold text-slate-500 tracking-wide uppercase">
-         , Marcos Aldazábal, Socio y Fundador
+          Marcos Aldazábal · Socio y Fundador
         </span>
         <span class="text-[10px] font-black text-primary/60 tracking-wider uppercase">
           Palta
@@ -246,7 +247,7 @@
                 Fee mensual
               </p>
               <p class="text-sm font-bold text-slate-900 tabular-nums whitespace-nowrap">
-                <template v-if="tier.monthlyFee !== null">USD {{ effectiveFee(tier) }}</template>
+                <template v-if="tier.monthlyFee !== null">USD {{ effectiveFee(tier).toLocaleString('es-AR') }}</template>
                 <template v-else>A medida</template>
               </p>
             </div>

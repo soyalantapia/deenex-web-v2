@@ -8,7 +8,7 @@
   -->
   <form @submit.prevent="onContinue" novalidate>
     <p class="text-[11px] font-black text-primary uppercase tracking-[0.2em] mb-3">
-      Paso 3 de 5
+      Paso 3 de 6
     </p>
     <!-- Sin <br /> entre el greeting y "cuánto ahorrás", el lead lee la
          frase como una sola idea ("Alan, mirá cuánto ahorrás."). El span
@@ -41,7 +41,7 @@
           Te ayudamos a migrar de apps de terceros.
         </p>
         <p class="text-xs text-slate-600 leading-snug">
-          Nuestro Customer Success te guía para recuperar el margen del 25% que
+          Nuestro Customer Success te guía para recuperar el margen del 30% que
           hoy le pagás a Rappi, PedidosYa o Uber Eats. La migración promedio
           de las marcas en Deenex demora 14 días.
         </p>
@@ -72,7 +72,7 @@
           </p>
           <p class="text-sm text-white/90 mt-2 leading-snug">
             vs lo que te cobrarían PedidosYa, Rappi o Uber Eats por el mismo volumen
-            ({{ totalOrdersLabel }} pedidos · ticket USD {{ onboarding.effectiveTicket.value }} · 25% de comisión).
+            ({{ totalOrdersLabel }} pedidos · ticket USD {{ onboarding.effectiveTicket.value }} · 30% de comisión).
           </p>
 
           <!-- Break-even visual -->
@@ -91,8 +91,12 @@
               <div class="absolute inset-y-0 right-0 w-px bg-white/50"></div>
             </div>
             <p class="text-[11px] text-white/80 leading-snug mt-2">
-              Tu ahorro vs apps cubre el costo de Deenex en {{ onboarding.breakEvenDays.value }} días.
-              Los {{ 30 - onboarding.breakEvenDays.value }} restantes del mes son ganancia neta.
+              Tu ahorro vs apps cubre el costo de Deenex en
+              <span class="tabular-nums">{{ onboarding.breakEvenDays.value }}</span>
+              {{ onboarding.breakEvenDays.value === 1 ? 'día' : 'días' }}.
+              {{ 30 - onboarding.breakEvenDays.value === 1 ? 'El día' : 'Los días' }}
+              <span class="tabular-nums">{{ 30 - onboarding.breakEvenDays.value }}</span>
+              restantes del mes son ganancia neta.
             </p>
           </div>
         </div>
@@ -109,7 +113,7 @@
           USD <AnimatedNumber :value="thirdPartyMonthly" :duration="1400" />
         </p>
         <p class="text-[11px] text-slate-400 leading-snug">
-          Comisión típica de apps de terceros (25% sobre GMV).
+          Comisión típica de apps de terceros (30% sobre delivery).
         </p>
       </div>
       <div class="rounded-2xl border-2 border-primary bg-primary/[0.04] p-4">
@@ -120,7 +124,7 @@
           USD <AnimatedNumber :value="deenexMonthly" :duration="1400" />
         </p>
         <p class="text-[11px] text-slate-600 leading-snug">
-          Fee fijo + {{ onboarding.recommendedPlan.value.commissionPct }}% por venta procesada.
+          Bundle + {{ onboarding.recommendedPlan.value.commissionPct }}% solo en delivery + Marketing AI performance.
         </p>
       </div>
     </div>
