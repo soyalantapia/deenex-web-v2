@@ -1,18 +1,24 @@
 <template>
   <Teleport to="body">
     <Transition name="resume-overlay">
-      <div v-if="show" class="fixed inset-0 z-[9998] bg-slate-900/50 backdrop-blur-sm" @click="onDecline"></div>
+      <div v-if="show" class="fixed inset-0 z-[9998] bg-slate-900/50 backdrop-blur-sm" @click="onDecline" aria-hidden="true"></div>
     </Transition>
     <Transition name="resume-modal">
       <div
         v-if="show"
         class="fixed inset-0 z-[9999] flex items-center justify-center p-4 pointer-events-none"
       >
-        <div class="bg-white rounded-3xl shadow-2xl max-w-md w-full p-7 pointer-events-auto">
+        <div
+          ref="modalRef"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="resume-modal-title"
+          class="bg-white rounded-3xl shadow-2xl max-w-md w-full p-7 pointer-events-auto"
+        >
           <div class="w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center mb-5">
             <Sparkles class="w-6 h-6 text-primary" />
           </div>
-          <h3 class="text-xl font-extrabold tracking-tight text-slate-900 mb-2">
+          <h3 id="resume-modal-title" class="text-xl font-extrabold tracking-tight text-slate-900 mb-2">
             ¡Te reconocemos!
           </h3>
           <p class="text-sm text-slate-500 leading-relaxed mb-2">
@@ -60,8 +66,9 @@
 </template>
 
 <script setup>
-import { onMounted, onUnmounted } from 'vue'
+import { ref, toRef, onMounted, onUnmounted } from 'vue'
 import { Sparkles } from 'lucide-vue-next'
+import { useFocusTrap } from '@/composables/useFocusTrap'
 
 const props = defineProps({
   show: { type: Boolean, default: false },
@@ -79,6 +86,15 @@ const props = defineProps({
 })
 
 const emit = defineEmits(['resume', 'startOver', 'decline'])
+
+// Ref al contenedor del modal para que useFocusTrap pueda buscar focusables.
+const modalRef = ref(null)
+
+// useFocusTrap espera un Ref<boolean>, convertimos `show` (prop, ya reactivo)
+// con toRef. Esto garantiza: foco-on-open, restore-on-close, Tab cycling +
+// Esc → close (Esc lo manejamos abajo manualmente porque el composable solo
+// hace trap de Tab; queremos cerrar el modal con Esc).
+useFocusTrap(toRef(props, 'show'), modalRef)
 
 function onResume() {
   emit('resume')

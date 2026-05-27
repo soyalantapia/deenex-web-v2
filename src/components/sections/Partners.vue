@@ -26,7 +26,7 @@
           <div class="grid grid-cols-3 sm:grid-cols-3 gap-6 sm:gap-10">
             <div v-for="partner in partners" :key="partner.src"
               class="group flex items-center justify-center p-2 transition-all duration-300">
-              <img :src="partner.src"
+              <img :src="partner.src" :alt="partner.name" loading="lazy"
                 :class="[partner.class, 'w-auto object-contain grayscale opacity-60 group-hover:grayscale-0 group-hover:opacity-100 group-hover:scale-110 transition-all duration-500']" />
             </div>
           </div>
@@ -41,12 +41,14 @@
 </template>
 
 <script setup>
+// `name` se usa como alt accesible (a11y). Sin esto los SR leían la URL completa
+// o el ícono quedaba mudo. Mantenelo sincronizado con la marca real del partner.
 const partners = [
-  { src: new URL('../../assets/images/clients/pimenton.png', import.meta.url).href, class: 'h-10 sm:h-12' },
-  { src: new URL('../../assets/images/clients/sportclub.png', import.meta.url).href, class: 'h-16 sm:h-[6rem]' },
-  { src: new URL('../../assets/images/clients/mp.png', import.meta.url).href, class: 'h-14 sm:h-[6rem]' },
-  { src: new URL('../../assets/images/clients/Odoo.webp', import.meta.url).href, class: 'h-10 sm:h-12' },
-  { src: new URL('../../assets/images/clients/ayres.webp', import.meta.url).href, class: 'h-10 sm:h-12' },
-  { src: new URL('../../assets/images/clients/Maxirest.webp', import.meta.url).href, class: 'h-10 sm:h-12' },
+  { src: new URL('../../assets/images/clients/pimenton.png', import.meta.url).href, name: 'Pimentón', class: 'h-10 sm:h-12' },
+  { src: new URL('../../assets/images/clients/sportclub.png', import.meta.url).href, name: 'SportClub', class: 'h-16 sm:h-[6rem]' },
+  { src: new URL('../../assets/images/clients/mp.png', import.meta.url).href, name: 'MercadoPago', class: 'h-14 sm:h-[6rem]' },
+  { src: new URL('../../assets/images/clients/Odoo.webp', import.meta.url).href, name: 'Odoo', class: 'h-10 sm:h-12' },
+  { src: new URL('../../assets/images/clients/ayres.webp', import.meta.url).href, name: 'Ayres', class: 'h-10 sm:h-12' },
+  { src: new URL('../../assets/images/clients/Maxirest.webp', import.meta.url).href, name: 'Maxirest', class: 'h-10 sm:h-12' },
 ]
 </script>

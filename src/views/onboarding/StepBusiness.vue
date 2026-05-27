@@ -92,11 +92,11 @@
               v-model.number="form.locations"
               type="number"
               min="1"
-              max="500"
+              max="200"
               inputmode="numeric"
               @blur="clampLocations"
               class="text-5xl font-black text-primary tabular-nums tracking-tighter w-32 bg-transparent border-2 border-transparent outline-none focus:bg-white focus:border-primary focus:shadow-md focus:shadow-primary/10 rounded-lg px-2 -mx-2 transition-all no-spinner"
-              aria-label="Cantidad de locales"
+              aria-label="Cantidad de locales (1 a 200, 200 o más entra en plan Enterprise)"
             />
             <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">
               {{ form.locations === 1 ? 'local' : 'locales operativos' }}
@@ -113,6 +113,7 @@
               type="range"
               min="1"
               max="200"
+              aria-label="Slider de cantidad de locales"
               class="w-full h-2 appearance-none bg-transparent cursor-pointer relative z-10 custom-range"
             />
             <div class="absolute inset-x-0 bottom-0 text-[10px] font-black text-slate-400 uppercase tracking-tight h-4">
@@ -382,9 +383,12 @@ function validate(field) {
 
 // Si el usuario escribe un número fuera de rango en el input, lo normalizamos
 // al perder foco para que el slider y el computed del plan no se rompan.
+// El cap superior es 200 (alineado con el slider y con la nota "200+ = Enterprise").
+// Antes era 500 acá pero el slider sólo iba a 200 → desincronía visual: el
+// number aceptaba 350 mientras el slider quedaba pegado al máximo.
 function clampLocations() {
   const n = Number(form.locations) || 1
-  form.locations = Math.max(1, Math.min(500, Math.round(n)))
+  form.locations = Math.max(1, Math.min(200, Math.round(n)))
 }
 
 const isFormValid = computed(() => {

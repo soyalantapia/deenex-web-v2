@@ -1,69 +1,101 @@
 <template>
-  <label class="block" ref="rootEl">
-    <span class="block text-[11px] font-bold text-slate-700 uppercase tracking-widest mb-2">
+  <div class="block" ref="rootEl">
+    <label :for="inputId" class="block text-[11px] font-bold text-slate-700 uppercase tracking-widest mb-2">
       {{ label }}
-      <span v-if="required" class="text-primary">·</span>
-    </span>
+      <span v-if="required" class="text-primary" aria-hidden="true">·</span>
+      <span v-if="required" class="sr-only"> (requerido)</span>
+    </label>
     <div
       class="flex items-stretch rounded-xl bg-white border-2 transition-colors overflow-hidden"
       :class="error
         ? 'border-rose-300 focus-within:border-rose-500'
         : 'border-slate-200 focus-within:border-primary'"
     >
+      <!-- Combobox button: WAI-ARIA exige aria-expanded + aria-controls que apunta
+           al listbox. aria-haspopup="listbox" para que el SR anuncie "expandible". -->
       <button
         type="button"
         @click.prevent="open = !open"
+        @keydown="onTriggerKeydown"
         class="flex items-center gap-1.5 px-3 border-r border-slate-200 bg-slate-50/60 text-sm font-semibold text-slate-700 hover:bg-slate-100 shrink-0"
         :aria-expanded="open"
-        aria-label="Cambiar país"
+        :aria-controls="listboxId"
+        aria-haspopup="listbox"
+        :aria-label="`País: ${selectedCountry.name}, ${selectedCountry.dial}. Click para cambiar.`"
       >
-        <span class="text-base leading-none">{{ selectedCountry.flag }}</span>
+        <span class="text-base leading-none" aria-hidden="true">{{ selectedCountry.flag }}</span>
         <span class="tabular-nums">{{ selectedCountry.dial }}</span>
-        <ChevronDown class="w-3 h-3 text-slate-400 transition-transform" :class="open ? 'rotate-180' : ''" />
+        <ChevronDown class="w-3 h-3 text-slate-400 transition-transform" :class="open ? 'rotate-180' : ''" aria-hidden="true" />
       </button>
       <input
+        :id="inputId"
         :value="localValue"
         :placeholder="selectedCountry.placeholder"
         type="tel"
         inputmode="tel"
         autocomplete="tel-national"
+        :required="required"
+        :aria-invalid="!!error"
+        :aria-describedby="describedById"
         @input="onInput($event.target.value)"
         @blur="$emit('blur')"
         class="flex-1 min-w-0 px-3 py-3 text-base text-slate-900 placeholder-slate-300 bg-white focus:outline-none"
       />
     </div>
 
-    <!-- Country dropdown -->
+    <!-- Country dropdown: role="listbox" + aria-activedescendant para que el SR
+         anuncie qué país está hover-iluminado mientras navegás con ↑↓. -->
     <Transition name="dropdown">
-      <div
+      <ul
         v-if="open"
-        class="mt-2 rounded-xl border border-slate-200 bg-white shadow-lg overflow-hidden"
+        :id="listboxId"
+        ref="listboxRef"
+        role="listbox"
+        :aria-activedescendant="activeCountryId"
+        @keydown="onListboxKeydown"
+        tabindex="-1"
+        class="mt-2 rounded-xl border border-slate-200 bg-white shadow-lg overflow-hidden list-none p-0"
       >
-        <button
-          v-for="c in countries"
+        <li
+          v-for="(c, idx) in countries"
           :key="c.code"
-          type="button"
-          @click.prevent="pickCountry(c.code)"
-          class="w-full flex items-center gap-3 px-4 py-2.5 text-left hover:bg-slate-50 transition-colors"
-          :class="c.code === selectedCountry.code ? 'bg-primary/[0.04] text-primary' : 'text-slate-700'"
+          :id="`country-${uid}-${c.code}`"
+          role="option"
+          :aria-selected="c.code === selectedCountry.code"
+          @click="pickCountry(c.code)"
+          @mouseenter="activeIndex = idx"
+          class="flex items-center gap-3 px-4 py-2.5 text-left cursor-pointer transition-colors"
+          :class="[
+            idx === activeIndex ? 'bg-slate-50' : '',
+            c.code === selectedCountry.code ? 'bg-primary/[0.04] text-primary' : 'text-slate-700',
+          ]"
         >
-          <span class="text-base leading-none">{{ c.flag }}</span>
+          <span class="text-base leading-none" aria-hidden="true">{{ c.flag }}</span>
           <span class="text-sm font-semibold tabular-nums w-12">{{ c.dial }}</span>
           <span class="text-sm">{{ c.name }}</span>
-        </button>
-      </div>
+        </li>
+      </ul>
     </Transition>
 
-    <p v-if="error" class="mt-1.5 text-xs text-rose-500 font-medium">{{ error }}</p>
-    <p v-else-if="hint" class="mt-1.5 text-xs text-slate-400 font-medium">{{ hint }}</p>
-  </label>
+    <p
+      v-if="error"
+      :id="errorId"
+      role="alert"
+      aria-live="polite"
+      class="mt-1.5 text-xs text-rose-500 font-medium"
+    >
+      {{ error }}
+    </p>
+    <p v-else-if="hint" :id="hintId" class="mt-1.5 text-xs text-slate-400 font-medium">{{ hint }}</p>
+  </div>
 </template>
 
 <script setup>
-import { ref, computed, watch, onMounted, onUnmounted } from 'vue'
+import { ref, computed, watch, onMounted, onUnmounted, useId, nextTick } from 'vue'
 import { ChevronDown } from 'lucide-vue-next'
 
 const rootEl = ref(null)
+const listboxRef = ref(null)
 
 const props = defineProps({
   modelValue: { type: String, default: '' },
@@ -71,6 +103,18 @@ const props = defineProps({
   hint: { type: String, default: '' },
   error: { type: String, default: '' },
   required: { type: Boolean, default: false },
+})
+
+// IDs únicos para a11y (label↔input + button↔listbox + input↔error/hint).
+const uid = useId()
+const inputId = `phone-${uid}`
+const listboxId = `phone-${uid}-listbox`
+const errorId = `phone-${uid}-error`
+const hintId = `phone-${uid}-hint`
+const describedById = computed(() => {
+  if (props.error) return errorId
+  if (props.hint) return hintId
+  return undefined
 })
 
 // `country-change` lo emitimos cada vez que el lead cambia de país. El parent
@@ -91,6 +135,13 @@ const countries = [
 const open = ref(false)
 const selectedCode = ref('AR')
 const localValue = ref('')
+// Índice del país hover/teclado-iluminado en el dropdown. Se actualiza con
+// ↑↓; el aria-activedescendant del listbox apunta a este país para que SR lea
+// "Argentina, +54, seleccionado" mientras navegás sin haber confirmado.
+const activeIndex = ref(0)
+const activeCountryId = computed(
+  () => (open.value && countries[activeIndex.value] ? `country-${uid}-${countries[activeIndex.value].code}` : null),
+)
 
 // Initialize from incoming model: split dial from local
 watch(
@@ -119,6 +170,41 @@ function pickCountry(code) {
   // Notificamos al parent para que re-dispare validación del número con
   // las reglas del nuevo país (mínimo dígitos, prefijo, etc).
   emit('country-change', code)
+}
+
+// Keyboard nav patrón Combobox (WAI-ARIA):
+//   - En el botón: Enter/Space abre, ↓ abre + foco al listbox.
+//   - En el listbox: ↑↓ mueven activeIndex, Enter selecciona, Esc cierra.
+async function onTriggerKeydown(e) {
+  if (e.key === 'ArrowDown' || e.key === 'Enter' || e.key === ' ') {
+    e.preventDefault()
+    open.value = true
+    // Inicializa el foco en el país actualmente seleccionado al abrir.
+    const currentIdx = countries.findIndex((c) => c.code === selectedCode.value)
+    activeIndex.value = currentIdx >= 0 ? currentIdx : 0
+    await nextTick()
+    listboxRef.value?.focus()
+  }
+}
+function onListboxKeydown(e) {
+  if (!open.value) return
+  if (e.key === 'ArrowDown') {
+    e.preventDefault()
+    activeIndex.value = (activeIndex.value + 1) % countries.length
+  } else if (e.key === 'ArrowUp') {
+    e.preventDefault()
+    activeIndex.value = (activeIndex.value - 1 + countries.length) % countries.length
+  } else if (e.key === 'Enter' || e.key === ' ') {
+    e.preventDefault()
+    const target = countries[activeIndex.value]
+    if (target) pickCountry(target.code)
+  } else if (e.key === 'Home') {
+    e.preventDefault()
+    activeIndex.value = 0
+  } else if (e.key === 'End') {
+    e.preventDefault()
+    activeIndex.value = countries.length - 1
+  }
 }
 
 function onInput(raw) {

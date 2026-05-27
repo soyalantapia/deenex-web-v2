@@ -123,13 +123,14 @@
         <div v-if="floatImages[0]" :class="['absolute left-[1%] top-[20%] z-30 block w-[35vw] max-w-[140px] sm:hidden transition-all duration-1000',
           ready ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4']" style="transition-delay: 1.5s">
           <div class="glass-morph float-card-inner rounded-lg shadow-xl overflow-hidden anim-f1">
-            <img :src="floatImages[0]" class="w-full" />
+            <!-- alt="" decorativo: los floats son pura ornamentación del hero, los SR los saltean -->
+            <img :src="floatImages[0]" alt="" class="w-full" />
           </div>
         </div>
         <div v-if="floatImages[1]" :class="['absolute right-[2%] top-[35%] z-30 block w-[32vw] max-w-[130px] sm:hidden transition-all duration-1000',
           ready ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4']" style="transition-delay: 1.7s">
           <div class="glass-morph float-card-inner rounded-lg shadow-xl overflow-hidden anim-f2">
-            <img :src="floatImages[1]" class="w-full" />
+            <img :src="floatImages[1]" alt="" class="w-full" />
           </div>
         </div>
 

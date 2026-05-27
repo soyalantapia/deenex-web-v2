@@ -15,28 +15,33 @@
     <Transition name="activation-overlay">
       <div
         v-if="show"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="activation-title"
         class="fixed inset-0 z-[10000] bg-white flex items-center justify-center p-4 overflow-y-auto"
       >
         <!-- Glow sutil de marca: pequeños halos primary + emerald en las
              esquinas para que no sea un blanco plano puro, pero el fondo
              principal se mantiene blanco como el resto del onboarding. -->
-        <div class="absolute top-0 left-0 w-[480px] h-[480px] rounded-full bg-primary/[0.06] blur-[140px] pointer-events-none"></div>
-        <div class="absolute bottom-0 right-0 w-[420px] h-[420px] rounded-full bg-emerald-400/10 blur-[140px] pointer-events-none"></div>
+        <div class="absolute top-0 left-0 w-[480px] h-[480px] rounded-full bg-primary/[0.06] blur-[140px] pointer-events-none" aria-hidden="true"></div>
+        <div class="absolute bottom-0 right-0 w-[420px] h-[420px] rounded-full bg-emerald-400/10 blur-[140px] pointer-events-none" aria-hidden="true"></div>
 
-        <div class="relative max-w-lg w-full">
+        <!-- aria-live="polite" en el bloque dinámico para que el SR anuncie los
+             cambios de step (provisionado, listo, etc) sin requerir focus. -->
+        <div class="relative max-w-lg w-full" aria-live="polite" aria-atomic="false">
           <!-- Header -->
           <div class="text-center mb-8">
-            <div class="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-primary/10 border border-primary/15 mb-5">
+            <div class="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-primary/10 border border-primary/15 mb-5" aria-hidden="true">
               <div class="w-8 h-8 rounded-full border-[3px] border-primary/20 border-t-primary animate-spin"></div>
             </div>
             <p class="text-[10px] font-black text-primary uppercase tracking-[0.25em] mb-2">
-              Activando tu cuenta
+              {{ allDone ? '¡Cuenta lista!' : 'Activando tu cuenta' }}
             </p>
-            <h2 class="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tighter leading-tight">
-              {{ activeStep ? activeStep.title : 'Conectando…' }}
+            <h2 id="activation-title" class="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tighter leading-tight">
+              {{ activeStep ? activeStep.title : (allDone ? 'Todo listo, redirigiendo…' : 'Conectando…') }}
             </h2>
             <p class="text-sm text-slate-500 mt-2 leading-relaxed">
-              {{ activeStep?.description || '' }}
+              {{ activeStep?.description || (allDone ? 'Te llevamos a tu dashboard en un segundo.' : '') }}
             </p>
           </div>
 
@@ -120,8 +125,13 @@
           </div>
 
           <p class="mt-5 text-center text-[11px] text-slate-400 leading-relaxed">
-            No cierres la pestaña. En {{ remainingSec || '~5' }} segundos
-            estás operando.
+            <template v-if="allDone">
+              ¡Listo! Redirigiéndote al dashboard…
+            </template>
+            <template v-else>
+              No cierres la pestaña. En {{ remainingSec || '~5' }} segundos
+              estás operando.
+            </template>
           </p>
         </div>
       </div>
@@ -213,6 +223,11 @@ const steps = ref([
 const activeStep = computed(() => steps.value.find((s) => s.status === 'doing'))
 const doneCount = computed(() => steps.value.filter((s) => s.status === 'done').length)
 const progressPct = computed(() => Math.round((doneCount.value / steps.value.length) * 100))
+// Cuando todos los pasos están done, mostramos copy distinto en el header y
+// footer en vez de seguir diciendo "Conectando…" o "En 0 segundos estás
+// operando" (el fallback `|| '~5'` aplicaba solo si remainingSec era 0 falsy,
+// pero el copy "Activando tu cuenta" igual quedaba inconsistente).
+const allDone = computed(() => doneCount.value === steps.value.length)
 const remainingSec = computed(() => {
   return steps.value
     .filter((s) => s.status !== 'done')

@@ -187,14 +187,27 @@
     <button
       @click="onActivate"
       :disabled="loading"
+      :aria-busy="loading"
       class="group w-full inline-flex items-center justify-center gap-2 bg-emerald-500 hover:bg-emerald-600 disabled:bg-slate-300 text-white font-bold rounded-xl px-6 py-4 text-base transition-all shadow-md shadow-emerald-500/25 hover:shadow-emerald-500/40 hover:-translate-y-0.5 disabled:hover:translate-y-0 disabled:cursor-not-allowed"
     >
-      <span v-if="loading" class="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></span>
+      <span v-if="loading" class="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" aria-hidden="true"></span>
+      <span v-if="loading" class="sr-only">Activando…</span>
       <template v-else>
         {{ activateButtonLabel }}
         <ArrowRight class="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
       </template>
     </button>
+
+    <!-- Error path: si la activación falla, mostramos el motivo + invitamos a
+         reintentar. role="alert" + aria-live para que el SR lo anuncie sin
+         requerir foco. -->
+    <p
+      v-if="activationError"
+      role="alert"
+      class="mt-3 text-sm text-rose-600 leading-relaxed text-center bg-rose-50/60 border border-rose-200 rounded-xl p-3"
+    >
+      {{ activationError }}
+    </p>
 
     <!-- "Cambiar de plan" removido, el plan se asigna automáticamente
          según volumen (no hay opción de elegir). -->
@@ -227,10 +240,16 @@ const activateButtonLabel = computed(() => 'Activar mi cuenta con MercadoPago')
 
 // Trust badges mobile, la versión inline que llena el gap del sidebar
 // desktop-only. Versión compacta para 390px.
+//
+// Antes el 3er badge prometía "Garantía 30 días · Devolución sin preguntas"
+// pero el negocio NO ofrece eso. Lo real es: cobramos recién al día 15 y
+// cancelás cuando quieras (sin permanencia). El badge engañoso quedó cuando
+// arreglamos el SidePanel/FAQ en Round 2 pero acá pasó por la grieta.
+// Reemplazado por algo que SI cumplimos: el primer cargo es al día 15.
 const mobileTrustBadges = [
   { title: 'MercadoPago oficial', desc: 'Partner certificado.', icon: Shield, color: 'text-sky-500' },
   { title: 'Cifrado AES-256', desc: 'Tus datos protegidos.', icon: Lock, color: 'text-emerald-500' },
-  { title: 'Garantía 30 días', desc: 'Devolución sin preguntas.', icon: FileText, color: 'text-amber-500' },
+  { title: 'Cobramos al día 15', desc: 'No al activar.', icon: FileText, color: 'text-amber-500' },
   { title: 'Cancelás en 1 click', desc: 'Sin permanencia.', icon: Clock, color: 'text-violet-500' },
 ]
 
@@ -255,50 +274,71 @@ const planSummary = computed(() => {
 // Loyalty viene incluida en el Bundle de entrada, sin costo extra.
 const totalMonthly = computed(() => planSummary.value.monthlyFee || 0)
 
+// Error visible para el lead cuando la activación falla. No bloqueamos
+// la UI con un alert(), preferimos un mensaje inline al lado del botón.
+const activationError = ref('')
+
 async function onActivate() {
   loading.value = true
+  activationError.value = ''
   onboarding.track('activation_initiated', {
     plan: onboarding.state.plan.key,
     total: totalMonthly.value,
     method: paymentChoice.value,
   })
 
-  // Si el lead viene del experimento del Hero, registramos la conversión
-  // (cuál variante del CTA lo trajo hasta acá). Es la métrica clave.
   try {
-    const assignments = JSON.parse(localStorage.getItem('deenex_experiments_v1') || '{}')
-    if (assignments.hero_cta_v1) {
-      const { trackEvent } = await import('@/utils/analytics')
-      trackEvent('experiment_conversion', {
-        experiment_id: 'hero_cta_v1',
-        variant_id: assignments.hero_cta_v1,
-        method: paymentChoice.value,
-        plan: onboarding.state.plan.key,
-      })
+    // Si el lead viene del experimento del Hero, registramos la conversión
+    // (cuál variante del CTA lo trajo hasta acá). Es la métrica clave.
+    // Si el tracking falla, NO bloqueamos la activación — capturamos por
+    // separado más abajo y dejamos seguir.
+    try {
+      const assignments = JSON.parse(localStorage.getItem('deenex_experiments_v1') || '{}')
+      if (assignments.hero_cta_v1) {
+        const { trackEvent } = await import('@/utils/analytics')
+        trackEvent('experiment_conversion', {
+          experiment_id: 'hero_cta_v1',
+          variant_id: assignments.hero_cta_v1,
+          method: paymentChoice.value,
+          plan: onboarding.state.plan.key,
+        })
+      }
+    } catch {
+      // tracking failure should never block activation
     }
-  } catch {
-    // tracking failure should never block activation
+
+    /*
+     * Integración backend (cuando exista):
+     *   POST /api/onboarding/checkout-preference → MercadoPago preference + tenantId
+     *   El backend dispara los webhooks de provisioning en orden:
+     *   account.created → subdomain.provisioned → branding.generated →
+     *   loyalty.configured → channels.linked → magic_link.sent
+     *   El ActivationOverlay escucha esos webhooks (vía SSE/polling) y avanza
+     *   los pasos. Hoy es simulado con setTimeout.
+     */
+    // Pequeño beat para que el botón muestre el spinner antes del overlay.
+    await new Promise((r) => setTimeout(r, 600))
+
+    // Marcamos el trial como activado ANTES de mostrar el overlay para que
+    // el state quede consistente si el lead refresca durante el provisioning.
+    onboarding.markTrialActivated(paymentChoice.value, 'stub_pref_' + Date.now())
+
+    // Mostramos el overlay con la simulación. La navegación al welcome ocurre
+    // cuando ActivationOverlay emit @complete (después de todos los pasos).
+    showActivationOverlay.value = true
+  } catch (err) {
+    // Cualquier excepción inesperada del backend / red / localStorage la
+    // captamos acá, apagamos el spinner y mostramos error inline. Sin esto
+    // el botón quedaba spinning para siempre y el lead no podía reintentar.
+    onboarding.track('activation_failed', {
+      reason: err?.message || 'unknown',
+      method: paymentChoice.value,
+    })
+    activationError.value =
+      'No pudimos activar tu cuenta. Revisá tu conexión y reintentá. Si el problema persiste, escribinos por WhatsApp.'
+  } finally {
+    loading.value = false
   }
-
-  /*
-   * Integración backend (cuando exista):
-   *   POST /api/onboarding/checkout-preference → MercadoPago preference + tenantId
-   *   El backend dispara los webhooks de provisioning en orden:
-   *   account.created → subdomain.provisioned → branding.generated →
-   *   loyalty.configured → channels.linked → magic_link.sent
-   *   El ActivationOverlay escucha esos webhooks (vía SSE/polling) y avanza
-   *   los pasos. Hoy es simulado con setTimeout.
-   */
-  // Pequeño beat para que el botón muestre el spinner antes del overlay.
-  await new Promise((r) => setTimeout(r, 600))
-
-  // Marcamos el trial como activado ANTES de mostrar el overlay para que
-  // el state quede consistente si el lead refresca durante el provisioning.
-  onboarding.markTrialActivated(paymentChoice.value, 'stub_pref_' + Date.now())
-
-  // Mostramos el overlay con la simulación. La navegación al welcome ocurre
-  // cuando ActivationOverlay emit @complete (después de todos los pasos).
-  showActivationOverlay.value = true
 }
 
 function onProvisioningComplete() {
