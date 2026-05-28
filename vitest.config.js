@@ -18,7 +18,9 @@ export default defineConfig({
     environment: 'jsdom',
     globals: true,
     // Excluimos dist/ y node_modules/ para no testear builds o deps.
-    exclude: ['node_modules', 'dist', '.git'],
+    // e2e/ tiene specs de Playwright (test.describe distinto al de vitest) —
+    // los corre `npm run test:e2e`, no vitest.
+    exclude: ['node_modules', 'dist', '.git', 'e2e/**'],
     // Setup global que stubea import.meta.env y otras cosas que no son fáciles
     // de mockear por test.
     setupFiles: ['./tests/setup.js'],

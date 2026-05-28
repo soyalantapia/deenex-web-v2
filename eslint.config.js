@@ -11,7 +11,13 @@ export default defineConfig([
     files: ['**/*.{vue,js,mjs,jsx}'],
   },
 
-  globalIgnores(['**/dist/**', '**/dist-ssr/**', '**/coverage/**']),
+  globalIgnores([
+    '**/dist/**',
+    '**/dist-ssr/**',
+    '**/coverage/**',
+    '**/playwright-report/**',
+    '**/test-results/**',
+  ]),
 
   {
     languageOptions: {
@@ -49,6 +55,18 @@ export default defineConfig([
         afterAll: 'readonly',
         vi: 'readonly',
         test: 'readonly',
+      },
+    },
+  },
+
+  // E2E tests con Playwright: usa `test`/`expect` importados explícitamente
+  // desde @playwright/test, así que no hay globals. Pero corren en Node y
+  // necesitan el environment de browser-driver. Aceptamos process/console.
+  {
+    files: ['e2e/**/*.js', 'playwright.config.js'],
+    languageOptions: {
+      globals: {
+        ...globals.node,
       },
     },
   },

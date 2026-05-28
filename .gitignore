@@ -35,6 +35,14 @@ coverage
 # Vitest
 __screenshots__/
 
+# Playwright
+/playwright-report/
+/test-results/
+/playwright/.cache/
+
+# Lighthouse CI
+.lighthouseci/
+
 # Vite
 *.timestamp-*-*.mjs
 .claude/
