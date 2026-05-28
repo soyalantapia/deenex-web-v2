@@ -341,10 +341,10 @@ const isEnterprise = computed(() => {
   return route.query.enterprise === '1' || onboarding.state.plan.key === 'enterprise'
 })
 
-// URLs del entorno. El default apunta al admin de desarrollo (que YA tiene el
-// branding multi-tenant funcionando). Cuando exista app.deenex.tech con session
-// handoff propio, podemos cambiar la default. Por env: VITE_APP_DASHBOARD_URL.
-const DASHBOARD_BASE = import.meta.env.VITE_APP_DASHBOARD_URL || 'https://administrador.desarrollo.deenex.tech'
+// URLs del entorno. Default apunta al admin LOCAL (npm run dev2 en :3002)
+// para iterar sin tocar el deploy. Para producción, setear:
+//   VITE_APP_DASHBOARD_URL=https://administrador.desarrollo.deenex.tech
+const DASHBOARD_BASE = import.meta.env.VITE_APP_DASHBOARD_URL || 'http://localhost:3002'
 // Fallback: si no hay calendar URL configurado (dev local sin .env), caemos a
 // WhatsApp en vez de a "#" (anchor vacío que dejaba al lead bailando).
 const calendarUrl = import.meta.env.VITE_CALENDAR_URL || whatsappLink(
@@ -380,13 +380,29 @@ function trackEnterpriseCta(channel) {
 // que el dashboard usa para hacer el lookup. Sin esto, el lead llega a
 // app.deenex.tech y tiene que volver a poner email / pass (no existe pass).
 const dashboardSessionToken = computed(() => {
-  const email = onboarding.state.identity.email || ''
-  const activatedAt = onboarding.state.trial.activatedAt || new Date().toISOString()
-  // En producción: JWT firmado por el backend con TTL corto (10 min) que el
-  // dashboard intercambia por una session cookie. Acá usamos base64 stub.
+  // En producción esto será un JWT firmado por el backend con TTL corto (10 min)
+  // que el admin intercambia por una session cookie. Mientras tanto, es un
+  // payload base64-encoded con los datos mínimos del lead — el hook
+  // useOnboardingHandoff del admin (palta-app-admin-frontend) lo decodifica
+  // y crea un user/session mock para auto-loguear al lead sin pedirle OTP.
+  //
+  // Antes era un hash opaco truncado a 32 chars que NO se podía decodificar
+  // (se perdían los caracteres `=` y `+` del base64 al sanitizar). Resultado:
+  // el admin no tenía cómo identificar al lead, lo mandaba a /auth y le pedía
+  // re-login. F-01 de la auditoría UX.
   if (typeof window === 'undefined') return ''
   try {
-    return btoa(`${email}|${activatedAt}|magiclink`).replace(/[^A-Za-z0-9]/g, '').slice(0, 32)
+    const payload = {
+      email: onboarding.state.identity.email || '',
+      firstName: onboarding.state.identity.firstName || '',
+      fullName: onboarding.state.identity.fullName || '',
+      whatsapp: onboarding.state.identity.whatsapp || '',
+      brand: onboarding.state.business.brand || '',
+      locations: onboarding.state.business.locations || 1,
+      planKey: onboarding.state.plan.key || 'inicio',
+      activatedAt: onboarding.state.trial.activatedAt || new Date().toISOString(),
+    }
+    return btoa(unescape(encodeURIComponent(JSON.stringify(payload))))
   } catch {
     return ''
   }
