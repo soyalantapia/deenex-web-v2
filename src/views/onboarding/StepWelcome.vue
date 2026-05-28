@@ -230,11 +230,18 @@
       <div class="p-4 flex items-start gap-3">
         <Mail class="w-5 h-5 text-amber-500 shrink-0 mt-0.5" />
         <div class="min-w-0 flex-1">
+          <!-- Antes el copy era "Confirmá tu email para acceder", lo que
+               implicaba que el lead NO podía entrar al dashboard sin clickear
+               el link. Pero el botón grande arriba dice "Entrar al dashboard"
+               y ese ya logea automáticamente vía session token. Cambiamos a un
+               recordatorio sin tono de gating — el lead puede entrar ahora Y
+               desde el link del email después si vuelve. -->
           <p class="text-xs font-bold text-slate-900 leading-tight">
-            Confirmá tu email para acceder
+            Guardá el link en tu email para volver
           </p>
           <p class="text-[11px] text-slate-500 leading-snug mt-1">
-            Te mandamos un link a <span class="font-semibold text-slate-700">{{ onboarding.state.identity.email }}</span>.
+            Te lo mandamos a <span class="font-semibold text-slate-700">{{ onboarding.state.identity.email }}</span>
+            así podés entrar al dashboard cuando quieras, desde cualquier dispositivo.
             Si no lo ves, revisá spam o
             <button type="button" @click="resendMagicLink" class="text-amber-700 font-semibold underline hover:text-amber-900">
               reenviá el link

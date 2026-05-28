@@ -168,7 +168,7 @@
     />
 
     <p class="mt-6 text-[11px] text-slate-400 leading-relaxed">
-      Sin cargo durante 14 días. Cancelás en 1 click. Si no convence, te exportamos los datos y bajamos la cuenta sin preguntas.
+      Empezás sin tarjeta. 14 días gratis. Cancelás en 1 click. Si no convence, te exportamos los datos y bajamos la cuenta sin preguntas.
     </p>
   </form>
 </template>

@@ -155,11 +155,15 @@ const emit = defineEmits(['complete'])
 // linked, magic_link.sent). Los delays son intencionalmente "humanos":
 // no instantáneos para que el lead perciba esfuerzo real, no fake.
 const steps = ref([
+  // Wow-moment-first: este primer paso era "Procesando pago con MercadoPago" en
+  // el modelo viejo (StepTrial pedía tarjeta antes del overlay). Ahora la
+  // activación es SIN tarjeta — el primer paso es la reserva del trial gratis.
+  // El paywall de MercadoPago se mueve al dashboard, después que cargue menú.
   {
-    key: 'payment',
-    title: 'Procesando pago con MercadoPago',
-    description: 'Validando método de pago y reservando tu cuenta…',
-    doneText: 'MercadoPago vinculado. Primer cargo: día 15.',
+    key: 'trial',
+    title: 'Reservando tu trial gratis',
+    description: 'Activando los 14 días sin tarjeta…',
+    doneText: 'Trial activo. Sin cargo hasta el día 15.',
     estimatedSec: 4,
     delayMs: 2200,
     status: 'doing',

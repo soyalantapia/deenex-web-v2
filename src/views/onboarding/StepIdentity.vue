@@ -19,8 +19,8 @@
       <span class="text-primary italic font-light">Te lleva menos de un minuto.</span>
     </h1>
     <p class="text-base text-slate-500 leading-relaxed mb-10 max-w-md">
-      Lo usamos para crear tu cuenta y mandarte los datos de acceso por
-      email y WhatsApp.
+      Lo usamos para crear tu cuenta y mandarte el link de acceso al
+      dashboard por email.
     </p>
 
     <div class="space-y-5">
@@ -43,7 +43,7 @@
         autocomplete="email"
         inputmode="email"
         placeholder="marcos@palta.com.ar"
-        hint="Te mandamos el magic link acá. Si no es corporativo, igual sirve."
+        hint="Te mandamos el link de acceso acá. Funciona con cualquier email."
         :error="errors.email"
         required
         @blur="validate('email')"

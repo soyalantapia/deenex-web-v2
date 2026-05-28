@@ -243,6 +243,14 @@ const onboarding = useOnboarding()
 // inferida del dominio. El usuario la puede cambiar a su gusto.
 const inferredBrand = onboarding.inferBrandFromEmail(onboarding.state.identity.email)
 
+// Antes el state.business.brand solo se hidrataba cuando el lead EDITABA el
+// campo (via watch on form.brand). Si avanzaba sin tocar nada, state quedaba
+// con brand="" y el Welcome mostraba "tu-marca.deenex.app" en lugar del
+// brand real → rompía el wow moment. Sincronizamos directo al setup acá.
+if (!onboarding.state.business.brand && inferredBrand) {
+  onboarding.state.business.brand = inferredBrand
+}
+
 const form = reactive({
   brand: onboarding.state.business.brand || inferredBrand,
   locations: onboarding.state.business.locations || 1,
@@ -261,7 +269,7 @@ watch(
   (val) => {
     onboarding.state.business.brand = val
     triggerSubdomainCheck()
-  }
+  },
 )
 
 // ── Subdomain availability check ────────────────────────────────────────
@@ -346,8 +354,10 @@ const errors = reactive({ brand: '', channels: '' })
 
 // Lista completa de POS gastronómicos populares en LATAM. Orden alfabético
 // (menos "No tengo POS" y "Otro" que van al final como casos especiales).
+// El label "Ayres" matchea con el logo en Partners.vue. Mantener `value` como
+// 'ayres' (slug estable) para no romper state persistido de leads previos.
 const posOptions = [
-  { value: 'ayresit', label: 'Ayresit' },
+  { value: 'ayres', label: 'Ayres' },
   { value: 'fudo', label: 'Fudo' },
   { value: 'bistrosoft', label: 'Bistrosoft' },
   { value: 'maxirest', label: 'Maxirest' },
