@@ -3,7 +3,7 @@
 </template>
 
 <script setup>
-import { ref, watch, onMounted } from 'vue'
+import { ref, watch, onMounted, onUnmounted } from 'vue'
 
 const props = defineProps({
   value: { type: Number, required: true },
@@ -55,6 +55,17 @@ onMounted(() => animate(props.value))
 
 watch(
   () => props.value,
-  (next) => animate(next)
+  (next) => animate(next),
 )
+
+// Cancelamos el rAF activo cuando el componente se desmonta. Sin esto, si el
+// lead navega mid-animation (ej. cambia de step) el callback sigue ejecutándose
+// y muta displayValue.value de un componente ya destruido — Vue lo absorbe
+// pero ensucia el call stack y a veces emite warnings en strict mode.
+onUnmounted(() => {
+  if (rafId) {
+    cancelAnimationFrame(rafId)
+    rafId = null
+  }
+})
 </script>

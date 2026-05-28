@@ -25,6 +25,7 @@
           v-if="open"
           class="fixed inset-0 z-[9997] bg-slate-900/50 backdrop-blur-sm"
           @click="open = false"
+          aria-hidden="true"
         ></div>
       </Transition>
       <Transition name="qr-modal">
@@ -32,11 +33,17 @@
           v-if="open"
           class="fixed inset-0 z-[9998] flex items-center justify-center p-4 pointer-events-none"
         >
-          <div class="bg-white rounded-3xl shadow-2xl max-w-sm w-full p-7 pointer-events-auto">
-            <div class="w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center mb-5">
+          <div
+            ref="modalRef"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="qr-modal-title"
+            class="bg-white rounded-3xl shadow-2xl max-w-sm w-full p-7 pointer-events-auto"
+          >
+            <div class="w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center mb-5" aria-hidden="true">
               <Smartphone class="w-6 h-6 text-primary" />
             </div>
-            <h3 class="text-xl font-extrabold tracking-tight text-slate-900 mb-2">
+            <h3 id="qr-modal-title" class="text-xl font-extrabold tracking-tight text-slate-900 mb-2">
               Continuá en tu celular
             </h3>
             <p class="text-sm text-slate-500 leading-relaxed mb-5">
@@ -65,11 +72,19 @@
                   type="button"
                   @click="copyLink"
                   class="text-[10px] font-black uppercase tracking-widest px-2.5 py-1 rounded-md transition-colors shrink-0"
-                  :class="copied ? 'bg-emerald-500 text-white' : 'bg-primary text-white hover:bg-[#3c1fc9]'"
+                  :class="copyFailed
+                    ? 'bg-rose-500 text-white'
+                    : copied ? 'bg-emerald-500 text-white' : 'bg-primary text-white hover:bg-[#3c1fc9]'"
                 >
-                  {{ copied ? '✓ Copiado' : 'Copiar' }}
+                  {{ copyFailed ? 'Error' : (copied ? '✓ Copiado' : 'Copiar') }}
                 </button>
               </div>
+              <!-- Mensaje fallback si copy falla (browser sin permisos, HTTP).
+                   Le decimos al lead que seleccione manualmente. role=alert
+                   para que el SR lo anuncie sin requerir foco. -->
+              <p v-if="copyFailed" role="alert" class="mt-1 text-[10px] text-rose-600 leading-snug">
+                No pudimos copiar automáticamente. Seleccioná el link arriba y copiá con Ctrl/Cmd+C.
+              </p>
             </div>
             <p class="text-[10px] text-slate-400 leading-relaxed mb-5 text-center">
               El link expira en 24 horas.
@@ -92,20 +107,29 @@
 import { ref, computed } from 'vue'
 import { Smartphone } from 'lucide-vue-next'
 import { useOnboarding } from '@/composables/useOnboarding'
+import { useFocusTrap } from '@/composables/useFocusTrap'
 import { generateQrSvg } from '@/utils/qrcode'
 
 const onboarding = useOnboarding()
 const open = ref(false)
 const copied = ref(false)
+const copyFailed = ref(false)
+const modalRef = ref(null)
 
-// Token "resume", en producción esto sería un JWT firmado por el backend
-// con expiración. Frontend-only por ahora: hash determinístico de email +
-// startedAt para que el QR sea reproducible si el lead lo abre varias veces.
+// a11y: foco-on-open, restore-on-close, Tab cycling. Mismo composable que
+// usan el save modal, exit intent, exit confirm y ResumeModal.
+useFocusTrap(open, modalRef)
+
+// Token "resume". En producción sería un JWT firmado por el backend con TTL
+// y revocación; el frontend solo lo pide al backend al abrir el modal.
+// Stub local: hash DETERMINÍSTICO de email + startedAt. Antes incluía
+// Date.now() en el hash → cada apertura del modal generaba un token distinto,
+// contradicción con la doc original. Ahora dos aperturas dan el mismo QR
+// (mientras email/startedAt no cambien) y el link es estable para compartir.
 const resumeToken = computed(() => {
   const email = onboarding.state.identity.email || ''
   const started = onboarding.state.meta.startedAt || ''
-  // btoa simple, suficiente para el stub.
-  return btoa(`${email}|${started}|${Date.now()}`).replace(/[^A-Za-z0-9]/g, '').slice(0, 24)
+  return btoa(`${email}|${started}`).replace(/[^A-Za-z0-9]/g, '').slice(0, 24)
 })
 
 const tokenPreview = computed(() => resumeToken.value.slice(0, 6) + '…')
@@ -121,13 +145,37 @@ const resumeUrl = computed(() => {
 const qrSvg = computed(() => generateQrSvg(resumeUrl.value, { size: 192, margin: 2 }))
 
 async function copyLink() {
+  // Reset error state en cada intento.
+  copyFailed.value = false
   try {
-    await navigator.clipboard.writeText(resumeUrl.value)
+    // navigator.clipboard requiere HTTPS o localhost. Si la página corre en
+    // HTTP plain o el browser bloquea, fallback a un truco con textarea +
+    // execCommand para no dejar al lead sin recurso.
+    if (navigator.clipboard?.writeText) {
+      await navigator.clipboard.writeText(resumeUrl.value)
+    } else {
+      // Fallback legacy: textarea oculto + execCommand. Deprecated pero
+      // soportado por todos los browsers actuales como último recurso.
+      const ta = document.createElement('textarea')
+      ta.value = resumeUrl.value
+      ta.style.position = 'fixed'
+      ta.style.opacity = '0'
+      document.body.appendChild(ta)
+      ta.select()
+      const ok = document.execCommand('copy')
+      document.body.removeChild(ta)
+      if (!ok) throw new Error('execCommand failed')
+    }
     copied.value = true
     onboarding.track('cross_device_link_copied')
     setTimeout(() => { copied.value = false }, 2000)
   } catch {
-    /* clipboard puede fallar en algunos browsers, UX queda igual */
+    // Le avisamos al lead que falló y mostramos el link plain para que lo
+    // pueda copiar manualmente. Antes el error se tragaba en silencio →
+    // botón "Copiar" no daba feedback y el lead quedaba bailando.
+    copyFailed.value = true
+    onboarding.track('cross_device_copy_failed')
+    setTimeout(() => { copyFailed.value = false }, 4000)
   }
 }
 </script>

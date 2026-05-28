@@ -23,6 +23,14 @@ const props = defineProps({
 onMounted(() => {
   const canvas = canvasEl.value
   if (!canvas) return
+
+  // Respetar prefers-reduced-motion (WCAG 2.3.3): los usuarios con OS-level
+  // "reduce motion" no quieren animaciones decorativas como confetti. Skip
+  // toda la lógica y dejamos el canvas vacío. La conversión sigue intacta
+  // — el confetti es pura ornamentación.
+  const reducedMotion = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches
+  if (reducedMotion) return
+
   const ctx = canvas.getContext('2d')
   const dpr = window.devicePixelRatio || 1
 
@@ -31,7 +39,11 @@ onMounted(() => {
     canvas.height = window.innerHeight * dpr
     canvas.style.width = window.innerWidth + 'px'
     canvas.style.height = window.innerHeight + 'px'
-    ctx.scale(dpr, dpr)
+    // setTransform RESETEA la matriz antes de aplicar scale. Antes usábamos
+    // ctx.scale(dpr, dpr) directo, que es ACUMULATIVO: cada resize multiplicaba
+    // la escala por dpr otra vez → después de 2-3 resizes el render quedaba
+    // offscreen (escala = dpr², dpr³, etc).
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0)
   }
   resize()
   const onResize = () => resize()
