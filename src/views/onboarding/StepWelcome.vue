@@ -280,104 +280,18 @@
       </Transition>
     </div>
 
-    <!-- Refer-a-friend block ────────────────────────────────────────── -->
-    <div v-if="!isEnterprise" class="relative rounded-3xl border-2 border-dashed border-primary/30 bg-primary/[0.02] p-6 mb-4">
-      <div class="absolute -top-3 left-6 bg-white px-3 py-0.5 text-[10px] font-black text-primary uppercase tracking-widest rounded-full border border-primary/30">
-        Beneficio mutuo
-      </div>
-      <div class="flex items-start gap-4">
-        <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-amber-400 to-amber-500 flex items-center justify-center shrink-0 text-2xl">
-          🎁
-        </div>
-        <div class="flex-1 min-w-0">
-          <h3 class="text-base font-bold text-slate-900 leading-tight mb-1">
-            ¿Conocés otra marca que sufre con apps de terceros?
-          </h3>
-          <p class="text-xs text-slate-500 leading-relaxed mb-4">
-            Invitalos con tu link personal: cuando activan, vos sumás
-            <span class="font-bold text-emerald-600">1 mes gratis</span>
-            y ellos arrancan con
-            <span class="font-bold text-emerald-600">25% off</span>
-            sobre el primer mes.
-          </p>
-          <div class="flex items-center gap-2 bg-white border border-slate-200 rounded-lg px-3 py-2">
-            <code class="flex-1 text-xs font-mono text-slate-600 truncate">{{ referralLink }}</code>
-            <button
-              type="button"
-              @click="copyReferral"
-              class="text-[10px] font-black uppercase tracking-widest px-2.5 py-1 rounded-md transition-colors shrink-0"
-              :class="copied ? 'bg-emerald-500 text-white' : 'bg-primary text-white hover:bg-[#3c1fc9]'"
-            >
-              {{ copied ? '¡Copiado!' : 'Copiar' }}
-            </button>
-          </div>
-          <div class="flex items-center gap-2 mt-3 flex-wrap">
-            <a
-              :href="whatsappShareUrl"
-              target="_blank"
-              rel="noopener"
-              @click="trackShare('whatsapp')"
-              class="inline-flex items-center gap-1.5 text-xs font-semibold text-emerald-600 hover:text-emerald-700 transition-colors"
-            >
-              <MessageCircle class="w-3 h-3" />
-              Compartir por WhatsApp
-            </a>
-            <span class="w-px h-3 bg-slate-200"></span>
-            <a
-              :href="emailShareUrl"
-              @click="trackShare('email')"
-              class="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-500 hover:text-slate-700 transition-colors"
-            >
-              <Mail class="w-3 h-3" />
-              Compartir por email
-            </a>
-            <span class="w-px h-3 bg-slate-200"></span>
-            <button
-              type="button"
-              @click="toggleReferralPreview"
-              class="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-500 hover:text-slate-700 transition-colors"
-            >
-              <Eye class="w-3 h-3" />
-              {{ referralPreviewOpen ? 'Ocultar preview' : 'Ver lo que reciben' }}
-            </button>
-          </div>
+    <!-- Refer-a-friend block REMOVIDO de StepWelcome — se movió al admin como
+         widget sticky bottom-left (ReferralWidget). Razón: el wow moment del
+         welcome es "tu marca está viva + auto-redirect al dashboard". El
+         referral aparece DESPUÉS dentro del admin, siempre disponible. -->
 
-          <!-- Preview: lo que ve el amigo cuando abre el link de referido -->
-          <Transition name="referral-preview">
-            <div v-if="referralPreviewOpen" class="mt-4 rounded-2xl bg-white border-2 border-slate-200 overflow-hidden">
-              <!-- Mock browser bar -->
-              <div class="px-3 py-1.5 border-b border-slate-100 bg-slate-50/80 flex items-center gap-1.5">
-                <span class="w-1.5 h-1.5 rounded-full bg-rose-400"></span>
-                <span class="w-1.5 h-1.5 rounded-full bg-amber-400"></span>
-                <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
-                <div class="flex-1 ml-2 text-[9px] font-mono text-slate-400 truncate">
-                  deenex.tech/r/{{ referralCode }}
-                </div>
-              </div>
-              <!-- Mock hero -->
-              <div class="p-5 bg-gradient-to-br from-primary/[0.04] to-transparent">
-                <div class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-700 text-[9px] font-black uppercase tracking-widest mb-3">
-                  <Gift class="w-2.5 h-2.5" />
-                  {{ greeting || 'Tu amigo' }} te invitó · 25% off
-                </div>
-                <p class="text-base font-extrabold tracking-tight text-slate-900 leading-tight mb-1.5">
-                  Te dejó el primer mes con<br />
-                  <span class="text-emerald-600">25% off en Deenex.</span>
-                </p>
-                <p class="text-[11px] text-slate-500 leading-snug mb-3">
-                  Activá tu cuenta antes del {{ referralExpiry }} y arrancás con el descuento aplicado automáticamente al primer cargo.
-                </p>
-                <div class="bg-primary text-white text-center px-3 py-2 rounded-lg text-[10px] font-bold">
-                  Activar mi trial con 25% off →
-                </div>
-                <p class="text-[9px] text-slate-400 mt-2 italic">
-                  Vista previa · así lo ven tus contactos
-                </p>
-              </div>
-            </div>
-          </Transition>
-        </div>
-      </div>
+    <!-- Auto-redirect notice: indica que vamos a llevarlo al admin en X segs -->
+    <div v-if="!isEnterprise && provisioningDone" class="rounded-2xl bg-emerald-50 border border-emerald-200 p-4 mb-4 flex items-center gap-3">
+      <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse shrink-0" aria-hidden="true"></span>
+      <p class="text-sm text-slate-700 leading-snug flex-1">
+        <span class="font-bold text-emerald-700">Te llevamos a tu dashboard</span>
+        en 5 segundos. O entrá ahora con el botón de abajo.
+      </p>
     </div>
 
     <!-- Enterprise CTA: ofrecemos DOS canales (calendar + WhatsApp) porque
@@ -412,9 +326,9 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useRoute } from 'vue-router'
-import { Check, CalendarDays, ArrowRight, MessageCircle, Mail, Clock, Gift, Eye } from 'lucide-vue-next'
+import { Check, CalendarDays, ArrowRight, MessageCircle, Mail, Clock } from 'lucide-vue-next'
 import ConfettiCanvas from '@/components/onboarding/ConfettiCanvas.vue'
 import ActivationOverlay from '@/components/onboarding/ActivationOverlay.vue'
 import { useOnboarding } from '@/composables/useOnboarding'
@@ -427,8 +341,10 @@ const isEnterprise = computed(() => {
   return route.query.enterprise === '1' || onboarding.state.plan.key === 'enterprise'
 })
 
-// URLs del entorno
-const DASHBOARD_BASE = import.meta.env.VITE_APP_DASHBOARD_URL || 'https://app.deenex.tech'
+// URLs del entorno. El default apunta al admin de desarrollo (que YA tiene el
+// branding multi-tenant funcionando). Cuando exista app.deenex.tech con session
+// handoff propio, podemos cambiar la default. Por env: VITE_APP_DASHBOARD_URL.
+const DASHBOARD_BASE = import.meta.env.VITE_APP_DASHBOARD_URL || 'https://administrador.desarrollo.deenex.tech'
 // Fallback: si no hay calendar URL configurado (dev local sin .env), caemos a
 // WhatsApp en vez de a "#" (anchor vacío que dejaba al lead bailando).
 const calendarUrl = import.meta.env.VITE_CALENDAR_URL || whatsappLink(
@@ -528,65 +444,12 @@ function trackNextStepClick(key) {
   onboarding.track('next_step_click', { step: key })
 }
 
-// ── Referral ─────────────────────────────────────────────────────────────
-// Código único: slug + nonce random de 5 chars. Evita colisiones entre
-// dos marcas con el mismo nombre (ej. "Glorias" en BA vs Córdoba).
-const REFERRAL_NONCE_KEY = 'deenex_referral_nonce'
-function getOrCreateNonce() {
-  if (typeof window === 'undefined') return 'abcde'
-  let n = localStorage.getItem(REFERRAL_NONCE_KEY)
-  if (!n) {
-    n = Math.random().toString(36).slice(2, 7)
-    try { localStorage.setItem(REFERRAL_NONCE_KEY, n) } catch { /* private browsing — ignorado */ }
-  }
-  return n
-}
-const referralCode = computed(() => {
-  const slug = onboarding.subdomainPreview.value
-  const base = slug && slug !== 'tu-marca' ? slug : 'amigo'
-  return `${base}-${getOrCreateNonce()}`
-})
-const referralLink = computed(() => `https://deenex.tech/r/${referralCode.value}`)
-const copied = ref(false)
-async function copyReferral() {
-  try {
-    await navigator.clipboard.writeText(referralLink.value)
-    copied.value = true
-    onboarding.track('referral_copied', { code: referralCode.value })
-    setTimeout(() => { copied.value = false }, 2000)
-  } catch {
-    // Clipboard fallido, UX queda igual, no rompemos nada.
-  }
-}
-const whatsappShareUrl = computed(() => {
-  const text = `Hola! Estoy probando Deenex y me parece muy útil para marcas gastronómicas. Te dejo mi link de referido, arrancás con 25% off el primer mes: ${referralLink.value}`
-  return `https://wa.me/?text=${encodeURIComponent(text)}`
-})
-const emailShareUrl = computed(() => {
-  const subject = 'Probá Deenex con 25% off el primer mes'
-  const body = `Estoy probando Deenex y me parece muy útil para marcas gastronómicas. Te dejo mi link de referido, arrancás con 25% off el primer mes: ${referralLink.value}`
-  return `mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`
-})
-function trackShare(channel) {
-  onboarding.track('referral_share', { channel, code: referralCode.value })
-}
-
-// Preview de lo que recibe el amigo invitado. Colapsable.
-const referralPreviewOpen = ref(false)
-const greeting = computed(() => onboarding.greeting.value)
-// Vencimiento simulado: 30 días desde hoy. En producción lo decide el backend
-// cuando crea el link de referido (`/api/onboarding/referral/create`).
-const referralExpiry = computed(() => {
-  const d = new Date()
-  d.setDate(d.getDate() + 30)
-  return new Intl.DateTimeFormat('es-AR', { day: 'numeric', month: 'short' }).format(d)
-})
-function toggleReferralPreview() {
-  referralPreviewOpen.value = !referralPreviewOpen.value
-  if (referralPreviewOpen.value) {
-    onboarding.track('referral_preview_opened', { code: referralCode.value })
-  }
-}
+// ── Referral REMOVIDO ─────────────────────────────────────────────────────
+// El bloque "¿Conocés otra marca?" + sharing por WhatsApp/email + preview se
+// movió al admin como widget sticky bottom-left (ReferralWidget). Razón: el
+// welcome del web hace auto-redirect al dashboard a los 5s — el lead no
+// tendría tiempo de interactuar con el referral acá. Adentro del admin queda
+// siempre visible y accionable cuando el lead lo necesite.
 
 // ── Resumen del plan + monto del próximo cargo ──────────────────────────
 const planSummary = computed(() => {
@@ -634,7 +497,33 @@ function onProvisioningComplete() {
   })
   // Confetti recién acá, después que el lead ve su URL viva (el wow moment real).
   setTimeout(() => { playConfetti.value = true }, 250)
+
+  // Auto-redirect al admin (dashboard): le damos 5s al lead para que vea el
+  // confetti + la URL viva ("Palta ya está viva"), después navegamos al admin
+  // con el session token. El admin muestra su propio welcome overlay con la
+  // URL del subdomain y el setup checklist (decisión de producto: el wow
+  // continúa adentro del dashboard, no afuera).
+  scheduleAutoRedirect()
 }
+
+// Lo guardamos en un ref para poder cancelarlo si el lead clickea manualmente
+// "Entrar al dashboard" antes de los 5s — evita doble navegación.
+let autoRedirectTimer = null
+function scheduleAutoRedirect() {
+  if (isEnterprise.value) return // Enterprise no auto-redirige (su flow es agendar)
+  if (autoRedirectTimer) clearTimeout(autoRedirectTimer)
+  autoRedirectTimer = setTimeout(() => {
+    onboarding.track('auto_redirect_to_dashboard', {
+      from: 'welcome_provisioning_complete',
+      subdomain: onboarding.subdomainPreview.value,
+    })
+    window.location.assign(dashboardUrl.value)
+  }, 5000)
+}
+
+onUnmounted(() => {
+  if (autoRedirectTimer) clearTimeout(autoRedirectTimer)
+})
 
 // ── Provisioning steps, mostrado como recap dentro de Welcome ──────────
 // Lista visual de qué pasó durante el overlay, queda como confirmación
