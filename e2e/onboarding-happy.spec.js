@@ -35,14 +35,15 @@ test.describe('Onboarding happy path', () => {
     await expect(page.getByRole('heading', { name: /Decinos quién sos/i })).toBeVisible()
   })
 
-  test('StepTrial → activation → Welcome (cubre ActivationOverlay R4-05)', async ({ page }) => {
-    // Seed state hasta plan completado, vamos directo a /activar.
-    // Las interacciones de form completo (Identity, Business, Savings, Plan)
-    // están cubiertas por unit tests. Lo crítico de E2E acá es:
-    //   1. StepTrial renderiza con el plan correcto
-    //   2. Click "Activar" dispara ActivationOverlay
-    //   3. ActivationOverlay corre y emite @complete
-    //   4. Navega a /listo con cuenta marcada como activada
+  test('Plan → /listo: ActivationOverlay corre automático sin tarjeta → Welcome wow moment', async ({ page }) => {
+    // Wow-moment-first: el step de tarjeta (/activar) salió del flow. El lead
+    // pasa de Plan directo a /listo, donde el ActivationOverlay corre al mount
+    // SIN pedir tarjeta. Cuando termina, muestra el welcome con la URL viva.
+    // Lo crítico de E2E acá:
+    //   1. /listo renderiza con ActivationOverlay visible inmediatamente
+    //   2. El overlay corre y emite @complete
+    //   3. Welcome muestra el subdomain live + URL de la marca
+    //   4. No hay mención de "Primer cargo USD X" (sacamos el paywall)
     await seedOnboardingState(page, {
       identity: {
         fullName: 'Marcos Test',
@@ -66,22 +67,22 @@ test.describe('Onboarding happy path', () => {
       meta: { startedAt: new Date().toISOString(), completedSteps: ['identity', 'business', 'savings', 'plan'] },
     })
 
-    await page.goto('/comenzar/activar')
-    await expect(page.getByRole('heading', { name: /activá tu trial/i })).toBeVisible()
+    await page.goto('/comenzar/listo')
 
-    // El plan summary muestra el tier
-    await expect(page.getByText(/Tu plan/i)).toBeVisible()
-
-    // Click Activar — dispara onActivate (R4-06 try/catch wrap)
-    await page.getByRole('button', { name: /Activar mi cuenta con MercadoPago/i }).click()
-
-    // ActivationOverlay aparece (R4-05: role=dialog + aria-labelledby)
-    await expect(page.getByRole('dialog', { name: /Procesando pago|Activando|Conectando|Todo listo/i }))
+    // ActivationOverlay aparece inmediatamente (no hace falta click).
+    await expect(page.getByRole('dialog', { name: /Procesando|Activando|Conectando|Todo listo|Cuenta lista/i }))
       .toBeVisible({ timeout: 5_000 })
 
-    // Esperar a que el overlay termine (corre ~13s en sim) y navegue a Welcome
-    await expect(page).toHaveURL(/\/comenzar\/listo/, { timeout: 25_000 })
-    await expect(page.getByRole('heading', { name: /cuenta está activa|Empezás a operar/i })).toBeVisible()
+    // Esperar a que el overlay termine (corre ~13s en sim). Cuando termina, el
+    // welcome se revela con el subdomain prominente.
+    await expect(page.getByRole('heading', { name: /ya está viva|Marca Test/i }))
+      .toBeVisible({ timeout: 25_000 })
+
+    // Wow moment central: la URL de la marca está visible como link.
+    await expect(page.locator('code', { hasText: /\.deenex\.app/ }).first()).toBeVisible()
+
+    // Que NO aparezca el copy viejo del paywall — eso se movió al dashboard.
+    await expect(page.getByText(/Primer cargo/i)).not.toBeVisible()
   })
 
   test('Identity bloquea Continuar con email inválido (validación)', async ({ page }) => {

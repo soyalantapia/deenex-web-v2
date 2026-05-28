@@ -89,7 +89,7 @@
       <p :class="{ 'animate-rise': ready, 'opacity-0': !ready }"
         class="mt-3 text-[11px] text-slate-400 font-medium"
         style="animation-delay:0.45s">
-        Sin cargo durante 14 días · Cancelás en 1 click · Setup en menos de 30 min
+        Empezás sin tarjeta · 14 días gratis · Cancelás en 1 click
       </p>
 
       <!-- Social Proof -->

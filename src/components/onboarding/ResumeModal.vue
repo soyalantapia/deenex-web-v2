@@ -82,7 +82,7 @@ const props = defineProps({
       lastActivity: '',
     }),
   },
-  totalSteps: { type: Number, default: 6 },
+  totalSteps: { type: Number, default: 5 },
 })
 
 const emit = defineEmits(['resume', 'startOver', 'decline'])

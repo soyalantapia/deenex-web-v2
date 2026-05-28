@@ -13,21 +13,21 @@
             Trial 14 días
           </div>
           <h3 class="text-xl font-extrabold tracking-tighter text-slate-900 mb-3 leading-tight">
-            Sin cargo hoy.<br />
-            <span class="text-primary italic font-light">Cancelás cuando quieras.</span>
+            Empezá gratis.<br />
+            <span class="text-primary italic font-light">Pagás cuando vendas.</span>
           </h3>
           <ul class="space-y-3 text-sm text-slate-600 leading-relaxed">
             <li class="flex items-start gap-2.5">
               <span class="w-5 h-5 rounded-full bg-primary/10 flex items-center justify-center shrink-0 mt-0.5">
                 <Check class="w-3 h-3 text-primary" />
               </span>
-              Setup en menos de 30 minutos. Te guía un CSM real.
+              Activás tu app sin tarjeta. La pedimos cuando actives cobros reales.
             </li>
             <li class="flex items-start gap-2.5">
               <span class="w-5 h-5 rounded-full bg-primary/10 flex items-center justify-center shrink-0 mt-0.5">
                 <Check class="w-3 h-3 text-primary" />
               </span>
-              Recién al día 15 del trial te cobramos con MercadoPago. Antes no pagás nada.
+              14 días para cargar menú, branding y probar pedidos en modo demo.
             </li>
             <li class="flex items-start gap-2.5">
               <span class="w-5 h-5 rounded-full bg-primary/10 flex items-center justify-center shrink-0 mt-0.5">

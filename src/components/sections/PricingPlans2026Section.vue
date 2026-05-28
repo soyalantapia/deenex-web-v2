@@ -302,7 +302,7 @@ const faqs = [
   },
   {
     q: '¿Cuánto dura el trial gratis?',
-    a: '14 días para todos los planes. Activás con MercadoPago pero el primer cargo es recién al día 15. Si cancelás antes, no te cobramos nada.',
+    a: 'Arrancás sin tarjeta. Activás tu app y la cargás con menú, branding y configuración. Te pedimos forma de pago recién cuando quieras empezar a recibir cobros reales (el trial sin tarjeta dura 14 días).',
   },
   {
     q: '¿Puedo cambiar de plan después?',

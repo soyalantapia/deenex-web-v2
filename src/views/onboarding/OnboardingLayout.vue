@@ -361,12 +361,14 @@ const onboarding = useOnboarding()
 // Flow: identity → business → savings → plan → trial → welcome (6 steps).
 // El step 'preview' (sandbox) fue removido para reducir fricción. El step
 // 'savings' separa la presentación del ahorro de la elección del plan.
+// Wow-moment-first: el step 'trial' (pedido de tarjeta) salió del flow. La
+// activación ocurre automáticamente en welcome via ActivationOverlay, sin
+// tarjeta. El paywall se movió al dashboard. Quedaron 5 steps en lugar de 6.
 const steps = [
   { key: 'identity', label: 'Vos', path: '/comenzar' },
   { key: 'business', label: 'Tu marca', path: '/comenzar/negocio' },
   { key: 'savings', label: 'Tu ahorro', path: '/comenzar/ahorro' },
   { key: 'plan', label: 'Plan', path: '/comenzar/plan' },
-  { key: 'trial', label: 'Activar', path: '/comenzar/activar' },
   { key: 'welcome', label: 'Listo', path: '/comenzar/listo' },
 ]
 

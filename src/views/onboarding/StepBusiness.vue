@@ -3,7 +3,7 @@
        buen respiro para los grids de POS/canales sin que queden anchísimos. -->
   <form @submit.prevent="onSubmit" novalidate v-autofocus class="max-w-2xl">
     <p class="text-[11px] font-black text-primary uppercase tracking-[0.2em] mb-3">
-      Paso 2 de 6
+      Paso 2 de 5
     </p>
     <h1 class="text-[clamp(1.8rem,4vw,2.6rem)] font-extrabold tracking-tighter leading-[1.05] text-slate-900 mb-4">
       <template v-if="onboarding.greeting.value">{{ onboarding.greeting.value }}, contanos<br /></template>

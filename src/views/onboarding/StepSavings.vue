@@ -8,7 +8,7 @@
   -->
   <form @submit.prevent="onContinue" novalidate>
     <p class="text-[11px] font-black text-primary uppercase tracking-[0.2em] mb-3">
-      Paso 3 de 6
+      Paso 3 de 5
     </p>
     <!-- Sin <br /> entre el greeting y "cuánto ahorrás", el lead lee la
          frase como una sola idea ("Alan, mirá cuánto ahorrás."). El span

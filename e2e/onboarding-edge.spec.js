@@ -123,8 +123,12 @@ test.describe('Onboarding · keyboard a11y', () => {
   test('Tab navega entre fields de StepIdentity sin escapar al footer', async ({ page }) => {
     await page.goto('/comenzar')
 
-    // El primer focusable principal debería ser el nombre input. v-autofocus
-    // ya lo focusea on mount; igual lo aseguramos.
+    // El v-autofocus directive del form tiene setTimeout(380ms) que mueve el
+    // foco al primer input. Si tabbeamos antes, hay race condition: el foco
+    // queda en email, luego setTimeout dispara y vuelve a nombre, el blur de
+    // email dispara validate → error visible → toBeFocused falla.
+    // Esperamos a que el autofocus complete antes de hacer cualquier Tab.
+    await page.waitForTimeout(500)
     await page.getByLabel(/Tu nombre/i).focus()
 
     // Tab → email field

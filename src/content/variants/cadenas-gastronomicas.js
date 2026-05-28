@@ -577,7 +577,7 @@ export const pricingModel = {
     {
       num: '03',
       title: 'Empezás a enviar el link',
-      desc: 'Compartís tu link de marca con tus clientes y arrancan a pedir. 14 días gratis, cobro recién al día 15 si seguís.',
+      desc: 'Compartís tu link de marca con tus clientes y arrancan a pedir. 14 días gratis sin tarjeta, agregás cobros cuando estés listo.',
       durationLabel: '14 días gratis',
     },
   ],
@@ -606,9 +606,9 @@ export const pricingModel = {
   ],
 
   // ── Footer CTA ─────────────────────────────────────────────────
-  ctaTitle: 'Probalo 14 días, sin cargo.',
+  ctaTitle: 'Empezá gratis. Pagás cuando vendas.',
   ctaSubtitle:
-    'Activás con MercadoPago, no te cobramos nada hasta el día 15 y podés cancelar en 1 click. Sin permanencia, sin setup fee, sin letra chica.',
+    'Activás tu app sin tarjeta y la usás 14 días. Agregás MercadoPago cuando quieras empezar a vender. Sin permanencia, sin setup fee, sin letra chica.',
   ctaPrimaryLabel: 'Empezar mi trial',
   ctaSecondaryLabel: 'Hablar con ventas',
   ctaSecondaryHref: '#agendar',

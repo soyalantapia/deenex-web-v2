@@ -52,19 +52,24 @@ const router = createRouter({
           meta: { step: 'plan', requires: 'business' },
         },
         {
-          // El step sandbox/preview fue removido, el lead va directo de
-          // plan → activar para reducir fricción. La demo pública sigue
-          // viva en /demo para el A/B "see_demo" del hero CTA.
+          // Wow-moment-first: /activar (StepTrial con pedido de tarjeta) salió
+          // del flow. El lead va directo de Plan a /listo, donde corre el
+          // ActivationOverlay simulado SIN tarjeta. El paywall vive en el
+          // dashboard, después que el lead cargue su menú y vea valor real.
+          //
+          // Mantenemos el path para redirigir resume tokens viejos que tengan
+          // /activar guardado (links de magic-email, QR cross-device antiguos).
           path: 'activar',
-          name: 'onboarding-trial',
-          component: () => import('../views/onboarding/StepTrial.vue'),
-          meta: { step: 'trial', requires: 'plan' },
+          redirect: { name: 'onboarding-welcome' },
         },
         {
           path: 'listo',
           name: 'onboarding-welcome',
           component: () => import('../views/onboarding/StepWelcome.vue'),
-          meta: { step: 'welcome', requires: 'trial' },
+          // requires: 'plan' (era 'trial'). Ya no necesitamos que el lead haya
+          // pasado por el step de tarjeta para ver el welcome — el welcome ES
+          // la activación ahora.
+          meta: { step: 'welcome', requires: 'plan' },
         },
       ],
     },
@@ -138,7 +143,8 @@ router.beforeEach((to) => {
     completedSteps = []
   }
 
-  // Welcome con flag enterprise está permitido aunque "trial" no esté completo.
+  // Welcome con flag enterprise está permitido aunque "plan" no esté completo
+  // (Enterprise puede llegar directo desde el formulario corto pidiendo demo).
   if (to.name === 'onboarding-welcome' && to.query.enterprise === '1') {
     return true
   }
@@ -147,14 +153,14 @@ router.beforeEach((to) => {
     return true
   }
 
-  // Redirige al primer step pendiente.
-  const order = ['identity', 'business', 'plan', 'trial']
+  // Wow-moment-first: 'trial' salió del orden — la activación es automática
+  // en /listo ahora, sin tarjeta. El último step gateable es 'plan'.
+  const order = ['identity', 'business', 'plan']
   const pending = order.find((s) => !completedSteps.includes(s)) || 'identity'
   const map = {
     identity: '/comenzar',
     business: '/comenzar/negocio',
     plan: '/comenzar/plan',
-    trial: '/comenzar/activar',
   }
   return map[pending]
 })

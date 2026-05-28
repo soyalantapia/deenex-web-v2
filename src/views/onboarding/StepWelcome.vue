@@ -1,5 +1,16 @@
 <template>
   <div>
+    <!-- Wow-moment-first: ActivationOverlay corre al mount cuando el lead
+         llega desde Plan sin tarjeta. Cuando termina (~13s), onProvisioning
+         Complete marca el trial activado y revela el welcome content. -->
+    <ActivationOverlay
+      v-if="!isEnterprise"
+      :show="!provisioningDone"
+      :brand="onboarding.state.business.brand || 'tu marca'"
+      :subdomain="onboarding.subdomainPreview.value"
+      @complete="onProvisioningComplete"
+    />
+
     <!-- Confetti cañón doble, solo cuando no es Enterprise -->
     <ConfettiCanvas v-if="!isEnterprise && playConfetti" :duration="3500" :particle-count="160" />
 
@@ -12,7 +23,7 @@
       </div>
 
       <p class="text-[11px] font-black text-emerald-600 uppercase tracking-[0.2em] mb-3">
-        ¡Listo! · Paso 6 de 6
+        ¡Listo! · Paso 5 de 5
       </p>
 
       <h1 v-if="isEnterprise" class="text-[clamp(1.8rem,4vw,2.6rem)] font-extrabold tracking-tighter leading-[1.05] text-slate-900 mb-4">
@@ -21,9 +32,11 @@
         <span class="text-primary italic font-light">ya está en revisión.</span>
       </h1>
       <h1 v-else class="text-[clamp(1.8rem,4vw,2.6rem)] font-extrabold tracking-tighter leading-[1.05] text-slate-900 mb-4">
-        <template v-if="onboarding.greeting.value">¡Listo, {{ onboarding.greeting.value }}!<br /></template>
-        <template v-else>Tu cuenta está activa.<br /></template>
-        <span class="text-primary italic font-light">Empezás a operar ahora.</span>
+        <template v-if="onboarding.state.business.brand">
+          {{ onboarding.state.business.brand }}<br />
+        </template>
+        <template v-else>Tu marca<br /></template>
+        <span class="text-primary italic font-light">ya está viva.</span>
       </h1>
 
       <p v-if="isEnterprise" class="text-base text-slate-500 leading-relaxed max-w-md">
@@ -40,45 +53,62 @@
           para coordinar la implementación.
         </template>
       </p>
-      <p v-else class="text-base text-slate-500 leading-relaxed max-w-md">
-        Te mandamos las credenciales por email a
-        <span class="font-semibold text-slate-900">{{ onboarding.state.identity.email }}</span>.
-        Entrá al dashboard y configuremos tu marca juntos.
-      </p>
+      <!-- Wow-moment-first: subdomain prominente como prueba de valor real. -->
+      <div v-else class="space-y-3 max-w-md">
+        <a
+          :href="`https://${onboarding.subdomainPreview.value}.deenex.app`"
+          target="_blank"
+          rel="noopener"
+          @click="trackBrandUrlClick"
+          class="group inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-emerald-50 border-2 border-emerald-200 hover:border-emerald-400 transition-colors"
+        >
+          <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" aria-hidden="true"></span>
+          <code class="text-sm font-mono font-bold text-emerald-700">
+            {{ onboarding.subdomainPreview.value }}.deenex.app
+          </code>
+          <ArrowRight class="w-3.5 h-3.5 text-emerald-600 group-hover:translate-x-0.5 transition-transform" aria-hidden="true" />
+        </a>
+        <p class="text-base text-slate-500 leading-relaxed">
+          Tu app respondiendo en vivo. Compartila con tus clientes ahora —
+          el dashboard te espera para cargar el menú y empezar a recibir pedidos.
+        </p>
+      </div>
     </div>
 
-    <!-- Trial info, descriptivo, no agresivo. Antes era countdown ansiogénico. -->
+    <!-- Trial info, descriptivo, no agresivo. Wow-moment-first: el lead arrancó
+         SIN tarjeta. La tarjeta se pide en el dashboard cuando intente activar
+         cobros reales (decisión producto). Acá solo mostramos: hasta cuándo es
+         gratis explorar, y qué hace falta para vender. -->
     <div v-if="!isEnterprise" class="rounded-2xl bg-slate-50 border border-slate-200 p-5 mb-6">
       <div class="flex items-start gap-4">
         <Clock class="w-7 h-7 text-primary shrink-0 mt-0.5" />
         <div class="flex-1 min-w-0">
           <p class="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-1">
-            Tu trial es hasta el
+            Tu trial sin tarjeta es hasta el
           </p>
           <p class="text-base font-bold text-slate-900 leading-tight">
             {{ onboarding.firstChargeDateFormatted.value }}
           </p>
           <p class="text-xs text-slate-500 leading-snug mt-1">
-            Cancelás en 1 click hasta esa fecha sin cargos.
+            Hasta esa fecha podés cargar menú, configurar branding y probar
+            pedidos en modo demo. Cancelás en 1 click cuando quieras.
           </p>
         </div>
       </div>
-      <!-- Monto del próximo cargo explícito (antes faltaba). -->
+      <!-- Lo que viene cuando estés listo para vender. Sin presión upfront. -->
       <div class="mt-4 pt-4 border-t border-slate-200/70 flex items-baseline justify-between gap-3">
         <div>
           <p class="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-1">
-            Primer cargo
+            Para empezar a vender
           </p>
           <p class="text-sm text-slate-700">
-            <span class="font-bold tabular-nums">USD {{ Number(planSummary.monthlyFee).toLocaleString('es-AR') }}</span>
-            <span class="text-slate-400"> / mes</span>
+            <span class="font-semibold">Agregás tarjeta cuando actives cobros</span>
             <span class="text-slate-300 mx-1.5">·</span>
-            <span class="font-semibold tabular-nums">{{ planSummary.commissionPct }}%</span>
-            <span class="text-slate-400"> en delivery</span>
+            <span class="text-slate-500">{{ planSummary.commissionPct }}% solo en delivery</span>
           </p>
         </div>
         <span class="text-[10px] font-bold text-emerald-600 uppercase tracking-widest whitespace-nowrap">
-          {{ daysUntilFirstCharge }} días
+          {{ daysUntilFirstCharge }} días gratis
         </span>
       </div>
     </div>
@@ -379,6 +409,7 @@ import { ref, computed, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 import { Check, CalendarDays, ArrowRight, MessageCircle, Mail, Clock, Gift, Eye } from 'lucide-vue-next'
 import ConfettiCanvas from '@/components/onboarding/ConfettiCanvas.vue'
+import ActivationOverlay from '@/components/onboarding/ActivationOverlay.vue'
 import { useOnboarding } from '@/composables/useOnboarding'
 import { CONTACT_EMAIL, whatsappLink } from '@/utils/contact'
 
@@ -572,16 +603,40 @@ const emailPreviewOpen = ref(false)
 
 const playConfetti = ref(false)
 
+// Wow-moment-first: el ActivationOverlay corre ACÁ (en Welcome) en lugar de
+// en StepTrial. Cuando el lead llega desde Plan, la cuenta NO está activada
+// todavía → mostramos el overlay con los 7 sub-pasos animados. Cuando termina,
+// marcamos el trial como activado SIN tarjeta (paymentChoice=null) y revelamos
+// el welcome content. Si el lead llega a Welcome con trial ya activado (resume,
+// refresh), saltamos el overlay y mostramos el welcome directo.
+//
+// Enterprise: siempre saltea el overlay — su flow es "solicitud en revisión",
+// no activación inmediata.
+const provisioningDone = ref(
+  isEnterprise.value || !!onboarding.state.trial.activatedAt,
+)
 
-// ── Provisioning steps, TODOS done desde el inicio en Welcome ─────────
-// El provisioning visual se hace ahora en ActivationOverlay (modal que
-// aparece después del click "Activar" en StepTrial). Cuando el lead llega
-// a Welcome, todos los pasos están terminados. Esta lista se muestra como
-// confirmación, no como progress en vivo.
+function onProvisioningComplete() {
+  // markTrialActivated con (paymentChoice=null, paymentRef=null) significa
+  // "trial activado sin tarjeta". El paywall vive ahora en el dashboard.
+  onboarding.markTrialActivated(null, null)
+  provisioningDone.value = true
+  onboarding.track('provisioning_complete', {
+    plan: onboarding.state.plan.key,
+    flow: 'wow_moment_first',
+  })
+  // Confetti recién acá, después que el lead ve su URL viva (el wow moment real).
+  setTimeout(() => { playConfetti.value = true }, 250)
+}
+
+// ── Provisioning steps, mostrado como recap dentro de Welcome ──────────
+// Lista visual de qué pasó durante el overlay, queda como confirmación
+// post-activación. Antes vivía en StepTrial; ahora es decorativa porque el
+// overlay completo ya hizo el trabajo visual.
 const provisioningTasks = ref([
   { key: 'account', label: 'Cuenta creada y guardada', status: 'done' },
   { key: 'subdomain', label: `Reservamos ${onboarding.subdomainPreview.value}.deenex.app`, status: 'done' },
-  { key: 'mp', label: 'Vinculación con MercadoPago', status: 'done' },
+  { key: 'branding', label: 'Branding aplicado a tu app', status: 'done' },
   { key: 'magic', label: 'Magic link enviado por email', status: 'done' },
 ])
 
@@ -612,18 +667,22 @@ onMounted(() => {
     onboarding.track('enterprise_request_submitted', {
       locations: onboarding.state.business.locations,
     })
-  } else {
-    onboarding.track('welcome_viewed', {
-      plan: onboarding.state.plan.key,
-    })
-    // Pequeño delay para que el confetti dispare después del paint inicial.
-    setTimeout(() => {
-      playConfetti.value = true
-    }, 200)
-    // startProvisioning() ya no se llama: el provisioning visual lo hace
-    // ActivationOverlay en el step anterior. Cuando llega acá, todo está done.
-    onboarding.track('provisioning_complete')
+    return
   }
+
+  onboarding.track('welcome_viewed', {
+    plan: onboarding.state.plan.key,
+    flow: 'wow_moment_first',
+    provisioning_already_done: provisioningDone.value,
+  })
+
+  // Si el lead llega con trial YA activado (resume / refresh dentro del welcome),
+  // disparamos confetti directo, sin esperar el overlay.
+  if (provisioningDone.value) {
+    setTimeout(() => { playConfetti.value = true }, 200)
+  }
+  // Sino, el overlay se monta solo (v-if en template) y onProvisioningComplete
+  // dispara el confetti cuando termine la animación de provisioning.
 })
 
 function trackDashboardClick() {
@@ -632,6 +691,14 @@ function trackDashboardClick() {
 
 function trackCsmClick() {
   onboarding.track('csm_click', { from: 'welcome' })
+}
+
+function trackBrandUrlClick() {
+  // El lead clickeó la URL viva de su marca — métrica core del wow moment.
+  onboarding.track('brand_url_click', {
+    subdomain: onboarding.subdomainPreview.value,
+    from: 'welcome_header',
+  })
 }
 
 </script>

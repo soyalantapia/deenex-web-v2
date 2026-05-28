@@ -5,14 +5,14 @@
     <ResumeModal
       :show="showResumeModal"
       :progress-summary="progressSummary"
-      :total-steps="6"
+      :total-steps="5"
       @resume="onResume"
       @start-over="onStartOver"
       @decline="showResumeModal = false"
     />
     <form @submit.prevent="onSubmit" novalidate v-autofocus>
     <p class="text-[11px] font-black text-primary uppercase tracking-[0.2em] mb-3">
-      Empezá gratis · Paso 1 de 6
+      Empezá gratis · Paso 1 de 5
     </p>
     <h1 class="text-[clamp(1.8rem,4vw,2.6rem)] font-extrabold tracking-tighter leading-[1.05] text-slate-900 mb-4">
       Decinos quién sos.<br />
@@ -146,28 +146,36 @@ onMounted(() => {
   // valida el token y restaura el snapshot completo antes de redirigir;
   // acá usamos el state ya persistido en localStorage (siempre disponible
   // porque el lead viene del mismo dispositivo o ya se hidrató en boot).
-  if (resumeToken && completed.includes('identity') && !completed.includes('trial')) {
+  //
+  // Wow-moment-first: el step 'trial' salió del flow — el último gateable
+  // antes del welcome es 'plan'. Si plan está completo, los mandamos a
+  // /listo donde corre el ActivationOverlay automático sin tarjeta.
+  if (resumeToken && completed.includes('identity') && !completed.includes('welcome')) {
     onboarding.track('resume_magic_link', {
       token: String(resumeToken).slice(0, 8) + '…',
       completed_count: completed.length,
     })
-    const pending = ['business', 'savings', 'plan', 'trial'].find(
+    const pending = ['business', 'savings', 'plan'].find(
       (s) => !completed.includes(s)
     )
     const map = {
       business: '/comenzar/negocio',
       savings: '/comenzar/ahorro',
       plan: '/comenzar/plan',
-      trial: '/comenzar/activar',
     }
     if (pending && map[pending]) {
       router.replace(map[pending])
       return
     }
+    // Plan ya está → activación pendiente: /listo se encarga del overlay.
+    if (completed.includes('plan')) {
+      router.replace('/comenzar/listo')
+      return
+    }
   }
 
   // Caso normal: hay progreso parcial → modal de bienvenida.
-  if (completed.includes('identity') && !completed.includes('trial')) {
+  if (completed.includes('identity') && !completed.includes('welcome')) {
     showResumeModal.value = true
     onboarding.track('resume_modal_shown', { completed_count: completed.length })
   }
@@ -176,17 +184,26 @@ onMounted(() => {
 function onResume() {
   showResumeModal.value = false
   onboarding.track('resume_accepted', { completed_count: onboarding.state.meta.completedSteps.length })
-  // Saltar al primer step incompleto
-  const pending = ['business', 'savings', 'plan', 'trial'].find(
-    (s) => !onboarding.state.meta.completedSteps.includes(s)
+  // Saltar al primer step incompleto. Wow-moment-first: si llegó a plan
+  // pero no a welcome, lo mandamos directo a /listo para que vea el
+  // ActivationOverlay y el wow moment.
+  const completed = onboarding.state.meta.completedSteps
+  const pending = ['business', 'savings', 'plan'].find(
+    (s) => !completed.includes(s),
   )
   const map = {
     business: '/comenzar/negocio',
     savings: '/comenzar/ahorro',
     plan: '/comenzar/plan',
-    trial: '/comenzar/activar',
   }
-  if (pending) router.push(map[pending])
+  if (pending && map[pending]) {
+    router.push(map[pending])
+    return
+  }
+  // Si plan está completo y welcome no, vamos a /listo (activation overlay).
+  if (completed.includes('plan') && !completed.includes('welcome')) {
+    router.push('/comenzar/listo')
+  }
 }
 
 function onStartOver() {
